@@ -1,21 +1,23 @@
+import MapView from 'react-native-maps';
 import { StyleSheet } from 'react-native';
 
-export default function TabOneScreen() {
+import { useLocation } from '@/hooks/useLocation';
+
+export default function MapScreen() {
+  const { location } = useLocation();
+
+  if (!location) return null;
+
+  return (
+    <MapView
+      style={styles.map}
+      initialRegion={location}
+    />
+  );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  map: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
   },
 });

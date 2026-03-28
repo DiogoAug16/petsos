@@ -1,4 +1,4 @@
-export const MOCK_COMPLAINTS = [
+const MOCK_COMPLAINTS = [
   {
     id: '1',
     title: 'Cachorro abandonado e ferido',
@@ -11,4 +11,9 @@ export const MOCK_COMPLAINTS = [
   },
 ];
 
-{/* teste com dado estatico, apagar quando fizer implementaçao real dos dados blz */}
+{/* Apagar o mock acima qd implementar os dados reais */ }
+
+export async function getComplaints() {
+  // TODO: substituir por fetch(`${API_URL}/complaints`)
+  return MOCK_COMPLAINTS;
+}

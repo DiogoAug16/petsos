@@ -50,7 +50,7 @@ export const mapScreenStyles = (colorScheme) => {
     fab: {
       position: 'absolute',
       right: 16,
-      bottom: 160,
+      bottom: 165,
       width: 52,
       height: 52,
       backgroundColor: '#FF6B35',
@@ -68,7 +68,7 @@ export const mapScreenStyles = (colorScheme) => {
     centerBtn: {
       position: 'absolute',
       right: 16,
-      bottom: 220,
+      bottom: 225,
       width: 52,
       height: 52,
       backgroundColor: isDark ? '#1C1C1E' : '#fff',
@@ -88,6 +88,7 @@ export const mapScreenStyles = (colorScheme) => {
       bottom: 0,
       left: 0,
       right: 0,
+      overflow: 'hidden',
       backgroundColor: isDark ? '#1C1C1E' : '#fff',
       borderTopLeftRadius: 24,
       borderTopRightRadius: 24,

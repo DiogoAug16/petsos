@@ -1,5 +1,5 @@
 import { BottomCard } from '@/components/bottom-card/bottom-card';
-import { useBottomCardAnimation } from '@/components/bottom-card/bottom-card.animation';
+import { useBottomCardAnimation } from '@/hooks/useBottomCardAnimation';
 import { FabButton } from '@/components/floating-buttons/create-complaint-button';
 import { CenterButton } from '@/components/floating-buttons/map-center-button';
 import { SearchBar } from '@/components/search-bar/search-bar';
@@ -42,8 +42,14 @@ export default function MapScreen() {
       <SearchBar style={styles} />
 
       <Animated.View style={{ transform: [{ translateY: buttonsTranslateY }] }}>
-        <CenterButton style={styles.centerBtn} onPress={centerOnUser} />
-        <FabButton style={styles.fab} onPress={() => console.log('Criar denúncia')} />
+        <CenterButton
+          style={styles.centerBtn}
+          onPress={() => {
+            console.log('Botão de centralizar clicado');
+            centerOnUser();
+          }}
+        />
+        <FabButton style={styles.fab} onPress={() => console.log('Botao criar denuncia clicado')} />
       </Animated.View>
 
       <BottomCard style={styles} complaint={nearestComplaint} animation={animation} />

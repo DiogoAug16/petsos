@@ -1,24 +1,29 @@
-import { mapScreenStyles } from '@/components/styles/mapScreen.styles.jsx';
-import { useColorScheme } from '@/components/useColorScheme.jsx';
-import { useLocation } from '@/hooks/useLocation.jsx';
-import { useRef } from 'react';
-import { View } from 'react-native';
-import MapView from 'react-native-maps';
 import { BottomCard } from '@/components/bottom-card/bottom-card';
-import { FabButton } from '@/components/floating-buttons/fab-button';
+import { useBottomCardAnimation } from '@/components/bottom-card/bottom-card.animation';
+import { FabButton } from '@/components/floating-buttons/create-complaint-button';
 import { CenterButton } from '@/components/floating-buttons/map-center-button';
 import { SearchBar } from '@/components/search-bar/search-bar';
-import { MOCK_COMPLAINTS } from '@/mocks/mocks-complaints';
+import { useColorScheme } from '@/hooks/useColorScheme.jsx';
+import { useComplaints } from '@/hooks/useComplaints';
+import { useFloatingButtonsAnimation } from '@/hooks/useFloatingButtonsAnimation';
+import { useLocation } from '@/hooks/useLocation.jsx';
+import { mapScreenStyles } from '@/styles/mapScreen.styles.jsx';
+import { useRef } from 'react';
+import { Animated, View } from 'react-native';
+import MapView from 'react-native-maps';
 
 export default function MapScreen() {
   const { location } = useLocation();
-  const colorScheme = useColorScheme() ?? 'light';
-  const styles = mapScreenStyles(colorScheme);
+  const colorScheme = useColorScheme();
+  const { complaints } = useComplaints();
   const mapRef = useRef(null);
+  const { translateY: buttonsTranslateY, animateTo } = useFloatingButtonsAnimation();
+  const animation = useBottomCardAnimation(160, animateTo);
 
   if (!location) return null;
 
-  const nearestComplaint = MOCK_COMPLAINTS[0];
+  const styles = mapScreenStyles(colorScheme);
+  const nearestComplaint = complaints[0];
 
   const centerOnUser = () => {
     mapRef.current?.animateToRegion(location, 500);
@@ -34,10 +39,14 @@ export default function MapScreen() {
         showsMyLocationButton={false}
       />
 
-      <SearchBar />
-      <CenterButton onPress={centerOnUser} />
-      <FabButton onPress={() => console.log('Criar denúncia')} />
-      <BottomCard complaint={nearestComplaint} />
+      <SearchBar style={styles} />
+
+      <Animated.View style={{ transform: [{ translateY: buttonsTranslateY }] }}>
+        <CenterButton style={styles.centerBtn} onPress={centerOnUser} />
+        <FabButton style={styles.fab} onPress={() => console.log('Criar denúncia')} />
+      </Animated.View>
+
+      <BottomCard style={styles} complaint={nearestComplaint} animation={animation} />
     </View>
   );
 }

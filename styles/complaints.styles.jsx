@@ -25,12 +25,14 @@ export const complaintsStyles = (colorScheme) => {
       backgroundColor: isDark ? '#1C1C1E' : '#fff',
       borderBottomWidth: 0.5,
       borderBottomColor: isDark ? '#3A3A3A' : '#E8E4DF',
+      flexDirection: 'row',              
+      justifyContent: 'space-between',  
+      alignItems: 'flex-start',        
     },
 
     headerTitle: {
       fontSize: 28,
       fontWeight: '700',
-      color: isDark ? '#fff' : '#1C1C1E',
     },
 
     headerSubtitle: {

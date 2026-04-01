@@ -10,21 +10,27 @@ export default function CreateComplaintScreen() {
   const [description, setDescription] = useState('');
 
   const {
-    imageUri,
-    pickImageFromGallery,
+    images,
+    pickImagesFromGallery,
     takePhoto,
-    removePhoto,
+    removeImage,
   } = usePhotoUpload();
 
   const handleSubmit = async () => {
     try {
+      console.log('Botao criar denuncia clicado');
+
       const payload = {
         title,
         description,
         type: 'outro',
-        latitude: -15.601411,
-        longitude: -56.097892,
-        imageUri,
+        animal: 'cachorro',
+        status: 'aberto',
+        location: {
+          latitude: -15.601411,
+          longitude: -56.097892,
+        },
+        imageUris: images,
       };
 
       const result = await createComplaint(payload);
@@ -33,7 +39,7 @@ export default function CreateComplaintScreen() {
       alert('Denúncia enviada com sucesso!');
     } catch (error) {
       console.log(error);
-      alert('Erro ao enviar denúncia');
+      alert(error.message || 'Erro ao enviar denúncia');
     }
   };
 
@@ -58,10 +64,10 @@ export default function CreateComplaintScreen() {
       />
 
       <PhotoPicker
-        imageUri={imageUri}
-        onPickGallery={pickImageFromGallery}
+        images={images}
+        onPickGallery={pickImagesFromGallery}
         onTakePhoto={takePhoto}
-        onRemove={removePhoto}
+        onRemove={removeImage}
       />
 
       <Button

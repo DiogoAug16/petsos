@@ -4,7 +4,7 @@ import { FabButton } from '@/components/floating-buttons/create-complaint-button
 import { CenterButton } from '@/components/floating-buttons/map-center-button';
 import { SearchBar } from '@/components/search-bar/search-bar';
 import { useColorScheme } from '@/hooks/useColorScheme.jsx';
-import { useComplaints } from '@/hooks/useComplaints';
+import { useComplaints } from '@/context/ComplaintsContext';
 import { useFloatingButtonsAnimation } from '@/hooks/useFloatingButtonsAnimation';
 import { useLocation } from '@/hooks/useLocation.jsx';
 import { mapScreenStyles } from '@/styles/mapScreen.styles.jsx';

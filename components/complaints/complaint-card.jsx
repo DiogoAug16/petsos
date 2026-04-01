@@ -5,6 +5,7 @@ import { Pressable, Text, View } from 'react-native';
 import { ANIMAL_EMOJI, STATUS_CONFIG, TYPE_CONFIG } from '@/constants/complaints.costants';
 import Animated from 'react-native-reanimated';
 import { useHaptics } from '@/hooks/useHaptics';
+import { Ionicons } from '@expo/vector-icons';
 
 export function ComplaintCard({ complaint, styles }) {
   const { animatedStyle, onPressIn, onPressOut } = usePressAnimation();
@@ -59,7 +60,10 @@ export function ComplaintCard({ complaint, styles }) {
 
             <View style={styles.cardDivider} />
             <View style={styles.cardFooter}>
-                <Text style={styles.cardDate}>{formatDate(complaint.createdAt)}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <Ionicons name="time-outline" size={14} style={styles.cardDate} />
+                  <Text style={styles.cardDate}>{formatDate(complaint.createdAt)}</Text>
+                </View>
                 <View style={styles[status.container]}>
                 <Text style={styles[status.text]}>{status.label}</Text>
                 </View>

@@ -57,7 +57,7 @@ export const mapScreenStyles = (colorScheme) => {
       borderRadius: 16,
       alignItems: 'center',
       justifyContent: 'center',
-      shadowColor: '#FF6B35',
+      shadowColor: '#000',
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.5,
       shadowRadius: 12,

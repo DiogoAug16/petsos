@@ -5,6 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
+import { ComplaintsProvider } from '@/context/ComplaintsContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 export { ErrorBoundary } from 'expo-router';
@@ -42,9 +43,11 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
+      <ComplaintsProvider>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+      </ComplaintsProvider>
     </ThemeProvider>
   );
 }

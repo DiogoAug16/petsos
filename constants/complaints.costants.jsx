@@ -33,11 +33,11 @@ export const STATUS_CONFIG = {
   aberto: {
     container: 'statusAberto',
     text: 'statusAbertoText',
-    label: 'Aberto',
+    label: '● Aberto',
   },
   resolvido: {
     container: 'statusResolvido',
     text: 'statusResolvidoText',
-    label: 'Resolvido',
+    label: '● Resolvido',
   },
 };

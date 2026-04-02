@@ -1,72 +1,110 @@
-import { Stack, router } from 'expo-router';
-import { useState } from 'react';
+import { Stack, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
 import {
-    Alert,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 
+import ComplaintBasicInfo from '../../components/complaints/ComplaintBasicInfo';
+import ComplaintLocation from '../../components/complaints/ComplaintLocation';
+import ComplaintTypeAnimal from '../../components/complaints/ComplaintTypeAnimal';
 import PhotoSection from '../../components/complaints/PhotoSection';
-import { ANIMAL_TYPES, COMPLAINT_TYPES } from '../../constants/complaintOptions';
+
+import { useLocation } from '../../hooks/useLocation';
 import { createComplaint } from '../../services/complaints.service';
-import {
-    buildComplaintLocation,
-    validateComplaintForm,
-} from '../../utils/complaintForm';
-import { useComplaints } from '../../context/ComplaintsContext';
+import { validateComplaintForm } from '../../utils/complaintForm';
 
 const COLORS = {
   background: '#F7F4F0',
-  card: '#FFFFFF',
   border: '#E8E4DF',
-  text: '#1C1C1E',
-  muted: '#8A8A8E',
-  placeholder: '#C0BCB8',
   orange: '#FF6B35',
-  green: '#1A936F',
-  danger: '#E63946',
+};
+
+// Estado inicial do formulário
+const INITIAL_FORM = {
+  title: '',
+  description: '',
+  type: 'abandono',
+  animal: '',
+  animalOther: '',
+  locationMode: 'auto',
+  photos: [],
 };
 
 export default function CreateComplaintScreen() {
-  const { refetch } = useComplaints();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [type, setType] = useState('abandono');
-  const [animal, setAnimal] = useState('');
-  const [animalOther, setAnimalOther] = useState('');
-  const [locationMode, setLocationMode] = useState('auto');
-  const [address, setAddress] = useState('');
-  const [photos, setPhotos] = useState([]);
+  const router = useRouter();
+
+  // Hook que captura localização automática
+  const { location } = useLocation();
+
+  const [form, setForm] = useState(INITIAL_FORM);
+
+  // Localização escolhida manualmente no mapa
+  const [manualLocation, setManualLocation] = useState(null);
+
+  // Controle de loading no envio
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const resetForm = () => {
-    setTitle('');
-    setDescription('');
-    setType('abandono');
-    setAnimal('');
-    setAnimalOther('');
-    setLocationMode('auto');
-    setAddress('');
-    setPhotos([]);
+  // Atualiza qualquer campo do formulário
+  const updateField = (field, value) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
+  // Reseta o formulário após envio
+  const resetForm = () => {
+    setForm(INITIAL_FORM);
+    setManualLocation(null);
+  };
+
+  // Quando entra no modo "map", define localização inicial no marcador
+  useEffect(() => {
+    if (form.locationMode === 'map' && location && !manualLocation) {
+      setManualLocation(location);
+    }
+  }, [form.locationMode, location, manualLocation]);
+
+  // Decide qual localização será enviada
+  const resolveLocation = () => {
+    if (form.locationMode === 'auto') {
+      return location || null;
+    }
+
+    if (form.locationMode === 'map') {
+      return manualLocation || null;
+    }
+
+    return null;
+  };
+
+  // Função principal de envio da denúncia
   const handleSubmit = async () => {
-    const validationError = validateComplaintForm({
-      title,
-      description,
-      type,
-      animal,
-      animalOther,
-      locationMode,
-      address,
-    });
+    // Validação do formulário
+    const validationError = validateComplaintForm(form);
 
     if (validationError) {
       Alert.alert('Validação', validationError);
+      return;
+    }
+
+    // Garante que localização automática foi obtida
+    if (form.locationMode === 'auto' && !location) {
+      Alert.alert(
+        'Localização',
+        'Não foi possível obter a localização atual.'
+      );
+      return;
+    }
+
+    // Garante que usuário escolheu ponto no mapa
+    if (form.locationMode === 'map' && !manualLocation) {
+      Alert.alert('Mapa', 'Selecione um ponto no mapa.');
       return;
     }
 
@@ -75,26 +113,30 @@ export default function CreateComplaintScreen() {
     try {
       setIsSubmitting(true);
 
+      // Monta payload final para API
       const payload = {
-        title: title.trim(),
-        description: description.trim(),
-        type,
-        animal: animal === 'outro' ? animalOther.trim() : animal,
+        title: form.title.trim(),
+        description: form.description.trim(),
+        type: form.type,
+        animal:
+          form.animal === 'outro'
+            ? form.animalOther.trim()
+            : form.animal,
         status: 'aberto',
-        location: buildComplaintLocation(locationMode, address),
-        photos,
+        location: resolveLocation(),
+        photos: form.photos,
       };
 
       console.log('Payload da denúncia:', payload);
 
       await createComplaint(payload);
 
+      // Feedback + navegação
       Alert.alert('Sucesso', 'Denúncia criada com sucesso!', [
         {
           text: 'OK',
           onPress: () => {
             resetForm();
-            refetch();
             router.back();
           },
         },
@@ -107,69 +149,9 @@ export default function CreateComplaintScreen() {
     }
   };
 
-  const renderChip = (item, selectedValue, onSelect, activeColor) => {
-    const isActive = item.value === selectedValue;
-
-    return (
-      <Pressable
-        key={item.value}
-        onPress={() => onSelect(item.value)}
-        style={[
-          styles.chip,
-          isActive && {
-            backgroundColor: activeColor,
-            borderColor: activeColor,
-          },
-        ]}
-      >
-        <Text style={[styles.chipText, isActive && { color: '#fff' }]}>
-          {item.label}
-        </Text>
-      </Pressable>
-    );
-  };
-
-  const renderLocationOption = (mode, icon, titleText, subtitle) => {
-    const selected = locationMode === mode;
-
-    return (
-      <Pressable
-        onPress={() => setLocationMode(mode)}
-        style={[
-          styles.locationOption,
-          selected && styles.locationOptionSelected,
-        ]}
-      >
-        <View
-          style={[
-            styles.locationIcon,
-            selected && { backgroundColor: COLORS.green },
-          ]}
-        >
-          <Text style={styles.locationIconText}>{icon}</Text>
-        </View>
-
-        <View style={{ flex: 1 }}>
-          <Text
-            style={[
-              styles.locationTitle,
-              selected && { color: COLORS.green },
-            ]}
-          >
-            {titleText}
-          </Text>
-          <Text style={styles.locationSubtitle}>{subtitle}</Text>
-        </View>
-
-        <View style={[styles.radio, selected && styles.radioSelected]}>
-          {selected ? <View style={styles.radioInner} /> : null}
-        </View>
-      </Pressable>
-    );
-  };
-
   return (
     <>
+      {/* Configuração do header */}
       <Stack.Screen
         options={{
           title: 'Nova Denúncia',
@@ -179,7 +161,7 @@ export default function CreateComplaintScreen() {
               <Text
                 style={[
                   styles.headerButton,
-                  isSubmitting && styles.headerButtonDisabled,
+                  isSubmitting && styles.disabledText,
                 ]}
               >
                 {isSubmitting ? 'Enviando...' : 'Enviar'}
@@ -195,100 +177,55 @@ export default function CreateComplaintScreen() {
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.card}>
-            <Text style={styles.label}>
-              TÍTULO <Text style={styles.required}>*</Text>
-            </Text>
-            <TextInput
-              value={title}
-              onChangeText={setTitle}
-              placeholder="Ex: Cachorro abandonado e ferido"
-              placeholderTextColor={COLORS.placeholder}
-              style={styles.input}
-            />
-          </View>
+          {/* Dados básicos */}
+          <ComplaintBasicInfo
+            title={form.title}
+            description={form.description}
+            onChangeTitle={(value) => updateField('title', value)}
+            onChangeDescription={(value) =>
+              updateField('description', value)
+            }
+          />
 
-          <View style={styles.card}>
-            <Text style={styles.label}>
-              DESCRIÇÃO <Text style={styles.required}>*</Text>
-            </Text>
-            <TextInput
-              value={description}
-              onChangeText={setDescription}
-              placeholder="Descreva o caso com detalhes..."
-              placeholderTextColor={COLORS.placeholder}
-              multiline
-              textAlignVertical="top"
-              style={[styles.input, styles.textArea]}
-            />
-          </View>
+          {/* Tipo e animal */}
+          <ComplaintTypeAnimal
+            type={form.type}
+            animal={form.animal}
+            animalOther={form.animalOther}
+            onChangeType={(value) => updateField('type', value)}
+            onChangeAnimal={(value) => updateField('animal', value)}
+            onChangeAnimalOther={(value) =>
+              updateField('animalOther', value)
+            }
+          />
 
-          <View style={styles.card}>
-            <Text style={styles.label}>
-              TIPO DE DENÚNCIA <Text style={styles.required}>*</Text>
-            </Text>
-            <View style={styles.chipsContainer}>
-              {COMPLAINT_TYPES.map((item) =>
-                renderChip(item, type, setType, COLORS.orange)
-              )}
-            </View>
-          </View>
+          {/* Localização */}
+          <ComplaintLocation
+            locationMode={form.locationMode}
+            location={location}
+            manualLocation={manualLocation}
+            onChangeLocationMode={(value) =>
+              updateField('locationMode', value)
+            }
+            onChangeManualLocation={setManualLocation}
+          />
 
-          <View style={styles.card}>
-            <Text style={styles.label}>
-              TIPO DE ANIMAL <Text style={styles.required}>*</Text>
-            </Text>
+          {/* Fotos */}
+          <PhotoSection
+            photos={form.photos}
+            setPhotos={(value) => {
+              if (typeof value === 'function') {
+                updateField('photos', value(form.photos));
+                return;
+              }
 
-            <View style={styles.chipsContainer}>
-              {ANIMAL_TYPES.map((item) =>
-                renderChip(item, animal, setAnimal, COLORS.green)
-              )}
-            </View>
-
-            {animal === 'outro' && (
-              <TextInput
-                value={animalOther}
-                onChangeText={setAnimalOther}
-                placeholder="Qual animal?"
-                placeholderTextColor={COLORS.placeholder}
-                style={[styles.input, styles.otherAnimalInput]}
-              />
-            )}
-          </View>
-
-          <View style={styles.card}>
-            <Text style={styles.label}>
-              LOCALIZAÇÃO <Text style={styles.required}>*</Text>
-            </Text>
-
-            {renderLocationOption(
-              'auto',
-              '📍',
-              'Usar localização atual',
-              'Capturar automaticamente'
-            )}
-
-            {locationMode === 'text' && (
-              <TextInput
-                value={address}
-                onChangeText={setAddress}
-                placeholder="Ex: Rua das Flores, 142, Cuiabá"
-                placeholderTextColor={COLORS.placeholder}
-                style={[styles.input, styles.addressInput]}
-              />
-            )}
-
-            {renderLocationOption(
-              'map',
-              '🗺️',
-              'Marcar no mapa',
-              'Apontar manualmente onde ocorreu'
-            )}
-          </View>
-
-          <PhotoSection photos={photos} setPhotos={setPhotos} maxPhotos={5} />
+              updateField('photos', value);
+            }}
+            maxPhotos={5}
+          />
         </ScrollView>
 
+        {/* Botão fixo inferior */}
         <View style={styles.footer}>
           <Pressable
             style={[
@@ -327,121 +264,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
-  headerButtonDisabled: {
+  disabledText: {
     opacity: 0.7,
-  },
-  card: {
-    backgroundColor: COLORS.card,
-    borderRadius: 16,
-    padding: 14,
-    borderWidth: 0.5,
-    borderColor: COLORS.border,
-  },
-  label: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: COLORS.muted,
-    letterSpacing: 0.8,
-    marginBottom: 10,
-  },
-  required: {
-    color: COLORS.danger,
-  },
-  input: {
-    backgroundColor: COLORS.background,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderWidth: 0.5,
-    borderColor: COLORS.border,
-    color: COLORS.text,
-    fontSize: 14,
-  },
-  textArea: {
-    minHeight: 100,
-  },
-  chipsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  chip: {
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 20,
-    backgroundColor: COLORS.background,
-    borderWidth: 0.5,
-    borderColor: COLORS.border,
-  },
-  chipText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.muted,
-  },
-  otherAnimalInput: {
-    marginTop: 10,
-    borderWidth: 1.5,
-    borderColor: COLORS.green,
-  },
-  locationOption: {
-    backgroundColor: COLORS.background,
-    borderRadius: 12,
-    padding: 12,
-    borderWidth: 0.5,
-    borderColor: COLORS.border,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 8,
-  },
-  locationOptionSelected: {
-    borderWidth: 1.5,
-    borderColor: COLORS.green,
-    backgroundColor: 'rgba(26,147,111,0.06)',
-  },
-  locationIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: COLORS.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  locationIconText: {
-    fontSize: 16,
-  },
-  locationTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  locationSubtitle: {
-    fontSize: 11,
-    color: COLORS.muted,
-    marginTop: 2,
-  },
-  radio: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  radioSelected: {
-    backgroundColor: COLORS.green,
-    borderColor: COLORS.green,
-  },
-  radioInner: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#fff',
-  },
-  addressInput: {
-    marginTop: 8,
-    marginBottom: 8,
   },
   footer: {
     position: 'absolute',

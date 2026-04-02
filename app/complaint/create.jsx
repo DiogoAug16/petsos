@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import { useState } from 'react';
 import {
     Alert,
@@ -17,6 +17,7 @@ import {
     buildComplaintLocation,
     validateComplaintForm,
 } from '../../utils/complaintForm';
+import { useComplaints } from '../../context/ComplaintsContext';
 
 const COLORS = {
   background: '#F7F4F0',
@@ -31,6 +32,7 @@ const COLORS = {
 };
 
 export default function CreateComplaintScreen() {
+  const { refetch } = useComplaints();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [type, setType] = useState('abandono');
@@ -87,8 +89,16 @@ export default function CreateComplaintScreen() {
 
       await createComplaint(payload);
 
-      Alert.alert('Sucesso', 'Denúncia criada com sucesso!');
-      resetForm();
+      Alert.alert('Sucesso', 'Denúncia criada com sucesso!', [
+        {
+          text: 'OK',
+          onPress: () => {
+            resetForm();
+            refetch();
+            router.back();
+          },
+        },
+      ]);
     } catch (error) {
       console.log('Erro ao criar denúncia:', error);
       Alert.alert('Erro', 'Não foi possível criar a denúncia.');

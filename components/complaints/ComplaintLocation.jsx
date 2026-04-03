@@ -74,16 +74,15 @@ export default function ComplaintLocation({
 
       {locationMode === 'auto' && location && (
         <View style={styles.previewContainer}>
-          <Text style={styles.previewTitle}>Localização capturada</Text>
-
+          
           <View style={styles.mapContainer}>
             <MapView
               style={styles.map}
               initialRegion={{
                 latitude: location.latitude,
                 longitude: location.longitude,
-                latitudeDelta: 0.005,
-                longitudeDelta: 0.005,
+                latitudeDelta: 0.002,
+                longitudeDelta: 0.002,
               }}
               scrollEnabled={false}
               zoomEnabled={false}
@@ -99,12 +98,7 @@ export default function ComplaintLocation({
             </MapView>
           </View>
 
-          <Text style={styles.coordinatesText}>
-            Latitude: {location.latitude}
-          </Text>
-          <Text style={styles.coordinatesText}>
-            Longitude: {location.longitude}
-          </Text>
+        
         </View>
       )}
 
@@ -117,9 +111,7 @@ export default function ComplaintLocation({
 
       {locationMode === 'map' && currentMapLocation && (
         <View style={styles.previewContainer}>
-          <Text style={styles.previewTitle}>
-            Toque no mapa ou arraste o marcador
-          </Text>
+          
 
           <View style={styles.mapContainer}>
             <MapView
@@ -127,8 +119,8 @@ export default function ComplaintLocation({
               initialRegion={{
                 latitude: currentMapLocation.latitude,
                 longitude: currentMapLocation.longitude,
-                latitudeDelta: 0.005,
-                longitudeDelta: 0.005,
+                latitudeDelta: 0.002,
+                longitudeDelta: 0.002,
               }}
               onPress={(event) => {
                 const coords = event.nativeEvent.coordinate;
@@ -145,12 +137,6 @@ export default function ComplaintLocation({
             </MapView>
           </View>
 
-          <Text style={styles.coordinatesText}>
-            Latitude: {currentMapLocation.latitude}
-          </Text>
-          <Text style={styles.coordinatesText}>
-            Longitude: {currentMapLocation.longitude}
-          </Text>
         </View>
       )}
 
@@ -243,11 +229,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   previewContainer: {
-    marginTop: 8,
-    marginBottom: 8,
-    padding: 10,
-    borderRadius: 12,
-    backgroundColor: 'rgba(26,147,111,0.06)',
+    //marginTop: 8,
+   // marginBottom: 8,
+    //padding: 10,
+   // borderRadius: 12,
+    //backgroundColor: 'rgba(26,147,111,0.06)',
   },
   previewTitle: {
     fontSize: 12,
@@ -262,7 +248,7 @@ const styles = StyleSheet.create({
   },
   map: {
     width: '100%',
-    height: 180,
+    height: 220,
   },
   coordinatesText: {
     fontSize: 12,

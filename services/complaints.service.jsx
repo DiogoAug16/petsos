@@ -22,15 +22,15 @@ export async function createComplaint(data) {
   formData.append('location', JSON.stringify(data.location));
 
   //  MULTIPLAS FOTOS
-  if (data.imageUris && data.imageUris.length > 0) {
-    data.imageUris.forEach((uri, index) => {
-      formData.append('photos', {
-        uri,
-        name: `foto_${index}.jpg`,
-        type: 'image/jpeg',
-      });
-    });
-  }
+  data.photos.forEach((uri, index) => {
+  const fixedUri = uri.startsWith('file://') ? uri : 'file://' + uri;
+
+  formData.append('photos', {
+    uri: fixedUri,
+    name: `foto_${index}.jpg`,
+    type: 'image/jpeg',
+  });
+});
 
   return apiFetch('/complaints', {
     method: 'POST',

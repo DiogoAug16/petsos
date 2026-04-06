@@ -8,8 +8,9 @@ import { useHaptics } from '@/hooks/useHaptics';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { complaintsStyles } from '@/styles/complaints';
+import { memo } from 'react';
 
-export function ComplaintCard({ complaint}) {
+function ComplaintCardComponent({ complaint}) {
   const { animatedStyle, onPressIn, onPressOut } = usePressAnimation();
   const { address, loadingAddress } = useAddress(complaint.location);
   const { triggerHaptics } = useHaptics();
@@ -76,3 +77,5 @@ export function ComplaintCard({ complaint}) {
     </Pressable>
   );
 }
+
+export const ComplaintCard = memo(ComplaintCardComponent);

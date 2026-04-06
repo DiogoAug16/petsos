@@ -23,8 +23,6 @@ export const complaintsStyles = (colorScheme) => {
       paddingBottom: 16,
       paddingHorizontal: 20,
       backgroundColor: isDark ? '#1C1C1E' : '#fff',
-      borderBottomWidth: 0.5,
-      borderBottomColor: isDark ? '#3A3A3A' : '#E8E4DF',
       flexDirection: 'row',              
       justifyContent: 'space-between',  
       alignItems: 'flex-start',        
@@ -238,6 +236,43 @@ export const complaintsStyles = (colorScheme) => {
       fontSize: 13,
       color: '#8A8A8E',
       textAlign: 'center',
+    },
+
+    
+    // ── barra de pesquisa ──────────────────────────────────
+    searchContainer: {
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      backgroundColor: isDark ? '#1C1C1E' : '#fff',
+      borderBottomWidth: 0.5,
+      borderBottomColor: isDark ? '#3A3A3A' : '#E8E4DF',
+    },
+
+    searchBar: {
+      backgroundColor: isDark ? '#2C2C2E' : '#F7F4F0',
+      borderRadius: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      borderWidth: 0.5,
+      borderColor: isDark ? '#3A3A3A' : '#E8E4DF',
+    },
+
+    searchInput: {
+      flex: 1,
+      fontSize: 14,
+      color: isDark ? '#fff' : '#1C1C1E',
+    },
+
+    filterBtn: {
+      width: 30,
+      height: 30,
+      backgroundColor: '#FF6B35',
+      borderRadius: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
   });
 };

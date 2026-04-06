@@ -6,11 +6,15 @@ import { ANIMAL_EMOJI, STATUS_CONFIG, TYPE_CONFIG } from '@/constants/complaints
 import Animated from 'react-native-reanimated';
 import { useHaptics } from '@/hooks/useHaptics';
 import { Ionicons } from '@expo/vector-icons';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { complaintsStyles } from '@/styles/complaints.styles';
 
-export function ComplaintCard({ complaint, styles }) {
+export function ComplaintCard({ complaint}) {
   const { animatedStyle, onPressIn, onPressOut } = usePressAnimation();
   const { address, loadingAddress } = useAddress(complaint.location);
   const { triggerHaptics } = useHaptics();
+  const colorScheme = useColorScheme();
+  const styles = complaintsStyles(colorScheme);
 
   const type = TYPE_CONFIG[complaint.type] ?? TYPE_CONFIG.outro;
   const status = STATUS_CONFIG[complaint.status] ?? STATUS_CONFIG.aberto;

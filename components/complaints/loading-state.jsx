@@ -1,6 +1,11 @@
 import { ActivityIndicator, Text, View } from 'react-native';
+import { complaintsStyles } from '@/styles/complaints.styles';
+import { useColorScheme } from '@/hooks/useColorScheme';
 
-export function LoadingState({ styles }) {
+export function LoadingState() {
+  const colorScheme = useColorScheme();
+  const styles = complaintsStyles(colorScheme);
+
   return (
     <View style={styles.centered}>
       <ActivityIndicator size="large" color="#FF6B35" />

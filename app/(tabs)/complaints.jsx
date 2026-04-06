@@ -3,17 +3,23 @@ import { ComplaintsHeader } from '@/components/complaints/complaint-header';
 import { EmptyState } from '@/components/complaints/empty-state';
 import { ErrorState } from '@/components/complaints/error-state';
 import { LoadingState } from '@/components/complaints/loading-state';
+import { SearchBar } from '@/components/search-bar/search-bar';
 import { useComplaints } from '@/context/ComplaintsContext';
+import { useComplaintsSearchFilter } from '@/hooks/useComplaintsSearchFilter';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { complaintsStyles } from '@/styles/complaints.styles';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
 import { FlatList, RefreshControl, View } from 'react-native';
 
+const keyExtractor = (item) => String(item.id);
+const renderItem = ({ item }) => <ComplaintCard complaint={item} />;
+
 export default function ComplaintsScreen() {
   const colorScheme = useColorScheme();
   const styles = complaintsStyles(colorScheme);
   const { data, loading, refreshing, error, refetchSilent, refresh } = useComplaints();
+  const { search, setSearch, filteredData } = useComplaintsSearchFilter(data);
 
   useFocusEffect(
     useCallback(() => {
@@ -21,29 +27,26 @@ export default function ComplaintsScreen() {
     }, [refetchSilent])
   );
 
-  const renderItem = useCallback(
-    ({ item }) => <ComplaintCard complaint={item} styles={styles} />,
-    [styles],
-  );
-
-  const keyExtractor = useCallback((item) => String(item.id), []);
-
-  if (loading) return <LoadingState styles={styles} />;
-  if (error) return <ErrorState message={error} onRetry={refresh} styles={styles} />;
+  if (loading) return <LoadingState />;
+  if (error) return <ErrorState message={error} onRetry={refresh} />;
 
   return (
     <View style={styles.container}>
-      <ComplaintsHeader count={data.length} />
-
+      <ComplaintsHeader count={filteredData.length} />
+      <SearchBar
+        style={styles}
+        value={search}
+        onChangeText={setSearch}
+      />
       <FlatList
-        data={data}
+        data={filteredData}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         contentContainerStyle={[
           styles.listContent,
-          data.length === 0 && { flex: 1 },
+          filteredData.length === 0 && { flex: 1 },
         ]}
-        ListEmptyComponent={<EmptyState styles={styles} />}
+        ListEmptyComponent={<EmptyState />}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl

@@ -39,7 +39,7 @@ export default function MapScreen() {
         showsMyLocationButton={false}
       />
 
-      <SearchBar style={styles} />
+      <SearchBar style={styles} showFilterBtn />
 
       <Animated.View style={{ transform: [{ translateY: buttonsTranslateY }] }}>
         <CenterButton

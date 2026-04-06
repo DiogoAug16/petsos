@@ -188,6 +188,13 @@ export const complaintsStyles = (colorScheme) => {
       padding: 32,
     },
 
+    emptyStateContent: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 12,
+      padding: 32,
+    },
+
     loadingText: {
       fontSize: 13,
       color: '#8A8A8E',

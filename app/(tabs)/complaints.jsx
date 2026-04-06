@@ -45,25 +45,27 @@ export default function ComplaintsScreen() {
         onChangeText={setSearch}
       />
       <FilterChips activeChip={activeChip} onChipPress={setActiveChip} />
-      <FlatList
-        data={chipFilteredData}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        contentContainerStyle={[
-          styles.listContent,
-          chipFilteredData.length === 0 && { flex: 1 },
-        ]}
-        ListEmptyComponent={<EmptyState />}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={refresh}
-            tintColor="#FF6B35"
-            colors={['#FF6B35']}
-          />
-        }
-      />
+      {chipFilteredData.length === 0 ? (
+        <View style={styles.centered}>
+          <EmptyState />
+        </View>
+      ) : (
+        <FlatList
+          data={chipFilteredData}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={refresh}
+              tintColor="#FF6B35"
+              colors={['#FF6B35']}
+            />
+          }
+        />
+      )}
     </View>
   );
 }

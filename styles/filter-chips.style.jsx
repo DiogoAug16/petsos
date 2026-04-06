@@ -7,6 +7,8 @@ export const filterChipsStyles = (colorScheme) => {
 
   return StyleSheet.create({
     scrollWrapper: {
+      flexGrow: 0,
+      flexShrink: 0,
       backgroundColor: isDark ? '#1C1C1E' : '#fff',
       borderBottomWidth: 0.5,
       borderBottomColor: isDark ? '#3A3A3A' : '#E8E4DF',

@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { ANIMAL_TYPES, COMPLAINT_TYPES } from '../../constants/complaintOptions';
+import { ANIMAL_TYPES, COMPLAINT_TYPES } from '@/constants/complaints.costants';
 
 const COLORS = {
   background: '#F7F4F0',

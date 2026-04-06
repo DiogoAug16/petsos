@@ -188,6 +188,13 @@ export const complaintsStyles = (colorScheme) => {
       padding: 32,
     },
 
+    emptyStateContent: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 12,
+      padding: 32,
+    },
+
     loadingText: {
       fontSize: 13,
       color: '#8A8A8E',
@@ -237,15 +244,12 @@ export const complaintsStyles = (colorScheme) => {
       color: '#8A8A8E',
       textAlign: 'center',
     },
-
-    
+  
     // ── barra de pesquisa ──────────────────────────────────
     searchContainer: {
       paddingHorizontal: 16,
       paddingVertical: 10,
       backgroundColor: isDark ? '#1C1C1E' : '#fff',
-      borderBottomWidth: 0.5,
-      borderBottomColor: isDark ? '#3A3A3A' : '#E8E4DF',
     },
 
     searchBar: {

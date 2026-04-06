@@ -7,7 +7,7 @@ export function EmptyState() {
   const styles = complaintsStyles(colorScheme);
 
   return (
-    <View style={styles.centered}>
+    <View style={styles.emptyStateContent}>
       <Text style={styles.emptyIcon}>🐾</Text>
       <Text style={styles.emptyTitle}>Sem denúncias</Text>
       <Text style={styles.emptySubtitle}>

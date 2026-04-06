@@ -1,5 +1,5 @@
 import { Text, View, Image } from 'react-native';
-import { complaintsStyles } from '@/styles/complaints.styles';
+import { complaintsStyles } from '@/styles/complaints';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 const ICONS = {

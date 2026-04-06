@@ -7,7 +7,7 @@ import Animated from 'react-native-reanimated';
 import { useHaptics } from '@/hooks/useHaptics';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { complaintsStyles } from '@/styles/complaints.styles';
+import { complaintsStyles } from '@/styles/complaints';
 
 export function ComplaintCard({ complaint}) {
   const { animatedStyle, onPressIn, onPressOut } = usePressAnimation();

@@ -4,11 +4,12 @@ import { EmptyState } from '@/components/complaints/empty-state';
 import { ErrorState } from '@/components/complaints/error-state';
 import { FilterChips } from '@/components/filter-chips/filter-chips';
 import { LoadingState } from '@/components/complaints/loading-state';
+import { NewComplaintButton } from '@/components/complaints/new-complaint-button';
 import { SearchBar } from '@/components/search-bar/search-bar';
 import { useComplaints } from '@/context/ComplaintsContext';
 import { useComplaintsSearchFilter } from '@/hooks/useComplaintsSearchFilter';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { complaintsStyles } from '@/styles/complaints.styles';
+import { complaintsStyles } from '@/styles/complaints';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
 import { FlatList, RefreshControl, View } from 'react-native';
@@ -66,6 +67,7 @@ export default function ComplaintsScreen() {
           }
         />
       )}
+      <NewComplaintButton />
     </View>
   );
 }

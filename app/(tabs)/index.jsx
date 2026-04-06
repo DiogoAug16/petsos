@@ -7,7 +7,7 @@ import { useColorScheme } from '@/hooks/useColorScheme.jsx';
 import { useComplaints } from '@/context/ComplaintsContext';
 import { useFloatingButtonsAnimation } from '@/hooks/useFloatingButtonsAnimation';
 import { useLocation } from '@/hooks/useLocation.jsx';
-import { mapScreenStyles } from '@/styles/mapScreen.styles.jsx';
+import { mapScreenStyles } from '@/styles/mapScreen';
 import { useRef } from 'react';
 import { Animated, View } from 'react-native';
 import MapView from 'react-native-maps';

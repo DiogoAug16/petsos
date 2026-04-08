@@ -28,7 +28,7 @@ const COLORS = {
 const INITIAL_FORM = {
   title: '',
   description: '',
-  type: 'abandono',
+  type: '',
   animal: '',
   animalOther: '',
   locationMode: 'auto',
@@ -118,10 +118,7 @@ export default function CreateComplaintScreen() {
         title: form.title.trim(),
         description: form.description.trim(),
         type: form.type,
-        animal:
-          form.animal === 'outro'
-            ? form.animalOther.trim()
-            : form.animal,
+        animal: form.animal ,
         status: 'aberto',
         location: resolveLocation(),
         photos: form.photos,
@@ -156,18 +153,6 @@ export default function CreateComplaintScreen() {
         options={{
           title: 'Nova Denúncia',
           headerBackTitleVisible: false,
-          headerRight: () => (
-            <Pressable onPress={handleSubmit} disabled={isSubmitting}>
-              <Text
-                style={[
-                  styles.headerButton,
-                  isSubmitting && styles.disabledText,
-                ]}
-              >
-                {isSubmitting ? 'Enviando...' : 'Enviar'}
-              </Text>
-            </Pressable>
-          ),
         }}
       />
 
@@ -269,13 +254,14 @@ const styles = StyleSheet.create({
   },
   footer: {
     position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 20,
-    padding: 16,
+    left: -25,
+    right: -25,
+    bottom: 0,
+    padding: 35,
     backgroundColor: COLORS.background,
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
+    overflow: 'hidden', //  ESSENCIAL
   },
   submitButton: {
     backgroundColor: COLORS.orange,
@@ -283,6 +269,8 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     alignItems: 'center',
     justifyContent: 'center',
+     marginTop: -25, // sobe o botão
+    width: '100%', //  garante alinhamento correto
   },
   submitButtonDisabled: {
     opacity: 0.7,

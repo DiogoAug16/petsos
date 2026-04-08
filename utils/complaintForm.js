@@ -46,10 +46,6 @@ export function validateComplaintForm({
     return 'Selecione o tipo de animal.';
   }
 
-  if (animal === 'outro' && !animalOther.trim()) {
-    return 'Informe qual é o animal.';
-  }
-
   if (locationMode === 'text' && !address.trim()) {
     return 'Digite o endereço.';
   }

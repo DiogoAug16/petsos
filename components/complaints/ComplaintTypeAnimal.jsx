@@ -1,5 +1,5 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { ANIMAL_TYPES, COMPLAINT_TYPES } from '@/constants/complaints.costants';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 const COLORS = {
   background: '#F7F4F0',
@@ -16,10 +16,10 @@ const COLORS = {
 export default function ComplaintTypeAnimal({
   type,
   animal,
-  animalOther,
+//  animalOther,
   onChangeType,
   onChangeAnimal,
-  onChangeAnimalOther,
+  //onChangeAnimalOther,
 }) {
   const renderChip = (item, selectedValue, onSelect, activeColor) => {
     const isActive = item.value === selectedValue;
@@ -67,15 +67,6 @@ export default function ComplaintTypeAnimal({
           )}
         </View>
 
-        {animal === 'outro' && (
-          <TextInput
-            value={animalOther}
-            onChangeText={onChangeAnimalOther}
-            placeholder="Qual animal?"
-            placeholderTextColor={COLORS.placeholder}
-            style={[styles.input, styles.otherAnimalInput]}
-          />
-        )}
       </View>
     </>
   );
@@ -120,19 +111,5 @@ const styles = StyleSheet.create({
   chipTextActive: {
     color: '#fff',
   },
-  input: {
-    backgroundColor: COLORS.background,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderWidth: 0.5,
-    borderColor: COLORS.border,
-    color: COLORS.text,
-    fontSize: 14,
-  },
-  otherAnimalInput: {
-    marginTop: 10,
-    borderWidth: 1.5,
-    borderColor: COLORS.green,
-  },
+
 });

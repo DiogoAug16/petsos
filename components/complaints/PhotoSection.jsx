@@ -1,13 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-
-const COLORS = {
-  background: '#F7F4F0',
-  border: '#E8E4DF',
-  text: '#1C1C1E',
-  muted: '#8A8A8E',
-  placeholder: '#C0BCB8',
-};
+import { FORM_COLORS, formStyles } from '@/constants/FormStyles';
 
 export default function PhotoSection({ photos, setPhotos, maxPhotos = 5 }) {
   const pickFromGallery = async () => {
@@ -25,7 +18,7 @@ export default function PhotoSection({ photos, setPhotos, maxPhotos = 5 }) {
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsMultipleSelection: true,
         quality: 1,
         selectionLimit: maxPhotos - photos.length,
@@ -61,7 +54,7 @@ export default function PhotoSection({ photos, setPhotos, maxPhotos = 5 }) {
       }
 
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsEditing: true,
         quality: 1,
       });
@@ -86,9 +79,9 @@ export default function PhotoSection({ photos, setPhotos, maxPhotos = 5 }) {
   };
 
   return (
-    <View style={styles.card}>
+    <View style={formStyles.card}>
       <View style={styles.photosHeader}>
-        <Text style={styles.label}>FOTOS DE EVIDÊNCIA</Text>
+        <Text style={formStyles.label}>FOTOS DE EVIDÊNCIA</Text>
         <Text style={styles.counter}>
           {photos.length}/{maxPhotos}
         </Text>
@@ -131,20 +124,6 @@ export default function PhotoSection({ photos, setPhotos, maxPhotos = 5 }) {
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 14,
-    borderWidth: 0.5,
-    borderColor: COLORS.border,
-  },
-  label: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: COLORS.muted,
-    letterSpacing: 0.8,
-    marginBottom: 10,
-  },
   photosHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -152,7 +131,7 @@ const styles = StyleSheet.create({
   },
   counter: {
     fontSize: 11,
-    color: COLORS.muted,
+    color: FORM_COLORS.muted,
   },
   photoActions: {
     flexDirection: 'row',
@@ -160,15 +139,15 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   secondaryButton: {
-    backgroundColor: COLORS.background,
+    backgroundColor: FORM_COLORS.background,
     borderWidth: 0.5,
-    borderColor: COLORS.border,
+    borderColor: FORM_COLORS.border,
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 14,
   },
   secondaryButtonText: {
-    color: COLORS.text,
+    color: FORM_COLORS.text,
     fontWeight: '600',
     fontSize: 13,
   },
@@ -183,19 +162,19 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1.5,
     borderStyle: 'dashed',
-    borderColor: COLORS.border,
+    borderColor: FORM_COLORS.border,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.background,
+    backgroundColor: FORM_COLORS.background,
   },
   addPhotoPlus: {
     fontSize: 22,
-    color: COLORS.placeholder,
+    color: FORM_COLORS.placeholder,
     fontWeight: '400',
   },
   addPhotoText: {
     fontSize: 9,
-    color: COLORS.placeholder,
+    color: FORM_COLORS.placeholder,
   },
   photoWrapper: {
     width: 72,

@@ -1,18 +1,20 @@
+import { ANIMAL_EMOJI, STATUS_CONFIG, TYPE_CONFIG } from '@/constants/complaints.constants';
 import { useAddress } from '@/hooks/useAddress';
-import { formatDate } from '@/utils/date.utils';
-import { usePressAnimation } from '@/hooks/usePressAnimation';
-import { Pressable, Text, View } from 'react-native';
-import { ANIMAL_EMOJI, STATUS_CONFIG, TYPE_CONFIG } from '@/constants/complaints.costants';
-import Animated from 'react-native-reanimated';
-import { useHaptics } from '@/hooks/useHaptics';
-import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { useHaptics } from '@/hooks/useHaptics';
+import { usePressAnimation } from '@/hooks/usePressAnimation';
 import { complaintsStyles } from '@/styles/complaints';
+import { formatDate } from '@/utils/date.utils';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { memo } from 'react';
+import { Image, Pressable, Text, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 function ComplaintCardComponent({ complaint}) {
   const { animatedStyle, onPressIn, onPressOut } = usePressAnimation();
   const { address, loadingAddress } = useAddress(complaint.location);
+  const router = useRouter();
   const { triggerHaptics } = useHaptics();
   const colorScheme = useColorScheme();
   const styles = complaintsStyles(colorScheme);
@@ -26,16 +28,27 @@ function ComplaintCardComponent({ complaint}) {
     triggerHaptics('soft');
   };
 
+  const UPLOAD_URL = process.env.EXPO_PUBLIC_UPLOAD_URL;
+
   return (
     <Pressable
       onPressIn={handlePressIn}
       onPressOut={onPressOut}
-      onPress={() => {}}
+      onPress={() => router.push(`/complaint/${complaint.id}`)}
     >
         <Animated.View style={[styles.card, animatedStyle]}>
             <View style={styles.cardTop}>
+                
                 <View style={[styles.cardPhoto, { backgroundColor: type.photoColor }]}>
-                <Text style={styles.cardPhotoEmoji}>{emoji}</Text>
+                {complaint.photos?.length > 0 ? (
+                    <Image 
+                        source={{ uri: `${UPLOAD_URL}${complaint.photos[0]}` }} 
+                        style={styles.cardPhoto}
+                        resizeMode="cover"
+                    />
+                ) : (
+                    <Text style={styles.cardPhotoEmoji}>{emoji}</Text>)
+                }
                 </View>
 
                 <View style={styles.cardBody}>

@@ -1,17 +1,6 @@
-import { ANIMAL_TYPES, COMPLAINT_TYPES } from '@/constants/complaints.costants';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-
-const COLORS = {
-  background: '#F7F4F0',
-  card: '#FFFFFF',
-  border: '#E8E4DF',
-  text: '#1C1C1E',
-  muted: '#8A8A8E',
-  placeholder: '#C0BCB8',
-  orange: '#FF6B35',
-  green: '#1A936F',
-  danger: '#E63946',
-};
+import { ANIMAL_TYPES, COMPLAINT_TYPES } from '@/constants/complaints.constants';
+import { FORM_COLORS, formStyles } from '@/constants/FormStyles';
 
 export default function ComplaintTypeAnimal({
   type,
@@ -45,25 +34,25 @@ export default function ComplaintTypeAnimal({
 
   return (
     <>
-      <View style={styles.card}>
-        <Text style={styles.label}>
-          TIPO DE DENÚNCIA <Text style={styles.required}>*</Text>
+      <View style={formStyles.card}>
+        <Text style={formStyles.label}>
+          TIPO DE DENÚNCIA <Text style={formStyles.required}>*</Text>
         </Text>
         <View style={styles.chipsContainer}>
           {COMPLAINT_TYPES.map((item) =>
-            renderChip(item, type, onChangeType, COLORS.orange)
+            renderChip(item, type, onChangeType, FORM_COLORS.orange)
           )}
         </View>
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.label}>
-          TIPO DE ANIMAL <Text style={styles.required}>*</Text>
+      <View style={formStyles.card}>
+        <Text style={formStyles.label}>
+          TIPO DE ANIMAL <Text style={formStyles.required}>*</Text>
         </Text>
 
         <View style={styles.chipsContainer}>
           {ANIMAL_TYPES.map((item) =>
-            renderChip(item, animal, onChangeAnimal, COLORS.green)
+            renderChip(item, animal, onChangeAnimal, FORM_COLORS.green)
           )}
         </View>
 
@@ -73,23 +62,6 @@ export default function ComplaintTypeAnimal({
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: COLORS.card,
-    borderRadius: 16,
-    padding: 14,
-    borderWidth: 0.5,
-    borderColor: COLORS.border,
-  },
-  label: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: COLORS.muted,
-    letterSpacing: 0.8,
-    marginBottom: 10,
-  },
-  required: {
-    color: COLORS.danger,
-  },
   chipsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -99,14 +71,14 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderRadius: 20,
-    backgroundColor: COLORS.background,
+    backgroundColor: FORM_COLORS.background,
     borderWidth: 0.5,
-    borderColor: COLORS.border,
+    borderColor: FORM_COLORS.border,
   },
   chipText: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.muted,
+    color: FORM_COLORS.muted,
   },
   chipTextActive: {
     color: '#fff',

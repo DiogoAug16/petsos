@@ -39,7 +39,7 @@ export const ANIMAL_TYPES = [
   { label: 'Cachorro', value: 'cachorro' },
   { label: 'Gato', value: 'gato' },
   { label: 'Passaro', value: 'passaro' },
-  { label: 'Outros', value: 'outro' },
+  { label: 'Outro', value: 'outro' },
 ];
 
 export const ANIMAL_EMOJI = {

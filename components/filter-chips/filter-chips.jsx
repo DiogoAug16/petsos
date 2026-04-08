@@ -1,4 +1,4 @@
-import { FILTER_CHIPS } from '@/constants/complaints.costants';
+import { FILTER_CHIPS } from '@/constants/complaints.constants';
 import { filterChipsStyles } from '@/styles/filter-chips.style';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useHaptics } from '@/hooks/useHaptics';

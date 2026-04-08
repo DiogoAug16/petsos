@@ -47,18 +47,23 @@ for (let i = 0; i < data.photos.length; i++) {
   });
 
 }
-
-//Converte qualquer imagem para formato JPEG. Isso é útil para garantir
-//  compatibilidade, especialmente com fotos tiradas em iPhones que podem estar no formato HEIC.
 async function convertToJpg(uri) {
   const result = await ImageManipulator.manipulateAsync(
     uri,
     [],
     {
-      compress: 1, // mantém qualidade máxima (pode ajustar depois)
+      compress: 1,
       format: ImageManipulator.SaveFormat.JPEG,
     }
   );
 
   return result.uri;
+}
+
+export async function getComplaintById(id, signal) {
+  return await apiFetch(`/complaints/${id}`, { signal });
+}
+
+export async function deleteComplaint(id) {
+  return await apiFetch(`/complaints/${id}`, { method: 'DELETE' });
 }

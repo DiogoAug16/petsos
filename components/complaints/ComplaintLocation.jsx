@@ -1,15 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-
-const COLORS = {
-  background: '#F7F4F0',
-  card: '#FFFFFF',
-  border: '#E8E4DF',
-  text: '#1C1C1E',
-  muted: '#8A8A8E',
-  green: '#1A936F',
-  danger: '#E63946',
-};
+import { FORM_COLORS, formStyles } from '@/constants/FormStyles';
 
 export default function ComplaintLocation({
   locationMode,
@@ -34,7 +25,7 @@ export default function ComplaintLocation({
         <View
           style={[
             styles.locationIcon,
-            selected && { backgroundColor: COLORS.green },
+            selected && { backgroundColor: FORM_COLORS.green },
           ]}
         >
           <Text style={styles.locationIconText}>{icon}</Text>
@@ -44,7 +35,7 @@ export default function ComplaintLocation({
           <Text
             style={[
               styles.locationTitle,
-              selected && { color: COLORS.green },
+              selected && { color: FORM_COLORS.green },
             ]}
           >
             {titleText}
@@ -60,9 +51,9 @@ export default function ComplaintLocation({
   };
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.label}>
-        LOCALIZAÇÃO <Text style={styles.required}>*</Text>
+    <View style={formStyles.card}>
+      <Text style={formStyles.label}>
+        LOCALIZAÇÃO <Text style={formStyles.required}>*</Text>
       </Text>
 
       {renderLocationOption(
@@ -152,29 +143,12 @@ export default function ComplaintLocation({
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: COLORS.card,
-    borderRadius: 16,
-    padding: 14,
-    borderWidth: 0.5,
-    borderColor: COLORS.border,
-  },
-  label: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: COLORS.muted,
-    letterSpacing: 0.8,
-    marginBottom: 10,
-  },
-  required: {
-    color: COLORS.danger,
-  },
   locationOption: {
-    backgroundColor: COLORS.background,
+    backgroundColor: FORM_COLORS.background,
     borderRadius: 12,
     padding: 12,
     borderWidth: 0.5,
-    borderColor: COLORS.border,
+    borderColor: FORM_COLORS.border,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
@@ -182,14 +156,14 @@ const styles = StyleSheet.create({
   },
   locationOptionSelected: {
     borderWidth: 1.5,
-    borderColor: COLORS.green,
+    borderColor: FORM_COLORS.green,
     backgroundColor: 'rgba(26,147,111,0.06)',
   },
   locationIcon: {
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: COLORS.border,
+    backgroundColor: FORM_COLORS.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -202,11 +176,11 @@ const styles = StyleSheet.create({
   locationTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.text,
+    color: FORM_COLORS.text,
   },
   locationSubtitle: {
     fontSize: 11,
-    color: COLORS.muted,
+    color: FORM_COLORS.muted,
     marginTop: 2,
   },
   radio: {
@@ -214,13 +188,13 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 1.5,
-    borderColor: COLORS.border,
+    borderColor: FORM_COLORS.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   radioSelected: {
-    backgroundColor: COLORS.green,
-    borderColor: COLORS.green,
+    backgroundColor: FORM_COLORS.green,
+    borderColor: FORM_COLORS.green,
   },
   radioInner: {
     width: 8,
@@ -238,7 +212,7 @@ const styles = StyleSheet.create({
   previewTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.green,
+    color: FORM_COLORS.green,
     marginBottom: 8,
   },
   mapContainer: {
@@ -252,19 +226,19 @@ const styles = StyleSheet.create({
   },
   coordinatesText: {
     fontSize: 12,
-    color: COLORS.text,
+    color: FORM_COLORS.text,
     marginTop: 2,
   },
   infoBox: {
     marginTop: 8,
     padding: 10,
     borderRadius: 10,
-    backgroundColor: COLORS.background,
+    backgroundColor: FORM_COLORS.background,
     borderWidth: 0.5,
-    borderColor: COLORS.border,
+    borderColor: FORM_COLORS.border,
   },
   infoText: {
     fontSize: 12,
-    color: COLORS.muted,
+    color: FORM_COLORS.muted,
   },
 });

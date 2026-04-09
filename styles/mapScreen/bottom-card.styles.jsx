@@ -5,10 +5,12 @@ export const bottomCardStyles = (colorScheme) => {
 
   return StyleSheet.create({
     bottomCard: {
-      position: 'absolute',
+     position: 'absolute',
       bottom: 0,
       left: 0,
       right: 0,
+
+      height: 115,          // ALTURA FIXA (recomendado)
       overflow: 'hidden',
       backgroundColor: isDark ? '#1C1C1E' : '#fff',
       borderTopLeftRadius: 24,
@@ -16,6 +18,7 @@ export const bottomCardStyles = (colorScheme) => {
       paddingHorizontal: 20,
       paddingBottom: 25,
       paddingTop: 10,
+
       shadowColor: '#000',
       shadowOffset: { width: 0, height: -4 },
       shadowOpacity: 0.08,
@@ -29,15 +32,15 @@ export const bottomCardStyles = (colorScheme) => {
       backgroundColor: isDark ? '#3A3A3A' : '#E8E4DF',
       borderRadius: 2,
       alignSelf: 'center',
-      marginBottom: 14,
+      marginBottom: -10,
     },
 
     bottomTitle: {
-      fontSize: 11,
+      fontSize: 12,
       fontWeight: '700',
-      color: isDark ? '#8A8A8E' : '#8A8A8E',
+      color: isDark ? '#8a8b8e' : '#8A8A8E',
       letterSpacing: 1,
-      marginBottom: 12,
+      marginBottom: -3,
     },
 
     miniCard: {
@@ -69,7 +72,7 @@ export const bottomCardStyles = (colorScheme) => {
     },
     
     miniCardTitle: {
-      fontSize: 13,
+      fontSize: 10,
       fontWeight: '600',
       color: isDark ? '#fff' : '#1C1C1E',
       marginBottom: 3,

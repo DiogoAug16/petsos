@@ -67,3 +67,8 @@ export async function getComplaintById(id, signal) {
 export async function deleteComplaint(id) {
   return await apiFetch(`/complaints/${id}`, { method: 'DELETE' });
 }
+
+// Função para buscar denúncias próximas com base na localização
+export async function getNearbyComplaints(lat, lng, radiusKm = 5) {
+  return apiFetch(`/complaints/nearest?lat=${lat}&lng=${lng}&radiusKm=${radiusKm}`);
+}

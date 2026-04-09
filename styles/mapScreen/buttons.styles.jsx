@@ -37,5 +37,6 @@ export const buttonsStyles = (colorScheme) => {
       shadowRadius: 12,
       elevation: 8,
     },
+    
   });
 };

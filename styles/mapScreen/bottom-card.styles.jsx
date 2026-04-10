@@ -10,7 +10,7 @@ export const bottomCardStyles = (colorScheme) => {
       left: 0,
       right: 0,
 
-      height: 115,          // ALTURA FIXA (recomendado)
+      height: 158,
       overflow: 'hidden',
       backgroundColor: isDark ? '#1C1C1E' : '#fff',
       borderTopLeftRadius: 24,
@@ -32,15 +32,15 @@ export const bottomCardStyles = (colorScheme) => {
       backgroundColor: isDark ? '#3A3A3A' : '#E8E4DF',
       borderRadius: 2,
       alignSelf: 'center',
-      marginBottom: -10,
+      marginBottom: 14,
     },
 
     bottomTitle: {
-      fontSize: 12,
+      fontSize: 11,
       fontWeight: '700',
-      color: isDark ? '#8a8b8e' : '#8A8A8E',
+      color: isDark ? '#8A8A8E' : '#8A8A8E',
       letterSpacing: 1,
-      marginBottom: -3,
+      marginBottom: 12,
     },
 
     miniCard: {
@@ -72,7 +72,7 @@ export const bottomCardStyles = (colorScheme) => {
     },
     
     miniCardTitle: {
-      fontSize: 10,
+      fontSize: 13,
       fontWeight: '600',
       color: isDark ? '#fff' : '#1C1C1E',
       marginBottom: 3,

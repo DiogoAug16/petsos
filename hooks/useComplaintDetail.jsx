@@ -1,8 +1,8 @@
+import { useComplaints } from '@/context/ComplaintsContext';
+import { deleteComplaint, getComplaintById } from '@/services/complaints.service';
+import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert } from 'react-native';
-import { useRouter } from 'expo-router';
-import { deleteComplaint, getComplaintById } from '@/services/complaints.service';
-import { useComplaints } from '@/context/ComplaintsContext';
 
 export function useComplaintDetail(id) {
   const router = useRouter();

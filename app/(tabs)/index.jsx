@@ -7,9 +7,9 @@ import { useColorScheme } from '@/hooks/useColorScheme.jsx';
 import { useFloatingButtonsAnimation } from '@/hooks/useFloatingButtonsAnimation';
 import { useLocation } from '@/hooks/useLocation.jsx';
 import { useNearbyComplaints } from '@/hooks/useNearbyComplaints';
-import { useComplaintCarousel } from '@/hooks/useNearestComplaintsCarousel';
 import { mapScreenStyles } from '@/styles/mapScreen';
-import { useRef } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback, useRef } from 'react';
 import { Animated, View } from 'react-native';
 import MapView from 'react-native-maps';
 
@@ -23,8 +23,20 @@ export default function MapScreen() {
 
   const animation = useBottomCardAnimation(160, animateTo);
 
-  const { nearbyComplaints } = useNearbyComplaints(location, 5);
-  const { currentComplaint } = useComplaintCarousel(nearbyComplaints);
+  //  AQUI: pegar refetchNearby
+  const { nearbyComplaints, refetchNearby } = useNearbyComplaints(location, 5);
+
+  //  AQUI: atualizar ao voltar pra tela
+  useFocusEffect(
+    useCallback(() => {
+      refetchNearby();
+    }, [location])
+  );
+
+  const nearestComplaint =
+    nearbyComplaints && nearbyComplaints.length > 0
+      ? nearbyComplaints[0]
+      : null;
 
   if (!location) return null;
 
@@ -58,10 +70,10 @@ export default function MapScreen() {
         />
       </Animated.View>
 
-      {currentComplaint && (
+      {nearestComplaint && (
         <BottomCard
           style={styles}
-          complaint={currentComplaint}
+          complaint={nearestComplaint}
           animation={animation}
         />
       )}

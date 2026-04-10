@@ -15,10 +15,11 @@ export function BottomCard({ style, complaint, animation }) {
       <View style={style.bottomHandle} />
       <Text style={style.bottomTitle}>DENÚNCIA PRÓXIMA</Text>
 
-      <View style={style.cardWrapper}>
-      <ComplaintNearbyCard style={style} complaint={complaint} />
+      <View style={style.miniCard}>
+        <View style={style.innerBorder}>
+          <ComplaintNearbyCard style={style} complaint={complaint} />
+        </View>
       </View>
-
     </Animated.View>
   );
 }

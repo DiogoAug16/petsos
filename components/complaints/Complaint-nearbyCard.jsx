@@ -69,13 +69,8 @@ function ComplaintNearbyCardComponent({ complaint }) {
         </View>
 
         <View style={{ flex: 1, marginHorizontal: 12 }}>
-          <View style={[styles.badgeBase, styles[type.badge], { marginBottom: 6 }]}>
-            <Text style={[styles.badgeTextBase, styles[type.badgeText]]}>
-              {type.label}
-            </Text>
-          </View>
-
-          <Text numberOfLines={1} style={[styles.cardTitle, { fontSize: 15 }]}>
+        
+          <Text numberOfLines={1} style={[styles.cardTitle, { fontSize: 12 }]}>
             {complaint.title}
           </Text>
 

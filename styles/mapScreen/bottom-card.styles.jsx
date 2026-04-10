@@ -42,16 +42,31 @@ export const bottomCardStyles = (colorScheme) => {
       letterSpacing: 1,
       marginBottom: 12,
     },
+    
 
     miniCard: {
-      backgroundColor: isDark ? '#2C2C2E' : '#F7F4F0',
+      backgroundColor: isDark ? 'rgba(28,28,30,0.6)' : 'rgba(255,255,255,0.6)',
       borderRadius: 16,
-      padding: 12,
+      padding: 0, // padding interno real
       flexDirection: 'row',
       alignItems: 'center',
       gap: 12,
-      borderWidth: 1,
-      borderColor: isDark ? '#3A3A3A' : '#E8E4DF',
+
+      // sombra leve
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: isDark ? 0.2 : 0.05,
+      shadowRadius: 6,
+      elevation: 3,
+    },
+
+    innerBorder: {
+     flex: 1, // importante pra ocupar tudo
+     borderRadius: 14,
+     borderWidth: 1,
+     borderColor: isDark ? '#3A3A3A' : '#E8E4DF',
+     padding: 1,
+    backgroundColor: isDark ? '#1C1C1E' : '#fff',
     },
 
     miniCardPhoto: {
@@ -95,5 +110,13 @@ export const bottomCardStyles = (colorScheme) => {
       fontWeight: '700',
       color: '#E63946',
     },
+
+      miniCardSubtitle: {
+      fontSize: 13,
+      color: '#666',
+      flexShrink: 1, // ESSENCIAL
+    },
+
+
   });
 };

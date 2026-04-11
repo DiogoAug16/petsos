@@ -16,7 +16,7 @@ export const TYPE_CONFIG = {
     label: 'Abandono',
     badge: 'badgeAbandono',
     badgeText: 'badgeAbandonoText',
-    photoColor: '#FFD4B8',
+    photoColor: '#B8EFD8',
     emoji: '🐕',
   },
   negligencia: {
@@ -26,11 +26,25 @@ export const TYPE_CONFIG = {
     photoColor: '#B8EFD8',
     emoji: '🐈',
   },
+  'maus-tratos fisicos': {
+    label: 'Maus-tratos',
+    badge: 'badgeMausTratos',
+    badgeText: 'badgeMausTratosText',
+    photoColor: '#B8EFD8',
+    emoji: '🐕',
+  },
+  perdido: {
+    label: 'Animal perdido',
+    badge: 'badgeAnimalPerdido',
+    badgeText: 'badgeAnimalPerdidoText',
+    photoColor: '#B8EFD8',
+    emoji: '🐾',
+  },
   outro: {
     label: 'Outro',
     badge: 'badgeOutro',
     badgeText: 'badgeOutroText',
-    photoColor: '#FFE5CC',
+    photoColor: '#B8EFD8',
     emoji: '🐾',
   },
 };

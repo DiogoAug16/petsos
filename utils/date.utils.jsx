@@ -1,6 +1,32 @@
+export function getTimestampFromApiDate(value) {
+  if (!value) return Number.NaN;
+
+  if (value instanceof Date) return value.getTime();
+  if (typeof value === 'number') return value;
+
+  if (typeof value === 'object' && value.$date) {
+    return getTimestampFromApiDate(value.$date);
+  }
+
+  if (typeof value !== 'string') return Number.NaN;
+
+  const parsed = Date.parse(value);
+  if (!Number.isNaN(parsed)) return parsed;
+
+  const [datePart, timePart = '00:00:00'] = value.trim().split(' ');
+  const [day, month, year] = datePart.split('/');
+
+  if (!day || !month || !year) return Number.NaN;
+
+  const normalizedYear = year.length === 2 ? `20${year}` : year;
+  const normalizedDate = `${normalizedYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${timePart}`;
+  return Date.parse(normalizedDate);
+}
+
 export function formatDate(isoString) {
-  if (!isoString) return '—';
-  const date = new Date(isoString);
+  const timestamp = getTimestampFromApiDate(isoString);
+  if (!Number.isFinite(timestamp)) return '—';
+  const date = new Date(timestamp);
   const now = new Date();
   const diffMs = now - date;
   const diffMin = Math.floor(diffMs / 60000);

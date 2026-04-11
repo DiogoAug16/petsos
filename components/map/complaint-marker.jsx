@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Marker } from 'react-native-maps';
 
-export const ComplaintMarker = ({ complaint }) => {
+export const ComplaintMarker = ({ complaint, onPress }) => {
   // Define a cor baseada no tipo (seguindo seu layout)
   const getTheme = (type) => {
     switch (type?.toLowerCase()) {
@@ -22,6 +22,9 @@ export const ComplaintMarker = ({ complaint }) => {
         latitude: Number(complaint.location?.latitude || 0),
         longitude: Number(complaint.location?.longitude || 0),
       }}
+      title={complaint.title}
+      description={complaint.type}
+      onPress={onPress}
       anchor={{ x: 0.5, y: 1 }} // Point to bottom center
       tracksViewChanges={false} // Melhora performance
     >
@@ -31,7 +34,9 @@ export const ComplaintMarker = ({ complaint }) => {
           size={16} 
           color={themeColor} 
         />
-        <Text style={styles.label}>{complaint.type}</Text>
+        <Text style={styles.label} numberOfLines={1}>
+          {complaint.title}
+        </Text>
         {/* Triângulo indicador inferior */}
         <View style={[styles.arrow, { borderTopColor: themeColor }]} />
       </View>

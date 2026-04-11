@@ -9,6 +9,7 @@ import { useLocation } from '@/hooks/useLocation.jsx';
 import { useNearbyComplaints } from '@/hooks/useNearbyComplaints';
 import { mapScreenStyles } from '@/styles/mapScreen';
 import { useFocusEffect } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Animated, View } from 'react-native';
 import MapView from 'react-native-maps';
@@ -17,6 +18,7 @@ import { ComplaintMarker } from '@/components/map/complaint-marker';
 import { getComplaints } from '@/services/complaints.service';
 
 export default function MapScreen() {
+  const router = useRouter();
   const { location } = useLocation();
   const colorScheme = useColorScheme();
   const mapRef = useRef(null);
@@ -105,6 +107,7 @@ export default function MapScreen() {
           <ComplaintMarker
             key={complaint.id || complaint._id}
             complaint={complaint}
+            onPress={() => router.push(`/complaint/${complaint.id || complaint._id}`)}
           />
         ))}
       </MapView>

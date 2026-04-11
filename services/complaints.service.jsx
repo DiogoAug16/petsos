@@ -66,6 +66,36 @@ export async function getComplaintById(id, signal) {
 
 export async function deleteComplaint(id) {
   return await apiFetch(`/complaints/${id}`, { method: 'DELETE' });
+  
+}
+
+// EDIÇÃO: Mudança para PATCH e JSON Puro
+export async function updateComplaint(id, data) {
+  const payload = {
+    title: data.title,
+    description: data.description,
+    type: data.type,
+    animal: data.animal,
+    status: data.status,
+    location: data.location
+      ? {
+          latitude: Number(data.location.latitude),
+          longitude: Number(data.location.longitude),
+        }
+      : undefined,
+  };
+
+  const cleanPayload = Object.fromEntries(
+    Object.entries(payload).filter(([_, value]) => value !== undefined)
+  );
+
+  return await apiFetch(`/complaints/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(cleanPayload),
+  });
 }
 
 // Função para buscar denúncias próximas com base na localização

@@ -24,8 +24,6 @@ export function useComplaintDetail(id) {
   }, [complaintFromCache]);
 
   const fetchComplaintDetails = useCallback(() => {
-    if (complaintFromCache?.description) return;
-
     const controller = new AbortController();
     setLoading(true);
     setError(null);
@@ -43,7 +41,7 @@ export function useComplaintDetail(id) {
       .finally(() => setLoading(false));
 
     return controller;
-  }, [id, complaintFromCache]);
+  }, [id]);
 
   useEffect(() => {
     const controller = fetchComplaintDetails();
@@ -55,8 +53,8 @@ export function useComplaintDetail(id) {
   }, [isHelping]);
 
   const handleEdit = useCallback(() => {
-    Alert.alert('Funcionalidade indisponível', 'Edição de denúncia em desenvolvimento.');
-  }, []);
+    router.push(`/complaint/create?edit=true&id=${id}`);
+  }, [router, id]);
 
   const handleOpenMap = useCallback((mapRef) => {
     setShowMapModal(true);

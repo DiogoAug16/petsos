@@ -8,6 +8,8 @@ export function SearchBar({
   value = '',
   onChangeText = () => {},
   showFilterBtn = false,
+  onFilterPress = () => {},
+  filterActive = false,
   showSortBtn = false,
   sortOrder = 'desc',
   onSortPress,
@@ -39,7 +41,10 @@ export function SearchBar({
           </TouchableOpacity>
         )}
         {showFilterBtn && (
-          <TouchableOpacity style={style.filterBtn}>
+          <TouchableOpacity
+            style={[style.filterBtn, filterActive ? style.filterBtnActive : null]}
+            onPress={onFilterPress}
+          >
             <Ionicons name="options-outline" size={18} color="#fff" />
           </TouchableOpacity>
         )}

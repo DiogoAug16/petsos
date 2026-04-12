@@ -83,6 +83,7 @@ export function useComplaintDetail(id) {
             setIsDeleting(true);
             try {
               await deleteComplaint(id);
+              Alert.alert('Sucesso', 'Denúncia excluída com sucesso!');
               router.back();
             } catch (_error) {
               Alert.alert('Erro', 'Não foi possível excluir a denúncia.');

@@ -116,6 +116,7 @@ export default function MapScreen() {
         <HighlightedCircle coordinate={highlightedCoordinate} />
 
         <ComplaintMarkersLayer
+          key={appliedType ?? 'all'}
           complaints={filteredComplaints}
           shouldRender={shouldShowComplaintMarkers}
           onMarkerPress={handleComplaintMarkerPress}

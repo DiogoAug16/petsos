@@ -1,5 +1,5 @@
+import { FORM_COLORS, formStyles } from '@/styles/form/form.styles';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
-import { FORM_COLORS, formStyles } from '@/constants/FormStyles';
 
 export default function ComplaintBasicInfo({
   title,

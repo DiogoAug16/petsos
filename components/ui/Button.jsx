@@ -1,5 +1,5 @@
+import Colors from '@/styles/theme/Colors';
 import { StyleSheet, Text, TouchableOpacity, useColorScheme } from 'react-native';
-import Colors from '../../constants/Colors';
 
 export default function Button({
   title,

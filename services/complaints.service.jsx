@@ -27,8 +27,6 @@ export async function createComplaint(data) {
   formData.append('status', data.status);
   formData.append('location', JSON.stringify(data.location));
 
-
-  //  MULTIPLAS FOTOS
   const convertedPhotos = await Promise.all(
     (Array.isArray(data.photos) ? data.photos : []).map(async (uri, index) => {
       const convertedUri = await convertToJpg(uri);
@@ -105,17 +103,16 @@ export async function deleteComplaint(id) {
   
 }
 
-// EDIÇÃO: Mudança para PATCH e JSON Puro
 export async function updateComplaint(id, data) {
+  const hasPhotosField = Array.isArray(data.photos);
+
   const payload = {
     title: data.title,
     description: data.description,
     type: data.type,
     animal: data.animal,
     status: data.status,
-    photos: Array.isArray(data.photos)
-      ? data.photos.filter((photo) => Boolean(photo))
-      : undefined,
+    photos: hasPhotosField ? data.photos.filter((photo) => Boolean(photo)) : undefined,
     location: data.location
       ? {
           latitude: Number(data.location.latitude),
@@ -124,31 +121,33 @@ export async function updateComplaint(id, data) {
       : undefined,
   };
 
-  const localPhotos = Array.isArray(payload.photos)
+  const localPhotos = hasPhotosField && Array.isArray(payload.photos)
     ? payload.photos.filter((photo) => isLocalPhotoUri(photo))
     : [];
 
-  const existingPhotos = Array.isArray(payload.photos)
+  const existingPhotos = hasPhotosField && Array.isArray(payload.photos)
     ? payload.photos.filter((photo) => !isLocalPhotoUri(photo))
     : [];
 
-  if (localPhotos.length > 0) {
-    const formData = new FormData();
-    formData.append('title', payload.title);
-    formData.append('description', payload.description);
-    formData.append('type', payload.type);
-    formData.append('animal', payload.animal);
+  const formData = new FormData();
+  formData.append('title', payload.title);
+  formData.append('description', payload.description);
+  formData.append('type', payload.type);
+  formData.append('animal', payload.animal);
 
-    if (payload.status !== undefined) {
-      formData.append('status', payload.status);
-    }
+  if (payload.status !== undefined) {
+    formData.append('status', payload.status);
+  }
 
-    if (payload.location) {
-      formData.append('location', JSON.stringify(payload.location));
-    }
+  if (payload.location) {
+    formData.append('location', JSON.stringify(payload.location));
+  }
 
+  if (hasPhotosField) {
     formData.append('existingPhotos', JSON.stringify(existingPhotos));
+  }
 
+  if (localPhotos.length > 0) {
     const convertedPhotos = await Promise.all(
       localPhotos.map(async (uri, index) => {
         const convertedUri = await convertToJpg(uri);
@@ -167,23 +166,11 @@ export async function updateComplaint(id, data) {
     convertedPhotos.forEach((photo) => {
       formData.append('photos', photo);
     });
-
-    return await apiFetch(`/complaints/${id}`, {
-      method: 'PATCH',
-      body: formData,
-    });
   }
-
-  const cleanPayload = Object.fromEntries(
-    Object.entries(payload).filter(([_, value]) => value !== undefined)
-  );
 
   return await apiFetch(`/complaints/${id}`, {
     method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(cleanPayload),
+    body: formData,
   });
 }
 

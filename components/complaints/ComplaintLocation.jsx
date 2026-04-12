@@ -1,6 +1,6 @@
+import { FORM_COLORS, formStyles } from '@/styles/form/form.styles';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import { FORM_COLORS, formStyles } from '@/constants/FormStyles';
 
 export default function ComplaintLocation({
   locationMode,

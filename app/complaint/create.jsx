@@ -130,6 +130,10 @@ export default function CreateComplaintScreen() {
           const complaint = normalizeComplaintResponse(response);
           const normalizedLocation = normalizeLocation(complaint?.location);
 
+          const loadedPhotos = Array.isArray(complaint?.photos)
+            ? complaint.photos.filter(Boolean)
+            : [];
+
           setForm({
             title: complaint?.title || '',
             description: complaint?.description || '',
@@ -137,9 +141,7 @@ export default function CreateComplaintScreen() {
             animal: normalizeAnimalType(complaint?.animal),
             animalOther: '',
             locationMode: normalizedLocation ? 'map' : 'auto',
-            photos: Array.isArray(complaint?.photos)
-              ? complaint.photos.filter(Boolean)
-              : [],
+            photos: loadedPhotos,
           });
           if (normalizedLocation) {
             setManualLocation(normalizedLocation);

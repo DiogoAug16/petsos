@@ -1,8 +1,8 @@
-import * as ImagePicker from 'expo-image-picker';
-import { Image } from 'expo-image';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { FORM_COLORS, formStyles } from '@/constants/FormStyles';
 import { useUploadUrl } from '@/hooks/useUploadUrl';
+import { FORM_COLORS, formStyles } from '@/styles/form/form.styles';
+import { Image } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function PhotoSection({ photos, setPhotos, maxPhotos = 5 }) {
   const uploadUrl = useUploadUrl();

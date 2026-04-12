@@ -1,6 +1,6 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { ANIMAL_TYPES, COMPLAINT_TYPES } from '@/constants/complaints.constants';
-import { FORM_COLORS, formStyles } from '@/constants/FormStyles';
+import { FORM_COLORS, formStyles } from '@/styles/form/form.styles';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 export default function ComplaintTypeAnimal({
   type,

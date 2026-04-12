@@ -16,11 +16,11 @@ import { ErrorState } from '@/components/complaints/error-state';
 import { LoadingState } from '@/components/complaints/loading-state';
 import { complaintsStyles } from '@/styles/complaints';
 
-import Colors from '@/constants/Colors';
 import { useAddress } from '@/hooks/useAddress';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useComplaintConfig } from '@/hooks/useComplaintConfig';
 import { useComplaintDetail } from '@/hooks/useComplaintDetail';
+import Colors from '@/styles/theme/Colors';
 
 export default function ComplaintDetailScreen() {
   const { id } = useLocalSearchParams();

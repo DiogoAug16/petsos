@@ -1,8 +1,8 @@
 import { Tabs } from 'expo-router';
 
-import Colors from '@/constants/Colors';
 import { AnimatedTabIcon } from '@/components/bottom-card/animated-tab-icon';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import Colors from '@/styles/theme/Colors';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme() ?? 'light';

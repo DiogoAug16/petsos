@@ -2,8 +2,12 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Marker } from 'react-native-maps';
+import { useColorScheme } from '@/hooks/useColorScheme';
 
 export const ComplaintMarker = ({ complaint, onPress }) => {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
+
   // Define a cor baseada no tipo (seguindo seu layout)
   const getTheme = (type) => {
     switch (type?.toLowerCase()) {
@@ -28,13 +32,22 @@ export const ComplaintMarker = ({ complaint, onPress }) => {
       anchor={{ x: 0.5, y: 1 }} // Point to bottom center
       tracksViewChanges={false} // Melhora performance
     >
-      <View style={[styles.container, { borderColor: themeColor }]}>
+      <View
+        style={[
+          styles.container,
+          {
+            borderColor: themeColor,
+            backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
+            shadowOpacity: isDark ? 0.4 : 0.2,
+          },
+        ]}
+      >
         <MaterialCommunityIcons 
           name={complaint.animal === 'Gato' ? 'cat' : 'dog'} 
           size={16} 
           color={themeColor} 
         />
-        <Text style={styles.label} numberOfLines={1}>
+        <Text style={[styles.label, { color: isDark ? '#F2F2F7' : '#333333' }]} numberOfLines={1}>
           {complaint.title}
         </Text>
         {/* Triângulo indicador inferior */}
@@ -68,7 +81,8 @@ const styles = StyleSheet.create({
   arrow: {
     position: 'absolute',
     bottom: -8,
-    alignSelf: 'center',
+    left: '50%',
+    marginLeft: -6,
     width: 0,
     height: 0,
     borderLeftWidth: 6,

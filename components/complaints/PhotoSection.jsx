@@ -1,8 +1,22 @@
 import * as ImagePicker from 'expo-image-picker';
-import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image } from 'expo-image';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { FORM_COLORS, formStyles } from '@/constants/FormStyles';
+import { useUploadUrl } from '@/hooks/useUploadUrl';
 
 export default function PhotoSection({ photos, setPhotos, maxPhotos = 5 }) {
+  const uploadUrl = useUploadUrl();
+
+  const resolvePhotoUri = (uri) => {
+    if (!uri) return '';
+    if (/^(https?:|file:|content:|data:)/i.test(uri)) return uri;
+    if (!uploadUrl) return uri;
+
+    const baseUrl = uploadUrl.endsWith('/') ? uploadUrl.slice(0, -1) : uploadUrl;
+    const path = uri.startsWith('/') ? uri : `/${uri}`;
+    return `${baseUrl}${path}`;
+  };
+
   const pickFromGallery = async () => {
     try {
       if (photos.length >= maxPhotos) {
@@ -20,7 +34,7 @@ export default function PhotoSection({ photos, setPhotos, maxPhotos = 5 }) {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images'],
         allowsMultipleSelection: true,
-        quality: 1,
+        quality: 0.8,
         selectionLimit: maxPhotos - photos.length,
       });
 
@@ -56,7 +70,7 @@ export default function PhotoSection({ photos, setPhotos, maxPhotos = 5 }) {
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ['images'],
         allowsEditing: true,
-        quality: 1,
+        quality: 0.8,
       });
 
       if (!result.canceled && result.assets?.length) {
@@ -106,9 +120,15 @@ export default function PhotoSection({ photos, setPhotos, maxPhotos = 5 }) {
             </Pressable>
           )}
 
-          {photos.map((uri) => (
-            <View key={uri} style={styles.photoWrapper}>
-              <Image source={{ uri }} style={styles.photo} />
+          {photos.map((uri, index) => (
+            <View key={`${uri}-${index}`} style={styles.photoWrapper}>
+              <Image
+                source={{ uri: resolvePhotoUri(uri) }}
+                style={styles.photo}
+                contentFit="cover"
+                cachePolicy="memory-disk"
+                transition={120}
+              />
               <Pressable
                 style={styles.removePhotoButton}
                 onPress={() => removePhoto(uri)}

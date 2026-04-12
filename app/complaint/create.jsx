@@ -1,5 +1,6 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import {
   Alert,
   Pressable,
@@ -16,6 +17,7 @@ import PhotoSection from '../../components/complaints/PhotoSection';
 
 import { useLocation } from '../../hooks/useLocation';
 import { createComplaint, getComplaintById, updateComplaint } from '../../services/complaints.service';
+import { ANIMAL_TYPES, COMPLAINT_TYPES } from '../../constants/complaints.constants';
 import { validateComplaintForm } from '../../utils/complaintForm';
 
 const COLORS = {
@@ -35,9 +37,72 @@ const INITIAL_FORM = {
   photos: [],
 };
 
+const normalizeText = (value) =>
+  String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
+const normalizeComplaintResponse = (response) =>
+  response?.data || response?.complaint || response;
+
+const normalizeLocation = (location) => {
+  const latitude = Number(location?.latitude);
+  const longitude = Number(location?.longitude);
+
+  if (Number.isNaN(latitude) || Number.isNaN(longitude)) {
+    return null;
+  }
+
+  return { latitude, longitude };
+};
+
+const normalizeComplaintType = (value) => {
+  const normalized = normalizeText(value);
+  if (!normalized) return '';
+
+  const directMatch = COMPLAINT_TYPES.find(
+    (item) =>
+      normalizeText(item.value) === normalized ||
+      normalizeText(item.label) === normalized
+  );
+
+  if (directMatch) return directMatch.value;
+
+  if (normalized.includes('maus')) return 'maus-tratos fisicos';
+  if (normalized.includes('neglig')) return 'negligencia';
+  if (normalized.includes('aband')) return 'abandono';
+  if (normalized.includes('perd')) return 'perdido';
+  if (normalized.includes('outro')) return 'outro';
+
+  return '';
+};
+
+const normalizeAnimalType = (value) => {
+  const normalized = normalizeText(value);
+  if (!normalized) return '';
+
+  const directMatch = ANIMAL_TYPES.find(
+    (item) =>
+      normalizeText(item.value) === normalized ||
+      normalizeText(item.label) === normalized
+  );
+
+  if (directMatch) return directMatch.value;
+
+  if (normalized.includes('cach') || normalized.includes('cao')) return 'cachorro';
+  if (normalized.includes('gat')) return 'gato';
+  if (normalized.includes('pass')) return 'passaro';
+  if (normalized.includes('outro')) return 'outro';
+
+  return '';
+};
+
 export default function CreateComplaintScreen() {
   const router = useRouter();
   const { edit, id } = useLocalSearchParams();
+  const complaintId = Array.isArray(id) ? id[0] : id;
 
   // Hook que captura localização automática
   const { location } = useLocation();
@@ -53,7 +118,7 @@ export default function CreateComplaintScreen() {
   // Controle de loading no carregamento para edição
   const [isLoadingEdit, setIsLoadingEdit] = useState(false);
 
-  const isEdit = edit === 'true' && id;
+  const isEdit = edit === 'true' && complaintId;
 
   // Carrega dados para edição
   useEffect(() => {
@@ -61,18 +126,23 @@ export default function CreateComplaintScreen() {
       const loadComplaint = async () => {
         try {
           setIsLoadingEdit(true);
-          const complaint = await getComplaintById(id);
+          const response = await getComplaintById(complaintId);
+          const complaint = normalizeComplaintResponse(response);
+          const normalizedLocation = normalizeLocation(complaint?.location);
+
           setForm({
-            title: complaint.title || '',
-            description: complaint.description || '',
-            type: complaint.type || '',
-            animal: complaint.animal || '',
+            title: complaint?.title || '',
+            description: complaint?.description || '',
+            type: normalizeComplaintType(complaint?.type),
+            animal: normalizeAnimalType(complaint?.animal),
             animalOther: '',
-            locationMode: 'map', // Para edição, usa a localização existente
-            photos: complaint.photos || [],
+            locationMode: normalizedLocation ? 'map' : 'auto',
+            photos: Array.isArray(complaint?.photos)
+              ? complaint.photos.filter(Boolean)
+              : [],
           });
-          if (complaint.location) {
-            setManualLocation(complaint.location);
+          if (normalizedLocation) {
+            setManualLocation(normalizedLocation);
           }
         } catch (error) {
           console.error('Erro ao carregar denúncia para edição:', error);
@@ -84,7 +154,7 @@ export default function CreateComplaintScreen() {
       };
       loadComplaint();
     }
-  }, [isEdit, id, router]);
+  }, [complaintId, isEdit, router]);
 
   // Atualiza qualquer campo do formulário
   const updateField = (field, value) => {
@@ -118,6 +188,15 @@ export default function CreateComplaintScreen() {
     }
 
     return null;
+  };
+
+  const handleGoBack = () => {
+    if (typeof router.canGoBack === 'function' && router.canGoBack()) {
+      router.back();
+      return;
+    }
+
+    router.replace('/');
   };
 
   // Função principal de envio da denúncia
@@ -160,7 +239,10 @@ export default function CreateComplaintScreen() {
       };
 
       const payload = isEdit
-        ? basePayload
+        ? {
+            ...basePayload,
+            photos: form.photos,
+          }
         : {
             ...basePayload,
             status: 'aberto',
@@ -170,8 +252,8 @@ export default function CreateComplaintScreen() {
       console.log('Payload da denúncia:', payload);
 
       if (isEdit) {
-        console.log('Calling updateComplaint with id:', id);
-        const result = await updateComplaint(id, payload);
+        console.log('Calling updateComplaint with id:', complaintId);
+        const result = await updateComplaint(complaintId, payload);
 
         if (result) {
           Alert.alert('Sucesso', 'Denúncia atualizada com sucesso!', [
@@ -211,8 +293,17 @@ export default function CreateComplaintScreen() {
       <Stack.Screen
         options={{
           title: isEdit ? 'Editar Denúncia' : 'Nova Denúncia',
-          headerBackTitle: '',
-          headerBackTitleVisible: false,
+          headerBackVisible: false,
+          headerLeft: () => (
+            <Pressable
+              onPress={handleGoBack}
+              hitSlop={12}
+              style={styles.headerBackContainer}
+            >
+              <Ionicons name="chevron-back" size={20} color={COLORS.orange} />
+              <Text style={styles.headerButton}>Voltar</Text>
+            </Pressable>
+          ),
         }}
       />
 
@@ -314,6 +405,12 @@ const styles = StyleSheet.create({
     color: COLORS.orange,
     fontSize: 16,
     fontWeight: '700',
+  },
+  headerBackContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 4,
+    paddingRight: 8,
   },
   disabledText: {
     opacity: 0.7,

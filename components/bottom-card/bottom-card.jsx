@@ -2,8 +2,6 @@ import { ComplaintNearbyCard } from '@/components/complaints/Complaint-nearbyCar
 import { Animated, Text, View } from 'react-native';
 
 export function BottomCard({ style, complaint, animation }) {
-  if (!complaint) return null;
-
   const { translateY, panResponder, setCardHeight } = animation;
 
   return (
@@ -16,9 +14,20 @@ export function BottomCard({ style, complaint, animation }) {
       <Text style={style.bottomTitle}>DENÚNCIA PRÓXIMA</Text>
 
       <View style={style.miniCard}>
-        <View style={style.innerBorder}>
-          <ComplaintNearbyCard style={style} complaint={complaint} />
-        </View>
+        {complaint ? (
+          <View style={style.innerBorder}>
+            <ComplaintNearbyCard style={style} complaint={complaint} />
+          </View>
+        ) : (
+          <View
+            style={[
+              style.innerBorder,
+              { minHeight: 62, alignItems: 'center', justifyContent: 'center' },
+            ]}
+          >
+            <Text style={style.miniCardSub}>Não há denuncias proximas</Text>
+          </View>
+        )}
       </View>
     </Animated.View>
   );

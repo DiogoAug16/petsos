@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { memo } from 'react';
-import { Image, Pressable, Text, View, useColorScheme } from 'react-native';
+import { Image } from 'expo-image';
+import { Pressable, Text, View, useColorScheme } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import { useAddress } from '@/hooks/useAddress';
@@ -20,6 +21,18 @@ function ComplaintNearbyCardComponent({ complaint }) {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const styles = complaintsStyles(colorScheme);
+
+  const resolvePhotoUri = (photoPath) => {
+    if (!photoPath) return null;
+    if (/^(https?:|file:|content:|data:)/i.test(photoPath)) return photoPath;
+    if (!UPLOAD_URL) return photoPath;
+
+    const baseUrl = UPLOAD_URL.endsWith('/') ? UPLOAD_URL.slice(0, -1) : UPLOAD_URL;
+    const normalizedPath = photoPath.startsWith('/') ? photoPath : `/${photoPath}`;
+    return `${baseUrl}${normalizedPath}`;
+  };
+
+  const coverPhotoUri = resolvePhotoUri(complaint.photos?.[0]);
 
   const handlePressIn = () => {
     onPressIn();
@@ -55,11 +68,13 @@ function ComplaintNearbyCardComponent({ complaint }) {
             },
           ]}
         >
-          {complaint.photos?.length > 0 ? (
+          {coverPhotoUri ? (
             <Image
-              source={{ uri: `${UPLOAD_URL}${complaint.photos[0]}` }}
+              source={{ uri: coverPhotoUri }}
               style={{ width: '100%', height: '100%', borderRadius: 14 }}
-              resizeMode="cover"
+              contentFit="cover"
+              cachePolicy="memory-disk"
+              transition={120}
             />
           ) : (
             <Text style={[styles.cardPhotoEmoji, { fontSize: 24 }]}>

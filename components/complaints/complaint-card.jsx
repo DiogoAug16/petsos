@@ -7,9 +7,10 @@ import { useComplaintConfig } from '@/hooks/useComplaintConfig';
 import { complaintsStyles } from '@/styles/complaints';
 import { formatDate } from '@/utils/date.utils';
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { memo } from 'react';
-import { Image, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 function ComplaintCardComponent({ complaint }) {
@@ -21,6 +22,18 @@ function ComplaintCardComponent({ complaint }) {
   const styles = complaintsStyles(colorScheme);
   const UPLOAD_URL = useUploadUrl();
   const { status, type, emoji } = useComplaintConfig(complaint);
+
+  const resolvePhotoUri = (photoPath) => {
+    if (!photoPath) return null;
+    if (/^(https?:|file:|content:|data:)/i.test(photoPath)) return photoPath;
+    if (!UPLOAD_URL) return photoPath;
+
+    const baseUrl = UPLOAD_URL.endsWith('/') ? UPLOAD_URL.slice(0, -1) : UPLOAD_URL;
+    const normalizedPath = photoPath.startsWith('/') ? photoPath : `/${photoPath}`;
+    return `${baseUrl}${normalizedPath}`;
+  };
+
+  const coverPhotoUri = resolvePhotoUri(complaint.photos?.[0]);
 
   const handlePressIn = () => {
     onPressIn();
@@ -36,11 +49,13 @@ function ComplaintCardComponent({ complaint }) {
       <Animated.View style={[styles.card, animatedStyle]}>
         <View style={styles.cardTop}>
           <View style={[styles.cardPhoto, { backgroundColor: type.photoColor }]}>
-            {complaint.photos?.length > 0 ? (
+            {coverPhotoUri ? (
               <Image
-                source={{ uri: `${UPLOAD_URL}${complaint.photos[0]}` }}
+                source={{ uri: coverPhotoUri }}
                 style={styles.cardPhoto}
-                resizeMode="cover"
+                contentFit="cover"
+                cachePolicy="memory-disk"
+                transition={120}
               />
             ) : (
               <Text style={styles.cardPhotoEmoji}>{emoji}</Text>

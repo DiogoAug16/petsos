@@ -2,6 +2,7 @@ import { BottomCard } from '@/components/bottom-card/bottom-card';
 import { FabButton } from '@/components/floating-buttons/create-complaint-button';
 import { CenterButton } from '@/components/floating-buttons/map-center-button';
 import { SearchBar } from '@/components/search-bar/search-bar';
+import { useComplaints } from '@/context/ComplaintsContext';
 import { useBottomCardAnimation } from '@/hooks/useBottomCardAnimation';
 import { useColorScheme } from '@/hooks/useColorScheme.jsx';
 import { useFloatingButtonsAnimation } from '@/hooks/useFloatingButtonsAnimation';
@@ -9,28 +10,35 @@ import { useLocation } from '@/hooks/useLocation.jsx';
 import { useNearbyComplaints } from '@/hooks/useNearbyComplaints';
 import { mapScreenStyles } from '@/styles/mapScreen';
 import { useFocusEffect } from '@react-navigation/native';
-import { useCallback, useRef } from 'react';
+import { useRouter } from 'expo-router';
+import { useCallback, useRef, useState } from 'react';
 import { Animated, View } from 'react-native';
 import MapView from 'react-native-maps';
 
+import { ComplaintMarker } from '@/components/map/complaint-marker';
+
+const CITY_LEVEL_MAX_DELTA = 0.22;
+
 export default function MapScreen() {
+  const router = useRouter();
   const { location } = useLocation();
   const colorScheme = useColorScheme();
   const mapRef = useRef(null);
+  const [region, setRegion] = useState(null);
+  const { data: allComplaints = [], refetchSilent } = useComplaints();
 
   const { translateY: buttonsTranslateY, animateTo } =
     useFloatingButtonsAnimation();
 
   const animation = useBottomCardAnimation(160, animateTo);
 
-  //  AQUI: pegar refetchNearby
   const { nearbyComplaints, refetchNearby } = useNearbyComplaints(location, 5);
 
-  //  AQUI: atualizar ao voltar pra tela
   useFocusEffect(
     useCallback(() => {
       refetchNearby();
-    }, [location])
+      refetchSilent();
+    }, [refetchNearby, refetchSilent])
   );
 
   const nearestComplaint =
@@ -46,6 +54,20 @@ export default function MapScreen() {
     mapRef.current?.animateToRegion(location, 500);
   };
 
+  const shouldShowComplaintMarkers =
+    !region ||
+    (region.latitudeDelta <= CITY_LEVEL_MAX_DELTA &&
+      region.longitudeDelta <= CITY_LEVEL_MAX_DELTA);
+
+  const validComplaints = (Array.isArray(allComplaints) ? allComplaints : []).filter(
+    complaint =>
+      complaint.location &&
+      complaint.location.latitude &&
+      complaint.location.longitude &&
+      !isNaN(Number(complaint.location.latitude)) &&
+      !isNaN(Number(complaint.location.longitude))
+  );
+
   return (
     <View style={styles.container}>
       <MapView
@@ -54,29 +76,33 @@ export default function MapScreen() {
         initialRegion={location}
         showsUserLocation
         showsMyLocationButton={false}
-      />
+        onRegionChangeComplete={setRegion}
+      >
+        {shouldShowComplaintMarkers &&
+          validComplaints.map(complaint => (
+            <ComplaintMarker
+              key={complaint.id || complaint._id}
+              complaint={complaint}
+              onPress={() => router.push(`/complaint/${complaint.id || complaint._id}`)}
+            />
+          ))}
+      </MapView>
 
       <SearchBar style={styles} showFilterBtn />
 
       <Animated.View style={{ transform: [{ translateY: buttonsTranslateY }] }}>
-        <CenterButton
-          style={styles.centerBtn}
-          onPress={centerOnUser}
-        />
+        <CenterButton style={styles.centerBtn} onPress={centerOnUser} />
 
         <FabButton
           style={styles.fab}
-          onPress={() => console.log('Botao criar denuncia clicado')}
         />
       </Animated.View>
 
-      {nearestComplaint && (
-        <BottomCard
-          style={styles}
-          complaint={nearestComplaint}
-          animation={animation}
-        />
-      )}
+      <BottomCard
+        style={styles}
+        complaint={nearestComplaint}
+        animation={animation}
+      />
     </View>
   );
 }

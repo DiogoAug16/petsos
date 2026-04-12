@@ -1,16 +1,29 @@
-import { Image, ScrollView, StyleSheet } from 'react-native';
+import { Image } from 'expo-image';
+import { ScrollView, StyleSheet } from 'react-native';
 import { useUploadUrl } from '@/hooks/useUploadUrl';
 
 export default function ComplaintPhotos({ photos }) {
   const UPLOAD_URL = useUploadUrl();
+  const resolvePhotoUri = (photoPath) => {
+    if (!photoPath) return null;
+    if (/^(https?:|file:|content:|data:)/i.test(photoPath)) return photoPath;
+    if (!UPLOAD_URL) return photoPath;
+
+    const baseUrl = UPLOAD_URL.endsWith('/') ? UPLOAD_URL.slice(0, -1) : UPLOAD_URL;
+    const normalizedPath = photoPath.startsWith('/') ? photoPath : `/${photoPath}`;
+    return `${baseUrl}${normalizedPath}`;
+  };
   
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
       {photos.map((uri, index) => (
         <Image 
-          key={index} 
-          source={{ uri: `${UPLOAD_URL}${uri}` }} 
+          key={`${uri}-${index}`} 
+          source={{ uri: resolvePhotoUri(uri) }} 
           style={styles.photo} 
+          contentFit="cover"
+          cachePolicy="memory-disk"
+          transition={120}
         />
       ))}
     </ScrollView>

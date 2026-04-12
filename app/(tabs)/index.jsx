@@ -1,23 +1,28 @@
 import { BottomCard } from '@/components/bottom-card/bottom-card';
+import { FiltroDenuncias } from '@/components/map/filtro-denuncias';
 import { ComplaintMarkersLayer } from '@/components/map/complaint-markers-layer';
 import { FabButton } from '@/components/floating-buttons/create-complaint-button';
 import { CenterButton } from '@/components/floating-buttons/map-center-button';
 import { SearchBar } from '@/components/search-bar/search-bar';
-import { MAP_HIGHLIGHT_RADIUS_METERS } from '@/constants/map.constants';
+import { NoResultsBadge } from '@/components/map/no-results-badge';
+import { AutocompleteSuggestions } from '@/components/map/autocomplete-suggestions';
+import { HighlightedCircle } from '@/components/map/highlighted-circle';
+import { useMapHandlers } from '@/hooks/useMapHandlers';
 import { useComplaints } from '@/context/ComplaintsContext';
 import { useBottomCardAnimation } from '@/hooks/useBottomCardAnimation';
 import { useColorScheme } from '@/hooks/useColorScheme.jsx';
 import { useFloatingButtonsAnimation } from '@/hooks/useFloatingButtonsAnimation';
 import { useLocation } from '@/hooks/useLocation.jsx';
 import { useMapSearchAutocomplete } from '@/hooks/useMapSearchAutocomplete';
+import { useMapTypeFilter } from '@/hooks/useMapTypeFilter';
 import { useNearbyComplaints } from '@/hooks/useNearbyComplaints';
 import { useVisibleMapComplaints } from '@/hooks/useVisibleMapComplaints';
 import { mapScreenStyles } from '@/styles/mapScreen';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
-import { Animated, Keyboard, Text, TouchableOpacity, View } from 'react-native';
-import MapView, { Circle } from 'react-native-maps';
+import { Animated, View } from 'react-native';
+import MapView from 'react-native-maps';
 
 export default function MapScreen() {
   const router = useRouter();
@@ -41,11 +46,6 @@ export default function MapScreen() {
     }, [refetchNearby, refetchSilent])
   );
 
-  const nearestComplaint =
-    nearbyComplaints && nearbyComplaints.length > 0
-      ? nearbyComplaints[0]
-      : null;
-
   const styles = mapScreenStyles(colorScheme);
 
   const centerOnUser = () => {
@@ -58,6 +58,19 @@ export default function MapScreen() {
   );
 
   const {
+    selectedType,
+    appliedType,
+    isFilterOpen,
+    filteredComplaints,
+    hasNoFilteredResults,
+    setSelectedType,
+    applyTypeFilter,
+    clearTypeFilter,
+    toggleFilter,
+    closeFilter,
+  } = useMapTypeFilter(validComplaints);
+
+  const {
     searchText,
     suggestions,
     highlightedCoordinate,
@@ -65,16 +78,27 @@ export default function MapScreen() {
     handleSearchTextChange,
     hideSuggestions,
     selectSuggestion,
-  } = useMapSearchAutocomplete(validComplaints);
+  } = useMapSearchAutocomplete(filteredComplaints);
 
-  const handleComplaintMarkerPress = useCallback(
-    (complaintRouteId) => {
-      if (complaintRouteId) {
-        router.push(`/complaint/${complaintRouteId}`);
-      }
-    },
-    [router]
-  );
+  const nearestComplaint =
+    nearbyComplaints && nearbyComplaints.length > 0
+      ? nearbyComplaints[0]
+      : null;
+
+  const {
+    handleComplaintMarkerPress,
+    handleMapPress,
+    handleToggleFilter,
+    handleApplyFilter,
+    handleClearFilter,
+  } = useMapHandlers({
+    router,
+    hideSuggestions,
+    closeFilter,
+    toggleFilter,
+    applyTypeFilter,
+    clearTypeFilter,
+  });
 
   if (!location) return null;
 
@@ -87,20 +111,12 @@ export default function MapScreen() {
         showsUserLocation
         showsMyLocationButton={false}
         onRegionChangeComplete={setRegion}
-        onPress={hideSuggestions}
+        onPress={handleMapPress}
       >
-        {highlightedCoordinate && (
-          <Circle
-            center={highlightedCoordinate}
-            radius={MAP_HIGHLIGHT_RADIUS_METERS}
-            strokeWidth={2}
-            strokeColor="rgba(255,107,53,0.9)"
-            fillColor="rgba(255,107,53,0.20)"
-          />
-        )}
+        <HighlightedCircle coordinate={highlightedCoordinate} />
 
         <ComplaintMarkersLayer
-          complaints={validComplaints}
+          complaints={filteredComplaints}
           shouldRender={shouldShowComplaintMarkers}
           onMarkerPress={handleComplaintMarkerPress}
         />
@@ -111,41 +127,30 @@ export default function MapScreen() {
         value={searchText}
         onChangeText={handleSearchTextChange}
         showFilterBtn
+        onFilterPress={handleToggleFilter}
+        filterActive={Boolean(appliedType)}
       />
 
-      {shouldRenderSuggestions && (
-        <View style={styles.autocompleteContainer}>
-          {suggestions.map((complaint, index) => {
-            const complaintId = complaint?.id ?? complaint?._id;
-            const itemKey = complaintId ? String(complaintId) : `suggestion-${index}`;
+      <FiltroDenuncias
+        style={styles}
+        visible={isFilterOpen}
+        selectedType={selectedType}
+        onSelectType={setSelectedType}
+        onApply={handleApplyFilter}
+        onClear={handleClearFilter}
+      />
 
-            return (
-              <TouchableOpacity
-                key={itemKey}
-                style={[
-                  styles.autocompleteItem,
-                  index === suggestions.length - 1 ? styles.autocompleteItemLast : null,
-                ]}
-                activeOpacity={0.8}
-                onPress={() => {
-                  const nextRegion = selectSuggestion(complaint);
-                  Keyboard.dismiss();
+      {Boolean(appliedType) && hasNoFilteredResults && !isFilterOpen && (
+        <NoResultsBadge styles={styles} message="Nenhuma denúncia encontrada para o tipo selecionado." />
+      )}
 
-                  if (nextRegion) {
-                    mapRef.current?.animateToRegion(nextRegion, 600);
-                  }
-                }}
-              >
-                <Text style={styles.autocompleteTitle} numberOfLines={1}>
-                  {complaint.title}
-                </Text>
-                <Text style={styles.autocompleteSubtitle} numberOfLines={1}>
-                  {complaint.type}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+      {shouldRenderSuggestions && !isFilterOpen && (
+        <AutocompleteSuggestions
+          styles={styles}
+          suggestions={suggestions}
+          selectSuggestion={selectSuggestion}
+          mapRef={mapRef}
+        />
       )}
 
       <Animated.View style={{ transform: [{ translateY: buttonsTranslateY }] }}>

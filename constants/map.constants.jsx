@@ -1,0 +1,4 @@
+export const CITY_LEVEL_MAX_DELTA = 0.22;
+export const FOCUS_REGION_DELTA = 0.012;
+export const SUGGESTION_MAX_ITEMS = 6;
+export const MAP_HIGHLIGHT_RADIUS_METERS = 70;

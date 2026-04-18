@@ -4,8 +4,8 @@ import {
   signOut,
   updateProfile,
 } from 'firebase/auth';
-import { auth } from '../config/firebase';
-import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../config/firebase';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 const COLLECTION_PREFIX = process.env.EXPO_PUBLIC_FIREBASE_COLLECTION_PREFIX || '';
 const USERS_COLLECTION = `${COLLECTION_PREFIX}users`;
@@ -20,8 +20,7 @@ const USERNAMES_COLLECTION = `${COLLECTION_PREFIX}usernames`;
  * @returns {Promise<UserCredential>} Credenciais do usuário criado
  */
 export async function register(email, password, name, username = null) {
-  const db = getFirestore();
-
+  
   if (username) {
     const usernameDoc = await getDoc(doc(db, USERNAMES_COLLECTION, username.toLowerCase()));
     if (usernameDoc.exists()) {
@@ -59,8 +58,7 @@ export async function register(email, password, name, username = null) {
  * @returns {Promise<UserCredential>} Credenciais do usuário autenticado
  */
 export async function login(emailOrUsername, password) {
-  const db = getFirestore();
-  let email = emailOrUsername;
+    let email = emailOrUsername;
 
   if (!emailOrUsername.includes('@')) {
     const usernameDoc = await getDoc(doc(db, USERNAMES_COLLECTION, emailOrUsername.toLowerCase()));

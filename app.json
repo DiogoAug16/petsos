@@ -49,7 +49,7 @@
         {
           "isAndroidForegroundServiceEnabled": true
         }
-      ],
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

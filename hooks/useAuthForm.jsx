@@ -40,12 +40,12 @@ export function useAuthForm() {
       newErrors.email = 'Email inválido';
     }
 
-    if (form.username.trim()) {
-      if (form.username.trim().length < 3) {
-        newErrors.username = 'Username deve ter pelo menos 3 caracteres';
-      } else if (!/^[a-zA-Z0-9_]+$/.test(form.username)) {
-        newErrors.username = 'Username pode conter apenas letras, números e _';
-      }
+    if (!form.username.trim()) {
+      newErrors.username = 'Username é obrigatório';
+    } else if (form.username.trim().length < 3) {
+      newErrors.username = 'Username deve ter pelo menos 3 caracteres';
+    } else if (!/^[a-zA-Z0-9_]+$/.test(form.username)) {
+      newErrors.username = 'Username pode conter apenas letras, números e _';
     }
 
     if (!form.password) {
@@ -75,7 +75,7 @@ export function useAuthForm() {
         form.email.trim(),
         form.password,
         form.name.trim(),
-        form.username.trim() || null
+        form.username.trim()
       );
 
       Alert.alert('Sucesso', 'Conta criada com sucesso!', [
@@ -108,6 +108,7 @@ export function useAuthForm() {
   const isFormValid =
     form.name.trim() &&
     form.email.trim() &&
+    form.username.trim() &&
     form.password &&
     form.confirmPassword &&
     Object.keys(errors).length === 0;

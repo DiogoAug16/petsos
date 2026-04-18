@@ -16,16 +16,13 @@ const USERNAMES_COLLECTION = `${COLLECTION_PREFIX}usernames`;
  * @param {string} email - Email do usuário
  * @param {string} password - Senha do usuário
  * @param {string} name - Nome do usuário
- * @param {string} username - Username único
+ * @param {string} username - Username único (obrigatório)
  * @returns {Promise<UserCredential>} Credenciais do usuário criado
  */
-export async function register(email, password, name, username = null) {
-  
-  if (username) {
-    const usernameDoc = await getDoc(doc(db, USERNAMES_COLLECTION, username.toLowerCase()));
-    if (usernameDoc.exists()) {
-      throw new Error('USERNAME_ALREADY_EXISTS');
-    }
+export async function register(email, password, name, username) {
+  const usernameDoc = await getDoc(doc(db, USERNAMES_COLLECTION, username.toLowerCase()));
+  if (usernameDoc.exists()) {
+    throw new Error('USERNAME_ALREADY_EXISTS');
   }
 
   const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -37,16 +34,14 @@ export async function register(email, password, name, username = null) {
   await setDoc(doc(db, USERS_COLLECTION, userCredential.user.uid), {
     email,
     name,
-    username: username ? username.toLowerCase() : null,
+    username: username.toLowerCase(),
     createdAt: new Date().toISOString(),
   });
 
-  if (username) {
-    await setDoc(doc(db, USERNAMES_COLLECTION, username.toLowerCase()), {
-      email,
-      uid: userCredential.user.uid,
-    });
-  }
+  await setDoc(doc(db, USERNAMES_COLLECTION, username.toLowerCase()), {
+    email,
+    uid: userCredential.user.uid,
+  });
 
   return userCredential;
 }

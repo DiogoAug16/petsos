@@ -49,10 +49,10 @@ export default function RegisterForm({
       />
 
       <AuthInput
-        label="USERNAME (OPCIONAL)"
+        label="USERNAME"
         value={form.username}
         onChangeText={(value) => updateField('username', value)}
-        placeholder="seu_username"
+        placeholder="Seu username"
         iconName="at-outline"
         error={errors.username}
         colors={colors}

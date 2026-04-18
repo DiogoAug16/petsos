@@ -32,7 +32,7 @@ export default function PawItem({ config, index, isDark }) {
         false
       )
     );
-  }, []);
+  }, [config.delay, config.duration, fadeAnim, floatAnim, index]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: fadeAnim.value,

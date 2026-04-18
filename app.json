@@ -50,7 +50,6 @@
           "isAndroidForegroundServiceEnabled": true
         }
       ],
-      "react-native-reanimated/plugin"
     ],
     "experiments": {
       "typedRoutes": true,

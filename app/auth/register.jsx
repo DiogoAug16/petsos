@@ -1,4 +1,4 @@
-import { ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { ScrollView, KeyboardAvoidingView, Platform, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import Colors from '@/styles/theme/Colors';
@@ -7,6 +7,7 @@ import { useEntranceAnimation } from '@/hooks/useEntranceAnimation';
 import PawBackground from '@/components/auth/PawBackground';
 import AuthHero from '@/components/auth/AuthHero';
 import RegisterForm from '@/components/auth/RegisterForm';
+import DogPeeking from '@/components/auth/DogPeeking';
 import { createRegisterStyles } from '@/styles/auth/register.styles';
 
 export default function RegisterScreen() {
@@ -50,7 +51,9 @@ export default function RegisterScreen() {
             subtitle="Proteção animal começa aqui"
           />
 
-          <RegisterForm
+          <View>
+            <DogPeeking />
+            <RegisterForm
             form={form}
             errors={errors}
             isSubmitting={isSubmitting}
@@ -64,7 +67,8 @@ export default function RegisterScreen() {
             colors={colors}
             isDark={isDark}
             styles={themedStyles}
-          />
+            />
+          </View>
         </ScrollView>
       </Animated.View>
     </KeyboardAvoidingView>

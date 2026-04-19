@@ -58,6 +58,7 @@ export const createRegisterStyles = (colors) => {
       elevation: 6,
       borderWidth: 1,
       borderColor: isDark ? '#2F3749' : '#F0F0F0',
+      overflow: 'visible',
     },
     submitButton: {
       backgroundColor: colors.primary,

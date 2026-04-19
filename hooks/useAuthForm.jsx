@@ -63,14 +63,16 @@ export function useAuthForm() {
     } catch (error) {
       let errorMessage = AUTH_ERRORS.GENERIC_ERROR;
 
-      if (error.code === 'auth/email-already-in-use') {
+      if (error.code === 'EMAIL_ALREADY_IN_USE') {
         errorMessage = AUTH_ERRORS.EMAIL_ALREADY_IN_USE;
-      } else if (error.code === 'auth/weak-password') {
-        errorMessage = AUTH_ERRORS.WEAK_PASSWORD;
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = AUTH_ERRORS.EMAIL_INVALID;
-      } else if (error.message === 'USERNAME_ALREADY_EXISTS') {
+      } else if (error.code === 'USERNAME_ALREADY_EXISTS') {
         errorMessage = AUTH_ERRORS.USERNAME_ALREADY_EXISTS;
+      } else if (error.code === 'WEAK_PASSWORD') {
+        errorMessage = AUTH_ERRORS.WEAK_PASSWORD;
+      } else if (error.code === 'INVALID_EMAIL') {
+        errorMessage = AUTH_ERRORS.EMAIL_INVALID;
+      } else if (error.message) {
+        errorMessage = error.message;
       }
 
       console.error('Erro ao criar conta:', errorMessage, error);

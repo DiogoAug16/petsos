@@ -1,11 +1,13 @@
 import { AUTH_ERRORS } from '@/constants/error.messages.constants';
-import { register } from '@/services/auth.service';
 import { validateForm as validateFormSchema } from '@/validators/auth.validators';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert } from 'react-native';
+import Toast from 'react-native-toast-message';
+import { useAuth } from './useAuth';
 
 export function useAuthForm() {
+  const { register } = useAuth();
+
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -49,12 +51,15 @@ export function useAuthForm() {
         form.username.trim()
       );
 
-      Alert.alert('Sucesso', 'Conta criada com sucesso!', [
-        {
-          text: 'OK',
-          onPress: () => router.replace('/(tabs)'),
-        },
-      ]);
+      Toast.show({
+        type: 'success',
+        text1: 'Conta criada!',
+        text2: 'Verifique seu email para confirmar',
+      });
+
+      setTimeout(() => {
+        router.replace('/(tabs)');
+      }, 2000);
     } catch (error) {
       let errorMessage = AUTH_ERRORS.GENERIC_ERROR;
 
@@ -69,6 +74,12 @@ export function useAuthForm() {
       }
 
       console.error('Erro ao criar conta:', errorMessage, error);
+
+      Toast.show({
+        type: 'error',
+        text1: 'Erro ao criar conta',
+        text2: errorMessage,
+      });
     } finally {
       setIsSubmitting(false);
     }

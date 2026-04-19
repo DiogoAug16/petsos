@@ -3,6 +3,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
+  sendEmailVerification,
 } from 'firebase/auth';
 import { auth, db } from '../config/firebase';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
@@ -42,6 +43,8 @@ export async function register(email, password, name, username) {
     email,
     uid: userCredential.user.uid,
   });
+
+  await sendEmailVerification(userCredential.user);
 
   return userCredential;
 }

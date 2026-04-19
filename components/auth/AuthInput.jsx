@@ -1,6 +1,7 @@
 import { View, Text, TextInput, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { authInputStyles as styles } from '@/styles/auth';
+import PasswordStrengthIndicator from './PasswordStrengthIndicator';
 
 export default function AuthInput({
   label,
@@ -14,6 +15,7 @@ export default function AuthInput({
   onToggleSecure,
   colors,
   isDark,
+  showPasswordStrength = false,
   ...props
 }) {
   return (
@@ -52,6 +54,9 @@ export default function AuthInput({
           </Pressable>
         )}
       </View>
+      {showPasswordStrength && !error && (
+        <PasswordStrengthIndicator password={value} colors={colors} isDark={isDark} />
+      )}
       {error && <Text style={[styles.errorText, { color: colors.danger }]}>{error}</Text>}
     </View>
   );

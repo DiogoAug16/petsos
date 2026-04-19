@@ -74,6 +74,7 @@ export default function RegisterForm({
         secureTextEntry={!showPassword}
         showToggle
         onToggleSecure={() => setShowPassword(!showPassword)}
+        showPasswordStrength
         autoCapitalize="none"
         autoCorrect={false}
         editable={!isSubmitting}

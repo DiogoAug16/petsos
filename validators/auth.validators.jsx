@@ -17,9 +17,8 @@ export const registerSchema = z
       .refine((val) => val.trim().length > 0, {
         message: AUTH_ERRORS.EMAIL_REQUIRED,
       })
-      .refine((val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim()), {
-        message: AUTH_ERRORS.EMAIL_INVALID,
-      }),
+      .transform((val) => val.trim())
+      .pipe(z.email({ message: AUTH_ERRORS.EMAIL_INVALID })),
 
     username: z
       .string()

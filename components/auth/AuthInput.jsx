@@ -1,7 +1,10 @@
-import { View, Text, TextInput, Pressable } from 'react-native';
+import { Text, TextInput, Pressable } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { authInputStyles as styles } from '@/styles/auth';
 import PasswordStrengthIndicator from './PasswordStrengthIndicator';
+import { useInputAnimation } from '@/hooks/useInputAnimation';
+import { useShakeAnimation } from '@/hooks/useShakeAnimation';
 
 export default function AuthInput({
   label,
@@ -18,10 +21,24 @@ export default function AuthInput({
   showPasswordStrength = false,
   ...props
 }) {
+  const { animatedStyle, glowStyle, handleFocus, handleBlur } = useInputAnimation();
+  const shakeStyle = useShakeAnimation(error);
+
   return (
-    <View style={styles.fieldContainer}>
+    <Animated.View style={[styles.fieldContainer, shakeStyle]}>
       <Text style={[styles.label, { color: colors.tabIconDefault }]}>{label}</Text>
-      <View style={styles.inputWrapper}>
+      <Animated.View style={[styles.inputWrapper, animatedStyle]}>
+        {/* Glow effect */}
+        <Animated.View
+          style={[
+            styles.glowEffect,
+            glowStyle,
+            {
+              shadowColor: colors.primary,
+              backgroundColor: isDark ? colors.primary + '10' : colors.primary + '08',
+            },
+          ]}
+        />
         <Ionicons
           name={iconName}
           size={20}
@@ -42,6 +59,8 @@ export default function AuthInput({
             showToggle && styles.passwordInput,
           ]}
           secureTextEntry={secureTextEntry}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           {...props}
         />
         {showToggle && (
@@ -53,11 +72,11 @@ export default function AuthInput({
             />
           </Pressable>
         )}
-      </View>
+      </Animated.View>
       {showPasswordStrength && !error && (
         <PasswordStrengthIndicator password={value} colors={colors} isDark={isDark} />
       )}
       {error && <Text style={[styles.errorText, { color: colors.danger }]}>{error}</Text>}
-    </View>
+    </Animated.View>
   );
 }

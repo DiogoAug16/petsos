@@ -8,7 +8,7 @@ import PawBackground from '@/components/auth/PawBackground';
 import AuthHero from '@/components/auth/AuthHero';
 import RegisterForm from '@/components/auth/RegisterForm';
 import DogPeeking from '@/components/auth/DogPeeking';
-import { createRegisterStyles } from '@/styles/auth/register.styles';
+import { createRegisterStyles } from '@/styles/auth';
 
 export default function RegisterScreen() {
   const colorScheme = useColorScheme();

@@ -1,6 +1,6 @@
 import { View, Text, TextInput, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { styles } from '@/styles/auth/auth-input.styles';
+import { authInputStyles as styles } from '@/styles/auth';
 
 export default function AuthInput({
   label,

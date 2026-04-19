@@ -9,7 +9,7 @@ import Animated, {
   withDelay,
   interpolate,
 } from 'react-native-reanimated';
-import { styles } from '@/styles/auth/paw-background.styles';
+import { pawBackgroundStyles as styles } from '@/styles/auth';
 
 export default function PawItem({ config, index, isDark }) {
   const fadeAnim = useSharedValue(0);

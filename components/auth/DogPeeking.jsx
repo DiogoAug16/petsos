@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 import { Image } from 'expo-image';
-import { styles } from '@/styles/auth/dog-peeking.styles';
+import { dogPeekingStyles as styles } from '@/styles/auth';
 
 export default function DogPeeking() {
   return (

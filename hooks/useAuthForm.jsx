@@ -1,7 +1,9 @@
+import { AUTH_ERRORS } from '@/constants/error.messages.constants';
+import { register } from '@/services/auth.service';
+import { validateForm as validateFormSchema } from '@/validators/auth.validators';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { Alert } from 'react-native';
-import { router } from 'expo-router';
-import { register } from '@/services/auth.service';
 
 export function useAuthForm() {
   const [form, setForm] = useState({
@@ -20,52 +22,21 @@ export function useAuthForm() {
   const updateField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: null }));
+      const newErrors = { ...errors };
+      delete newErrors[field];
+      setErrors(newErrors);
     }
   };
 
   const validateForm = () => {
-    const newErrors = {};
-
-    if (!form.name.trim()) {
-      newErrors.name = 'Nome é obrigatório';
-    } else if (form.name.trim().length < 3) {
-      newErrors.name = 'Nome deve ter pelo menos 3 caracteres';
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!form.email.trim()) {
-      newErrors.email = 'Email é obrigatório';
-    } else if (!emailRegex.test(form.email)) {
-      newErrors.email = 'Email inválido';
-    }
-
-    if (!form.username.trim()) {
-      newErrors.username = 'Username é obrigatório';
-    } else if (form.username.trim().length < 3) {
-      newErrors.username = 'Username deve ter pelo menos 3 caracteres';
-    } else if (!/^[a-zA-Z0-9_]+$/.test(form.username)) {
-      newErrors.username = 'Username pode conter apenas letras, números e _';
-    }
-
-    if (!form.password) {
-      newErrors.password = 'Senha é obrigatória';
-    } else if (form.password.length < 6) {
-      newErrors.password = 'Senha deve ter pelo menos 6 caracteres';
-    }
-
-    if (!form.confirmPassword) {
-      newErrors.confirmPassword = 'Confirme sua senha';
-    } else if (form.password !== form.confirmPassword) {
-      newErrors.confirmPassword = 'Senhas não coincidem';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const validationErrors = validateFormSchema(form);
+    setErrors(validationErrors);
+    return Object.keys(validationErrors).length === 0;
   };
 
   const handleSubmit = async () => {
-    if (!validateForm()) return;
+    const isValid = validateForm();
+    if (!isValid) return;
     if (isSubmitting) return;
 
     try {
@@ -85,21 +56,19 @@ export function useAuthForm() {
         },
       ]);
     } catch (error) {
-      console.error('Erro ao criar conta:', error);
-
-      let errorMessage = 'Não foi possível criar conta. Tente novamente.';
+      let errorMessage = AUTH_ERRORS.GENERIC_ERROR;
 
       if (error.code === 'auth/email-already-in-use') {
-        errorMessage = 'Este email já está cadastrado';
+        errorMessage = AUTH_ERRORS.EMAIL_ALREADY_IN_USE;
       } else if (error.code === 'auth/weak-password') {
-        errorMessage = 'Senha muito fraca';
+        errorMessage = AUTH_ERRORS.WEAK_PASSWORD;
       } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'Email inválido';
+        errorMessage = AUTH_ERRORS.EMAIL_INVALID;
       } else if (error.message === 'USERNAME_ALREADY_EXISTS') {
-        errorMessage = 'Este username já está em uso';
+        errorMessage = AUTH_ERRORS.USERNAME_ALREADY_EXISTS;
       }
 
-      Alert.alert('Erro', errorMessage);
+      console.error('Erro ao criar conta:', errorMessage, error);
     } finally {
       setIsSubmitting(false);
     }
@@ -111,7 +80,7 @@ export function useAuthForm() {
     form.username.trim() &&
     form.password &&
     form.confirmPassword &&
-    Object.keys(errors).length === 0;
+    Object.keys(errors).filter(key => errors[key]).length === 0;
 
   return {
     form,

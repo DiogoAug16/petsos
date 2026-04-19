@@ -66,7 +66,7 @@ export default function RegisterForm({
         label="SENHA"
         value={form.password}
         onChangeText={(value) => updateField('password', value)}
-        placeholder="Mínimo 6 caracteres"
+        placeholder="Mínimo 8 caracteres"
         iconName="lock-closed-outline"
         error={errors.password}
         colors={colors}

@@ -6,7 +6,7 @@ export default function DogPeeking() {
   return (
     <View style={styles.container}>
       <Image
-        source={require('@/assets/images/pets/dog-peeking.png')}
+        source={require('@/assets/images/pets/dog-peeking-3.png')}
         style={styles.image}
         contentFit="contain"
         priority="high"

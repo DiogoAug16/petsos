@@ -1,15 +1,16 @@
 import {
   signInWithEmailAndPassword,
-  signInWithCustomToken,
+  createUserWithEmailAndPassword,
   signOut,
   sendEmailVerification,
+  updateProfile,
 } from 'firebase/auth';
 import { auth } from '../config/firebase';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 /**
- * Registra novo usuário via backend e autentica
+ * Registra novo usuário via Client SDK e completa perfil no backend
  * @param {string} email - Email do usuário
  * @param {string} password - Senha do usuário
  * @param {string} name - Nome do usuário
@@ -17,14 +18,21 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL;
  * @returns {Promise<UserCredential>} Credenciais do usuário autenticado
  */
 export async function register(email, password, name, username) {
-  const response = await fetch(`${API_URL}/auth/register`, {
+  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+  await updateProfile(userCredential.user, {
+    displayName: name,
+  });
+
+  const idToken = await userCredential.user.getIdToken();
+
+  const response = await fetch(`${API_URL}/auth/complete-profile`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${idToken}`,
     },
     body: JSON.stringify({
-      email,
-      password,
       name,
       username,
     }),
@@ -33,12 +41,10 @@ export async function register(email, password, name, username) {
   const data = await response.json();
 
   if (!response.ok) {
-    const error = new Error(data.message || 'Erro ao criar conta');
+    const error = new Error(data.message || 'Erro ao completar perfil');
     error.code = data.errorCode;
     throw error;
   }
-
-  const userCredential = await signInWithCustomToken(auth, data.data.customToken);
 
   await sendEmailVerification(userCredential.user);
 

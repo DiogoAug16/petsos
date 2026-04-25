@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 
+import { AuthProvider } from '@/context/AuthContext';
 import { ComplaintsProvider } from '@/context/ComplaintsContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { toastConfig } from '@/config/toast.config';
@@ -45,15 +46,16 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <ComplaintsProvider>
-        <Stack>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="auth/register" options={{ headerShown: false }} />
-          <Stack.Screen name="auth/login" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack>
-        <Toast config={toastConfig} topOffset={60} />
-      </ComplaintsProvider>
+      <AuthProvider>
+        <ComplaintsProvider>
+          <Stack screenOptions={{ detachInactiveScreens: true, animation: 'none' }}>
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          </Stack>
+          <Toast config={toastConfig} topOffset={60} />
+        </ComplaintsProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

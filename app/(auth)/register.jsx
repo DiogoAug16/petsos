@@ -7,7 +7,6 @@ import { useEntranceAnimation } from '@/hooks/useEntranceAnimation';
 import PawBackground from '@/components/auth/PawBackground';
 import AuthHero from '@/components/auth/AuthHero';
 import RegisterForm from '@/components/auth/RegisterForm';
-import DogPeeking from '@/components/auth/DogPeeking';
 import { createRegisterStyles } from '@/styles/auth';
 
 export default function RegisterScreen() {
@@ -43,6 +42,7 @@ export default function RegisterScreen() {
           contentContainerStyle={themedStyles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          removeClippedSubviews={true}
         >
           <AuthHero
             colors={colors}
@@ -52,7 +52,6 @@ export default function RegisterScreen() {
           />
 
           <View>
-            <DogPeeking />
             <RegisterForm
             form={form}
             errors={errors}

@@ -3,10 +3,10 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    top: -95,
+    top: -180,
     alignSelf: 'center',
     zIndex: 10,
-    right: -90,
+    right: -80,
   },
   image: {
     width: 300,

@@ -3,7 +3,7 @@ import { validateForm as validateFormSchema } from '@/validators/auth.validators
 import { router } from 'expo-router';
 import { useState } from 'react';
 import Toast from 'react-native-toast-message';
-import { useAuth } from './useAuth';
+import { useAuth } from '@/context/AuthContext';
 
 export function useAuthForm() {
   const { register } = useAuth();
@@ -54,32 +54,28 @@ export function useAuthForm() {
       Toast.show({
         type: 'success',
         text1: 'Conta criada!',
-        text2: 'Verifique seu email para confirmar',
+        text2: 'Verifique seu email e faça login para continuar',
       });
 
       setTimeout(() => {
-        router.replace('/(tabs)');
+        router.replace('/(auth)/login');
       }, 2000);
     } catch (error) {
-      let errorMessage = AUTH_ERRORS.GENERIC_ERROR;
-
       if (error.code === 'auth/email-already-in-use') {
-        errorMessage = AUTH_ERRORS.EMAIL_ALREADY_IN_USE;
+        setErrors((prev) => ({ ...prev, email: AUTH_ERRORS.EMAIL_ALREADY_IN_USE }));
       } else if (error.code === 'auth/invalid-email') {
-        errorMessage = AUTH_ERRORS.EMAIL_INVALID;
+        setErrors((prev) => ({ ...prev, email: AUTH_ERRORS.EMAIL_INVALID }));
       } else if (error.code === 'auth/weak-password') {
-        errorMessage = AUTH_ERRORS.WEAK_PASSWORD;
+        setErrors((prev) => ({ ...prev, password: AUTH_ERRORS.WEAK_PASSWORD }));
       } else if (error.code === 'USERNAME_ALREADY_EXISTS') {
-        errorMessage = AUTH_ERRORS.USERNAME_ALREADY_EXISTS;
-      } else if (error.message) {
-        errorMessage = error.message;
+        setErrors((prev) => ({ ...prev, username: AUTH_ERRORS.USERNAME_ALREADY_EXISTS }));
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Erro ao criar conta',
+          text2: error.message || AUTH_ERRORS.GENERIC_ERROR,
+        });
       }
-
-      Toast.show({
-        type: 'error',
-        text1: 'Erro ao criar conta',
-        text2: errorMessage,
-      });
     } finally {
       setIsSubmitting(false);
     }

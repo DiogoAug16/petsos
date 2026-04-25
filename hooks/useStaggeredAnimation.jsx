@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useSharedValue, useAnimatedStyle, withTiming, withDelay } from 'react-native-reanimated';
+import { useSharedValue, useAnimatedStyle, withTiming, withDelay, cancelAnimation } from 'react-native-reanimated';
 
 export function useStaggeredAnimation(index, totalItems = 5) {
   const opacity = useSharedValue(0);
@@ -10,6 +10,11 @@ export function useStaggeredAnimation(index, totalItems = 5) {
 
     opacity.value = withDelay(delay, withTiming(1, { duration: 600 }));
     translateY.value = withDelay(delay, withTiming(0, { duration: 500 }));
+
+    return () => {
+      cancelAnimation(opacity);
+      cancelAnimation(translateY);
+    };
   }, [index, opacity, translateY]);
 
   const animatedStyle = useAnimatedStyle(() => ({

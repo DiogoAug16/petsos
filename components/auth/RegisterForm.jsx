@@ -1,6 +1,7 @@
+import { memo } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { Link } from 'expo-router';
+import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AuthInput from './AuthInput';
 import { useStaggeredAnimation } from '@/hooks/useStaggeredAnimation';
@@ -8,7 +9,7 @@ import { useButtonPulse } from '@/hooks/useButtonPulse';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-export default function RegisterForm({
+function RegisterForm({
   form,
   errors,
   isSubmitting,
@@ -140,12 +141,12 @@ export default function RegisterForm({
 
       <Animated.View style={[styles.linkContainer, linkStyle]}>
         <Text style={styles.linkText}>Já faz parte? </Text>
-        <Link href="/auth/login" asChild>
-          <Pressable>
-            <Text style={[styles.link, { color: colors.primary }]}>Entre aqui</Text>
-          </Pressable>
-        </Link>
+        <Pressable onPress={() => router.replace('/(auth)/login')}>
+          <Text style={[styles.link, { color: colors.primary }]}>Entre aqui</Text>
+        </Pressable>
       </Animated.View>
     </View>
   );
 }
+
+export default memo(RegisterForm);

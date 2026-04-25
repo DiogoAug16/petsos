@@ -5,6 +5,7 @@ import {
   withRepeat,
   withSequence,
   withTiming,
+  cancelAnimation,
 } from 'react-native-reanimated';
 
 export function useButtonPulse(isLoading) {
@@ -23,6 +24,10 @@ export function useButtonPulse(isLoading) {
     } else {
       scale.value = withTiming(1, { duration: 200 });
     }
+
+    return () => {
+      cancelAnimation(scale);
+    };
   }, [isLoading, scale]);
 
   const animatedStyle = useAnimatedStyle(() => ({

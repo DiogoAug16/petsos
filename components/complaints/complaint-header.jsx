@@ -3,8 +3,8 @@ import { complaintsStyles } from '@/styles/complaints';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 const ICONS = {
-  light: require('@/assets/images/app-icons/icon-light.png'),
-  dark: require('@/assets/images/app-icons/icon-dark.png'),
+  light: require('@/assets/images/app-icons/icon-light.webp'),
+  dark: require('@/assets/images/app-icons/icon-dark.webp'),
 };
 
 export function ComplaintsHeader({ count }) {

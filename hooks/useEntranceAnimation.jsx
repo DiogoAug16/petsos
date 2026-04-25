@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { useSharedValue, useAnimatedStyle, withTiming, cancelAnimation } from 'react-native-reanimated';
 
 export function useEntranceAnimation() {
   const opacity = useSharedValue(0);
@@ -8,7 +8,12 @@ export function useEntranceAnimation() {
   useEffect(() => {
     opacity.value = withTiming(1, { duration: 800 });
     translateY.value = withTiming(0, { duration: 700 });
-  }, []);
+
+    return () => {
+      cancelAnimation(opacity);
+      cancelAnimation(translateY);
+    };
+  }, [opacity, translateY]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,

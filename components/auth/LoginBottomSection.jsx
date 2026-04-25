@@ -5,7 +5,7 @@ export default function LoginBottomSection({ colors, isDark }) {
   return (
     <View style={styles.container}>
       <Image
-        source={require('@/assets/images/pets/pet-shield-transparent.png')}
+        source={require('@/assets/images/pets/pet-shield-transparent.webp')}
         style={styles.shieldImage}
         contentFit="contain"
       />
@@ -15,7 +15,7 @@ export default function LoginBottomSection({ colors, isDark }) {
         </Text>
       </View>
       <Image
-        source={require('@/assets/images/pets/cat-bottom-login-screen-3.png')}
+        source={require('@/assets/images/pets/cat-bottom-login-screen-3.webp')}
         style={[styles.catImage, {
           opacity: isDark ? 0.3 : 0.4,
           tintColor: isDark ? '#6B7A94' : '#7FB3CC',

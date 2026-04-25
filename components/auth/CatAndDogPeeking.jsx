@@ -6,7 +6,7 @@ export default function CatAndDogPeeking() {
     <>
       <View style={catStyles.container}>
         <Image
-          source={require('@/assets/images/pets/cat-peeking.png')}
+          source={require('@/assets/images/pets/cat-peeking.webp')}
           style={catStyles.image}
           contentFit="contain"
           priority="high"
@@ -14,7 +14,7 @@ export default function CatAndDogPeeking() {
       </View>
       <View style={dogStyles.container}>
         <Image
-          source={require('@/assets/images/pets/dog-peeking-looking-left.png')}
+          source={require('@/assets/images/pets/dog-peeking-looking-left.webp')}
           style={dogStyles.image}
           contentFit="contain"
           priority="high"

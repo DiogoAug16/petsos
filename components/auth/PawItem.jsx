@@ -54,7 +54,7 @@ function PawItem({ config, isDark, onImageLoaded }) {
     >
       <Animated.View style={floatStyle}>
         <Image
-          source={require('@/assets/images/pets/paw.png')}
+          source={require('@/assets/images/pets/paw.webp')}
           style={[
             styles.pawImage,
             {

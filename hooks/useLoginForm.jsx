@@ -1,7 +1,7 @@
 import { AUTH_ERRORS } from '@/constants/error.messages.constants';
+import { useAuth } from '@/context/AuthContext';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
 
 export function useLoginForm() {
   const { login } = useAuth();
@@ -47,11 +47,13 @@ export function useLoginForm() {
     if (isSubmitting) return;
 
     try {
-      setIsSubmitting(true);
+    const userCredential = await login(form.email.trim(), form.password);
 
-      await login(form.email.trim(), form.password);
+    const token = await userCredential.user.getIdToken();
 
-      router.replace('/(tabs)');
+    //console.log('TOKEN FIREBASE:', token);
+
+    router.replace('/(tabs)');
     } catch (error) {
       if (
         error.code === 'auth/user-not-found' ||

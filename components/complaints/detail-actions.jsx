@@ -1,14 +1,21 @@
 import { Pressable, Text, View } from 'react-native';
 
-export function DetailActions({ isHelping, onToggleHelp, onEdit, onDelete, styles }) {
+export function DetailActions({ isHelping, onToggleHelp, onEdit,onDelete,loading,styles
+}) {
   return (
     <View style={styles.detailActionsFixed}>
       <Pressable 
-        style={[styles.detailBtnHelp, isHelping && styles.detailBtnHelping]}
+        style={[styles.detailBtnHelp,isHelping && styles.detailBtnHelping,loading && styles.detailBtnDisabled]}
         onPress={onToggleHelp}
+        disabled={loading}
       >
-        <Text style={styles.detailBtnHelpText}>{isHelping ? 'Ajudando' : 'Ajudar'}</Text>
-        <Text style={{ fontSize: 16 }}>{isHelping ? '✅' : '🤝'}</Text>
+        <Text style={styles.detailBtnHelpText}>
+          {loading ? 'Carregando...' : isHelping ? 'Acompanhando' : 'Assumir'}
+        </Text>
+
+        <Text style={{ fontSize: 16 }}>
+          {isHelping ? '✅' : '🤝'}
+        </Text>
       </Pressable>
 
       <Pressable style={styles.detailBtnEdit} onPress={onEdit}>

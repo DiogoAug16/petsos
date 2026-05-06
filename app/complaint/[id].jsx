@@ -1,5 +1,5 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { ScrollView, View } from 'react-native';
 
 import { DetailActions } from '@/components/complaints/detail-actions';
@@ -20,6 +20,7 @@ import { useAddress } from '@/hooks/useAddress';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useComplaintConfig } from '@/hooks/useComplaintConfig';
 import { useComplaintDetail } from '@/hooks/useComplaintDetail';
+import { useFollowComplaint } from '@/hooks/useFollowComplaint';
 import Colors from '@/styles/theme/Colors';
 
 export default function ComplaintDetailScreen() {
@@ -45,6 +46,28 @@ export default function ComplaintDetailScreen() {
     handleCloseMapModal,
   } = useComplaintDetail(id);
 
+    const {
+    isFollowing,
+    followComplaint,
+    unfollowComplaint,
+    checkIsFollowing,
+    loading: followLoading,
+  } = useFollowComplaint();
+
+    useEffect(() => {
+      if (id) {
+        checkIsFollowing(id);
+      }
+    }, [id, checkIsFollowing]);
+
+      const handleToggleFollow = () => {
+
+      if (isFollowing) {
+        unfollowComplaint(id);
+      } else {
+        followComplaint(id);
+      }
+    };
   const { address } = useAddress(complaint?.location);
   const { status, type, emoji } = useComplaintConfig(complaint);
 
@@ -72,7 +95,7 @@ export default function ComplaintDetailScreen() {
           status={status}
           type={type}
           emoji={emoji}
-          isHelping={isHelping}
+          isHelping={isFollowing}
           styles={styles}
           colorScheme={colorScheme}
         />
@@ -88,17 +111,18 @@ export default function ComplaintDetailScreen() {
             styles={styles}
           />
           <DetailRegistrarCard complaint={complaint} styles={styles} />
-          <DetailHelpToast isHelping={isHelping} styles={styles} />
+          <DetailHelpToast isHelping={isFollowing} styles={styles} />
         </View>
       </ScrollView>
 
-      <DetailActions 
-        isHelping={isHelping}
-        onToggleHelp={handleToggleHelp}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        styles={styles}
-      />
+        <DetailActions
+          isHelping={isFollowing}
+          onToggleHelp={handleToggleFollow}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          loading={followLoading}
+          styles={styles}
+        />
 
       <DetailMapModal 
         visible={showMapModal}

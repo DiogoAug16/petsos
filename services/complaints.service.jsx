@@ -178,3 +178,21 @@ export async function updateComplaint(id, data) {
 export async function getNearbyComplaints(lat, lng, radiusKm = 5) {
   return apiFetch(`/complaints/nearest?lat=${lat}&lng=${lng}&radiusKm=${radiusKm}`);
 }
+
+
+// Função para assumir denuncia 
+export const assumeComplaint = (complaintId) => {
+  return apiFetch(`/complaints/${complaintId}/assumir`, {
+    method: 'POST',
+  });
+};
+
+export const unfollowComplaint = (complaintId) => {
+  return apiFetch(`/complaint-followers/${complaintId}`, {
+    method: 'DELETE',
+  });
+};
+
+export const getFollowers = (complaintId) => {
+  return apiFetch(`/complaint-followers/${complaintId}`);
+};

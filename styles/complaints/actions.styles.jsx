@@ -10,6 +10,7 @@ export const actionsStyles = (colorScheme) => {
       flexDirection: 'row',
       gap: 8,
       padding: 14,
+       paddingBottom: 35, //  sobe o botão
       backgroundColor: isDark ? '#000' : '#F7F4F0',
       borderTopWidth: 0.5,
       borderTopColor: isDark ? '#3A3A3A' : '#E8E4DF',

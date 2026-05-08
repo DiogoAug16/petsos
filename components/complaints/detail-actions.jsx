@@ -1,11 +1,10 @@
 import { Pressable, Text, View } from 'react-native';
 
-export function DetailActions({ isHelping, onToggleHelp, onEdit,onDelete,loading,styles
-}) {
+export function DetailActions({ isHelping, isOwner, onToggleHelp, onEdit, onDelete, loading, styles }) {
   return (
     <View style={styles.detailActionsFixed}>
-      <Pressable 
-        style={[styles.detailBtnHelp,isHelping && styles.detailBtnHelping,loading && styles.detailBtnDisabled]}
+      <Pressable
+        style={[styles.detailBtnHelp, isHelping && styles.detailBtnHelping, loading && styles.detailBtnDisabled]}
         onPress={onToggleHelp}
         disabled={loading}
       >
@@ -18,14 +17,18 @@ export function DetailActions({ isHelping, onToggleHelp, onEdit,onDelete,loading
         </Text>
       </Pressable>
 
-      <Pressable style={styles.detailBtnEdit} onPress={onEdit}>
-        <Text style={{ fontSize: 16 }}>✏️</Text>
-        <Text style={styles.detailBtnEditText}>Editar</Text>
-      </Pressable>
+      {isOwner && (
+        <Pressable style={styles.detailBtnEdit} onPress={onEdit}>
+          <Text style={{ fontSize: 16 }}>✏️</Text>
+          <Text style={styles.detailBtnEditText}>Editar</Text>
+        </Pressable>
+      )}
 
-      <Pressable style={styles.detailBtnDelete} onPress={onDelete}>
-        <Text style={{ fontSize: 16 }}>🗑️</Text>
-      </Pressable>
+      {isOwner && (
+        <Pressable style={styles.detailBtnDelete} onPress={onDelete}>
+          <Text style={{ fontSize: 16 }}>🗑️</Text>
+        </Pressable>
+      )}
     </View>
   );
 }

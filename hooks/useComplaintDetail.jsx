@@ -1,6 +1,7 @@
 import { useComplaints } from '@/context/ComplaintsContext';
 import { deleteComplaint, getComplaintById } from '@/services/complaints.service';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 
@@ -43,10 +44,12 @@ export function useComplaintDetail(id) {
     return controller;
   }, [id]);
 
-  useEffect(() => {
-    const controller = fetchComplaintDetails();
-    return () => controller?.abort();
-  }, [fetchComplaintDetails]);
+  useFocusEffect(
+    useCallback(() => {
+      const controller = fetchComplaintDetails();
+      return () => controller?.abort();
+    }, [fetchComplaintDetails])
+  );
 
   const handleToggleHelp = useCallback(() => {
     setIsHelping(!isHelping);

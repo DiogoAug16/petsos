@@ -261,7 +261,7 @@ export default function CreateComplaintScreen() {
           Alert.alert('Sucesso', 'Denúncia atualizada com sucesso!', [
             {
               text: 'OK',
-              onPress: () => router.replace('/'),
+              onPress: () => router.back(),
             },
           ]);
         } else {

@@ -17,6 +17,7 @@ import { LoadingState } from '@/components/complaints/loading-state';
 import { complaintsStyles } from '@/styles/complaints';
 
 import { useAddress } from '@/hooks/useAddress';
+import { useAuth } from '@/context/AuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useComplaintConfig } from '@/hooks/useComplaintConfig';
 import { useComplaintDetail } from '@/hooks/useComplaintDetail';
@@ -26,6 +27,7 @@ import Colors from '@/styles/theme/Colors';
 export default function ComplaintDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const { user } = useAuth();
   const colorScheme = useColorScheme();
   const styles = complaintsStyles(colorScheme);
   const theme = Colors[colorScheme ?? 'light'];
@@ -117,6 +119,7 @@ export default function ComplaintDetailScreen() {
 
         <DetailActions
           isHelping={isFollowing}
+          isOwner={user?.uid === complaint.createdById}
           onToggleHelp={handleToggleFollow}
           onEdit={handleEdit}
           onDelete={handleDelete}

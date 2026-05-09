@@ -1,8 +1,7 @@
-import { USE_MAPLIBRE } from '@/constants/map-provider.constants';
+import MapLibreGL from '@maplibre/maplibre-react-native';
 import { View } from 'react-native';
 
-const MapLibreGL = USE_MAPLIBRE ? require('@maplibre/maplibre-react-native') : null;
-const RNMaps = USE_MAPLIBRE ? null : require('react-native-maps');
+const { MarkerView, PointAnnotation } = MapLibreGL;
 
 let markerCounter = 0;
 
@@ -12,73 +11,49 @@ export function UnifiedMarker({
   description,
   anchor,
   draggable = false,
-  tracksViewChanges = false,
   onPress,
   onDragEnd,
   children,
 }) {
-  if (USE_MAPLIBRE) {
-    const { MarkerView, PointAnnotation } = MapLibreGL;
-    const coord = [
-      Number(coordinate.longitude || 0),
-      Number(coordinate.latitude || 0),
-    ];
+  const coord = [
+    Number(coordinate.longitude || 0),
+    Number(coordinate.latitude || 0),
+  ];
 
-    if (draggable) {
-      const id = `marker-${markerCounter++}`;
-      return (
-        <PointAnnotation
-          id={id}
-          coordinate={coord}
-          title={title}
-          snippet={description}
-          anchor={anchor || { x: 0.5, y: 1 }}
-          draggable
-          onSelected={() => onPress?.()}
-          onDragEnd={(event) => {
-            if (!onDragEnd) return;
-            const [lng, lat] = event.geometry.coordinates;
-            onDragEnd({
-              nativeEvent: { coordinate: { latitude: lat, longitude: lng } },
-            });
-          }}
-        >
-          {children || <View style={defaultPin} />}
-        </PointAnnotation>
-      );
-    }
-
+  if (draggable) {
+    const id = `marker-${markerCounter++}`;
     return (
-      <MarkerView
+      <PointAnnotation
+        id={id}
         coordinate={coord}
+        title={title}
+        snippet={description}
         anchor={anchor || { x: 0.5, y: 1 }}
-        allowOverlap
+        draggable
+        onSelected={() => onPress?.()}
+        onDragEnd={(event) => {
+          if (!onDragEnd) return;
+          const [lng, lat] = event.geometry.coordinates;
+          onDragEnd({
+            nativeEvent: { coordinate: { latitude: lat, longitude: lng } },
+          });
+        }}
       >
-        <View onStartShouldSetResponder={() => true} onResponderRelease={() => onPress?.()}>
-          {children || <View style={defaultPin} />}
-        </View>
-      </MarkerView>
+        {children || <View style={defaultPin} />}
+      </PointAnnotation>
     );
   }
 
-  const { Marker } = RNMaps;
-
   return (
-    <Marker
-      coordinate={{
-        latitude: Number(coordinate.latitude || 0),
-        longitude: Number(coordinate.longitude || 0),
-      }}
-      title={title}
-      description={description}
-      anchor={anchor}
-      draggable={draggable}
-      tracksViewChanges={tracksViewChanges}
-      onPress={onPress}
-      onDragEnd={onDragEnd}
+    <MarkerView
+      coordinate={coord}
+      anchor={anchor || { x: 0.5, y: 1 }}
+      allowOverlap
     >
-      {children}
-    </Marker>
+      <View onStartShouldSetResponder={() => true} onResponderRelease={() => onPress?.()}>
+        {children || <View style={defaultPin} />}
+      </View>
+    </MarkerView>
   );
 }
 

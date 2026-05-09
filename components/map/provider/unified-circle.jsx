@@ -1,7 +1,6 @@
-import { USE_MAPLIBRE } from '@/constants/map-provider.constants';
+import MapLibreGL from '@maplibre/maplibre-react-native';
 
-const MapLibreGL = USE_MAPLIBRE ? require('@maplibre/maplibre-react-native') : null;
-const RNMaps = USE_MAPLIBRE ? null : require('react-native-maps');
+const { ShapeSource, FillLayer, LineLayer } = MapLibreGL;
 
 export function UnifiedCircle({
   center,
@@ -12,40 +11,25 @@ export function UnifiedCircle({
 }) {
   if (!center) return null;
 
-  if (USE_MAPLIBRE) {
-    const { ShapeSource, FillLayer, LineLayer } = MapLibreGL;
-    const polygon = createCirclePolygon(center, radius);
-
-    return (
-      <ShapeSource id="highlight-circle" shape={polygon}>
-        <FillLayer
-          id="highlight-circle-fill"
-          style={{
-            fillColor: fillColor,
-            fillOpacity: 1,
-          }}
-        />
-        <LineLayer
-          id="highlight-circle-stroke"
-          style={{
-            lineColor: strokeColor,
-            lineWidth: strokeWidth,
-          }}
-        />
-      </ShapeSource>
-    );
-  }
-
-  const { Circle } = RNMaps;
+  const polygon = createCirclePolygon(center, radius);
 
   return (
-    <Circle
-      center={center}
-      radius={radius}
-      strokeWidth={strokeWidth}
-      strokeColor={strokeColor}
-      fillColor={fillColor}
-    />
+    <ShapeSource id="highlight-circle" shape={polygon}>
+      <FillLayer
+        id="highlight-circle-fill"
+        style={{
+          fillColor: fillColor,
+          fillOpacity: 1,
+        }}
+      />
+      <LineLayer
+        id="highlight-circle-stroke"
+        style={{
+          lineColor: strokeColor,
+          lineWidth: strokeWidth,
+        }}
+      />
+    </ShapeSource>
   );
 }
 

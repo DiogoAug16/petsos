@@ -51,7 +51,7 @@ export function useLoginForm() {
 
     const token = await userCredential.user.getIdToken();
 
-    //console.log('TOKEN FIREBASE:', token);
+    console.log('TOKEN FIREBASE:', token);
 
     router.replace('/(tabs)');
     } catch (error) {

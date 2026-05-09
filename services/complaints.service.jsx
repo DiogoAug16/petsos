@@ -193,6 +193,6 @@ export const unfollowComplaint = (complaintId) => {
   });
 };
 
-export const getFollowers = (complaintId) => {
-  return apiFetch(`/complaint-followers/${complaintId}`);
+export const getIsFollowingComplaint = (complaintId) => {
+  return apiFetch(`/complaint-followers/${complaintId}/me`);
 };

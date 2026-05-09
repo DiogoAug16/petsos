@@ -1,6 +1,4 @@
-import MapLibreGL from '@maplibre/maplibre-react-native';
-
-const { ShapeSource, FillLayer, LineLayer } = MapLibreGL;
+import { GeoJSONSource, Layer } from '@maplibre/maplibre-react-native';
 
 export function UnifiedCircle({
   center,
@@ -14,22 +12,24 @@ export function UnifiedCircle({
   const polygon = createCirclePolygon(center, radius);
 
   return (
-    <ShapeSource id="highlight-circle" shape={polygon}>
-      <FillLayer
+    <GeoJSONSource id="highlight-circle" data={polygon}>
+      <Layer
         id="highlight-circle-fill"
-        style={{
-          fillColor: fillColor,
-          fillOpacity: 1,
+        type="fill"
+        paint={{
+          'fill-color': fillColor,
+          'fill-opacity': 1,
         }}
       />
-      <LineLayer
+      <Layer
         id="highlight-circle-stroke"
-        style={{
-          lineColor: strokeColor,
-          lineWidth: strokeWidth,
+        type="line"
+        paint={{
+          'line-color': strokeColor,
+          'line-width': strokeWidth,
         }}
       />
-    </ShapeSource>
+    </GeoJSONSource>
   );
 }
 

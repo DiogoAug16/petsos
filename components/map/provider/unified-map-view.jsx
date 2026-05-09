@@ -1,9 +1,7 @@
 import { OPENFREEMAP_STYLE_URL } from '@/constants/map-provider.constants';
-import MapLibreGL from '@maplibre/maplibre-react-native';
+import { Map, Camera, UserLocation } from '@maplibre/maplibre-react-native';
 import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { StyleSheet } from 'react-native';
-
-const { MapView, Camera, UserLocation } = MapLibreGL;
 
 export const UnifiedMapView = forwardRef(function UnifiedMapView(
   {
@@ -26,11 +24,10 @@ export const UnifiedMapView = forwardRef(function UnifiedMapView(
 
   useImperativeHandle(ref, () => ({
     animateToRegion: (rgn, duration = 500) => {
-      cameraRef.current?.setCamera({
-        centerCoordinate: [rgn.longitude, rgn.latitude],
-        zoomLevel: deltaToZoom(rgn.latitudeDelta),
-        animationDuration: duration,
-        animationMode: 'easeTo',
+      cameraRef.current?.easeTo({
+        center: [rgn.longitude, rgn.latitude],
+        zoom: deltaToZoom(rgn.latitudeDelta),
+        duration,
       });
     },
   }));
@@ -38,35 +35,35 @@ export const UnifiedMapView = forwardRef(function UnifiedMapView(
   const center = initialRegion || region;
 
   return (
-    <MapView
+    <Map
       style={style || styles.map}
       mapStyle={OPENFREEMAP_STYLE_URL}
-      scrollEnabled={scrollEnabled}
-      zoomEnabled={zoomEnabled}
-      rotateEnabled={rotateEnabled}
-      pitchEnabled={pitchEnabled}
+      dragPan={scrollEnabled}
+      touchZoom={zoomEnabled}
+      touchRotate={rotateEnabled}
+      touchPitch={pitchEnabled}
       pointerEvents={pointerEvents}
       onPress={(event) => {
         if (!onPress) return;
-        const { geometry } = event;
-        onPress({
-          nativeEvent: {
-            coordinate: {
-              latitude: geometry.coordinates[1],
-              longitude: geometry.coordinates[0],
+        const { lngLat } = event.nativeEvent;
+        if (lngLat) {
+          onPress({
+            nativeEvent: {
+              coordinate: {
+                latitude: lngLat[1],
+                longitude: lngLat[0],
+              },
             },
-          },
-        });
+          });
+        }
       }}
       onRegionDidChange={(event) => {
         if (!onRegionChangeComplete) return;
-        const { geometry, properties } = event;
-        const [lng, lat] = geometry.coordinates;
-        const zoom = properties.zoomLevel;
+        const { center: c, zoom } = event.nativeEvent;
         const delta = zoomToDelta(zoom);
         onRegionChangeComplete({
-          latitude: lat,
-          longitude: lng,
+          latitude: c[1],
+          longitude: c[0],
           latitudeDelta: delta,
           longitudeDelta: delta,
         });
@@ -74,18 +71,18 @@ export const UnifiedMapView = forwardRef(function UnifiedMapView(
     >
       <Camera
         ref={cameraRef}
-        defaultSettings={{
-          centerCoordinate: center
-            ? [center.longitude, center.latitude]
-            : [0, 0],
-          zoomLevel: center ? deltaToZoom(center.latitudeDelta) : 2,
-        }}
+        initialViewState={
+          center
+            ? {
+                center: [center.longitude, center.latitude],
+                zoom: deltaToZoom(center.latitudeDelta),
+              }
+            : undefined
+        }
       />
-      {showsUserLocation && (
-        <UserLocation visible animated showsUserHeadingIndicator />
-      )}
+      {showsUserLocation && <UserLocation visible animated />}
       {children}
-    </MapView>
+    </Map>
   );
 });
 

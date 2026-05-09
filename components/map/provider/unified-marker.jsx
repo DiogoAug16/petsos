@@ -1,60 +1,59 @@
-import MapLibreGL from '@maplibre/maplibre-react-native';
+import { Marker, ViewAnnotation } from '@maplibre/maplibre-react-native';
 import { View } from 'react-native';
-
-const { MarkerView, PointAnnotation } = MapLibreGL;
-
-let markerCounter = 0;
 
 export function UnifiedMarker({
   coordinate,
-  title,
-  description,
   anchor,
   draggable = false,
   onPress,
   onDragEnd,
   children,
 }) {
-  const coord = [
+  const lngLat = [
     Number(coordinate.longitude || 0),
     Number(coordinate.latitude || 0),
   ];
 
+  const resolvedAnchor = anchor ? numericToAnchor(anchor) : 'bottom';
+
   if (draggable) {
-    const id = `marker-${markerCounter++}`;
     return (
-      <PointAnnotation
-        id={id}
-        coordinate={coord}
-        title={title}
-        snippet={description}
-        anchor={anchor || { x: 0.5, y: 1 }}
+      <ViewAnnotation
+        lngLat={lngLat}
+        anchor={resolvedAnchor}
         draggable
-        onSelected={() => onPress?.()}
         onDragEnd={(event) => {
           if (!onDragEnd) return;
-          const [lng, lat] = event.geometry.coordinates;
+          const { lngLat: newLngLat } = event.nativeEvent;
           onDragEnd({
-            nativeEvent: { coordinate: { latitude: lat, longitude: lng } },
+            nativeEvent: {
+              coordinate: { latitude: newLngLat[1], longitude: newLngLat[0] },
+            },
           });
         }}
       >
         {children || <View style={defaultPin} />}
-      </PointAnnotation>
+      </ViewAnnotation>
     );
   }
 
   return (
-    <MarkerView
-      coordinate={coord}
-      anchor={anchor || { x: 0.5, y: 1 }}
-      allowOverlap
+    <Marker
+      lngLat={lngLat}
+      anchor={resolvedAnchor}
+      onPress={() => onPress?.()}
     >
-      <View onStartShouldSetResponder={() => true} onResponderRelease={() => onPress?.()}>
-        {children || <View style={defaultPin} />}
-      </View>
-    </MarkerView>
+      {children || <View style={defaultPin} />}
+    </Marker>
   );
+}
+
+function numericToAnchor(anchor) {
+  if (anchor.y === 1) return 'bottom';
+  if (anchor.y === 0) return 'top';
+  if (anchor.x === 0) return 'left';
+  if (anchor.x === 1) return 'right';
+  return 'center';
 }
 
 const defaultPin = {

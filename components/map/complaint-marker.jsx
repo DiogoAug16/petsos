@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
 import { Text, View } from 'react-native';
-import { Marker } from 'react-native-maps';
+import { UnifiedMarker } from '@/components/map/provider';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { complaintMarkerStyles as styles } from '@/styles/mapScreen/complaint-marker.styles';
 
@@ -21,7 +21,7 @@ export const ComplaintMarker = ({ complaint, onPress }) => {
   const themeColor = getTheme(complaint.type);
 
   return (
-    <Marker
+    <UnifiedMarker
       coordinate={{
         latitude: Number(complaint.location?.latitude || 0),
         longitude: Number(complaint.location?.longitude || 0),
@@ -42,16 +42,16 @@ export const ComplaintMarker = ({ complaint, onPress }) => {
           },
         ]}
       >
-        <MaterialCommunityIcons 
-          name={complaint.animal === 'Gato' ? 'cat' : 'dog'} 
-          size={16} 
-          color={themeColor} 
+        <MaterialCommunityIcons
+          name={complaint.animal === 'Gato' ? 'cat' : 'dog'}
+          size={16}
+          color={themeColor}
         />
         <Text style={[styles.label, { color: isDark ? '#F2F2F7' : '#333333' }]} numberOfLines={1}>
           {complaint.title}
         </Text>
         <View style={[styles.arrow, { borderTopColor: themeColor }]} />
       </View>
-    </Marker>
+    </UnifiedMarker>
   );
 };

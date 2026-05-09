@@ -1,5 +1,5 @@
+import { UnifiedMapView, UnifiedMarker } from '@/components/map/provider';
 import { Pressable, Text, View } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
 
 export function DetailMapCard({ location, address, onOpenMap, styles }) {
   if (!location) return null;
@@ -9,7 +9,7 @@ export function DetailMapCard({ location, address, onOpenMap, styles }) {
       <Text style={styles.detailSectionLabel}>Localização</Text>
       <Pressable onPress={onOpenMap}>
         <View style={styles.detailMapContainer}>
-          <MapView
+          <UnifiedMapView
             style={styles.detailMap}
             region={{
               latitude: location.latitude,
@@ -21,8 +21,8 @@ export function DetailMapCard({ location, address, onOpenMap, styles }) {
             zoomEnabled={false}
             pointerEvents="none"
           >
-            <Marker coordinate={location} />
-          </MapView>
+            <UnifiedMarker coordinate={location} />
+          </UnifiedMapView>
         </View>
       </Pressable>
       <Text style={styles.detailMapAddress}>{address}</Text>

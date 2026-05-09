@@ -18,11 +18,11 @@ import { useMapTypeFilter } from '@/hooks/useMapTypeFilter';
 import { useNearbyComplaints } from '@/hooks/useNearbyComplaints';
 import { useVisibleMapComplaints } from '@/hooks/useVisibleMapComplaints';
 import { mapScreenStyles } from '@/styles/mapScreen';
+import { UnifiedMapView } from '@/components/map/provider';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
 import { Animated, View } from 'react-native';
-import MapView from 'react-native-maps';
 
 export default function MapScreen() {
   const router = useRouter();
@@ -104,7 +104,7 @@ export default function MapScreen() {
 
   return (
     <View style={styles.container}>
-      <MapView
+      <UnifiedMapView
         ref={mapRef}
         style={styles.map}
         initialRegion={location}
@@ -121,7 +121,7 @@ export default function MapScreen() {
           shouldRender={shouldShowComplaintMarkers}
           onMarkerPress={handleComplaintMarkerPress}
         />
-      </MapView>
+      </UnifiedMapView>
 
       <SearchBar
         style={styles}

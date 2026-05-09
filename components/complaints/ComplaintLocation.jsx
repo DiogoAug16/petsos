@@ -1,6 +1,6 @@
+import { UnifiedMapView, UnifiedMarker } from '@/components/map/provider';
 import { FORM_COLORS, formStyles } from '@/styles/form/form.styles';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
 
 export default function ComplaintLocation({
   locationMode,
@@ -67,7 +67,7 @@ export default function ComplaintLocation({
         <View style={styles.previewContainer}>
           
           <View style={styles.mapContainer}>
-            <MapView
+            <UnifiedMapView
               style={styles.map}
               initialRegion={{
                 latitude: location.latitude,
@@ -80,13 +80,13 @@ export default function ComplaintLocation({
               rotateEnabled={false}
               pitchEnabled={false}
             >
-              <Marker
+              <UnifiedMarker
                 coordinate={{
                   latitude: location.latitude,
                   longitude: location.longitude,
                 }}
               />
-            </MapView>
+            </UnifiedMapView>
           </View>
 
         
@@ -105,7 +105,7 @@ export default function ComplaintLocation({
           
 
           <View style={styles.mapContainer}>
-            <MapView
+            <UnifiedMapView
               style={styles.map}
               initialRegion={{
                 latitude: currentMapLocation.latitude,
@@ -118,14 +118,14 @@ export default function ComplaintLocation({
                 onChangeManualLocation(coords);
               }}
             >
-              <Marker
+              <UnifiedMarker
                 coordinate={currentMapLocation}
                 draggable
                 onDragEnd={(event) => {
                   onChangeManualLocation(event.nativeEvent.coordinate);
                 }}
               />
-            </MapView>
+            </UnifiedMapView>
           </View>
 
         </View>

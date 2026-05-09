@@ -1,10 +1,10 @@
-import { Circle } from 'react-native-maps';
+import { UnifiedCircle } from '@/components/map/provider';
 import { MAP_HIGHLIGHT_RADIUS_METERS } from '@/constants/map.constants';
 
 export function HighlightedCircle({ coordinate }) {
   if (!coordinate) return null;
   return (
-    <Circle
+    <UnifiedCircle
       center={coordinate}
       radius={MAP_HIGHLIGHT_RADIUS_METERS}
       strokeWidth={2}

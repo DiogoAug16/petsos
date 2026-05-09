@@ -1,12 +1,13 @@
-import { assumeComplaint, getFollowers, unfollowComplaint } from '@/services/complaints.service';
+import { assumeComplaint, getIsFollowingComplaint, unfollowComplaint } from '@/services/complaints.service';
 import { useCallback, useState } from 'react';
+
+
 
 export function useFollowComplaint() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  //  Verifica se o usuário já segue
   const checkIsFollowing = useCallback(async (complaintId) => {
     if (!complaintId) return;
 
@@ -14,11 +15,9 @@ export function useFollowComplaint() {
       setLoading(true);
       setError(null);
 
-      const response = await getFollowers(complaintId);
+      const response = await getIsFollowingComplaint(complaintId);
 
-      const followers = response?.data ?? [];
-
-      setIsFollowing(Array.isArray(followers) && followers.length > 0);
+      setIsFollowing(Boolean(response?.data?.isFollowing));
     } catch (_err) {
       setError('Erro ao verificar acompanhamento');
     } finally {
@@ -26,47 +25,48 @@ export function useFollowComplaint() {
     }
   }, []);
 
-  //  Assumir denúncia
-  const followComplaint = useCallback(async (complaintId) => {
-    if (!complaintId || loading) return;
+  const followComplaint = useCallback(
+    async (complaintId) => {
+      if (!complaintId || loading) return;
 
-    try {
-      setLoading(true);
-      setError(null);
+      try {
+        setLoading(true);
+        setError(null);
 
-      await assumeComplaint(complaintId);
+        await assumeComplaint(complaintId);
+        await checkIsFollowing(complaintId);
+      } catch (err) {
+        if (err.message?.includes('409')) {
+          await checkIsFollowing(complaintId);
+          return;
+        }
 
-      setIsFollowing(true);
-    } catch (err) {
-      // trata 409 (já está seguindo)
-      if (err.message?.includes('409')) {
-        setIsFollowing(true);
-        return;
+        setError('Erro ao assumir denúncia');
+      } finally {
+        setLoading(false);
       }
+    },
+    [loading, checkIsFollowing],
+  );
 
-      setError('Erro ao assumir denúncia');
-    } finally {
-      setLoading(false);
-    }
-  }, [loading]);
+  const unfollow = useCallback(
+    async (complaintId) => {
+      if (!complaintId || loading) return;
 
-  //  Parar de acompanhar
-  const unfollow = useCallback(async (complaintId) => {
-    if (!complaintId || loading) return;
+      try {
+        setLoading(true);
+        setError(null);
 
-    try {
-      setLoading(true);
-      setError(null);
-
-      await unfollowComplaint(complaintId);
-
-      setIsFollowing(false);
-    } catch (_err) {
-      setError('Erro ao parar de acompanhar');
-    } finally {
-      setLoading(false);
-    }
-  }, [loading]);
+        await unfollowComplaint(complaintId);
+        await checkIsFollowing(complaintId);
+      } catch (_err) {
+        setError('Erro ao parar de acompanhar');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [loading, checkIsFollowing],
+  );
 
   return {
     isFollowing,

@@ -9,8 +9,10 @@ import { searchStyles } from './search.styles';
 import { heroStyles } from './hero.styles';
 import { infoBarStyles } from './info-bar.styles';
 import { detailCardsStyles } from './detail-cards.styles';
-import { actionsStyles } from './actions.styles';
-import { toastStyles } from './toast.styles';
+import { detailCommentsStyles } from './detail-comments.styles';
+import { detailFollowStyles } from './detail-follow.styles';
+import { detailLayoutStyles } from './detail-layout.styles';
+import { detailMenuStyles } from './detail-menu.styles';
 
 export const complaintsStyles = (colorScheme) => {
   return StyleSheet.create({
@@ -24,7 +26,9 @@ export const complaintsStyles = (colorScheme) => {
     ...heroStyles(colorScheme),
     ...infoBarStyles(colorScheme),
     ...detailCardsStyles(colorScheme),
-    ...actionsStyles(colorScheme),
-    ...toastStyles(colorScheme),
+    ...detailLayoutStyles(colorScheme),
+    ...detailMenuStyles(colorScheme),
+    ...detailFollowStyles(colorScheme),
+    ...detailCommentsStyles(colorScheme),
   });
 };

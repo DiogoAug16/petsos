@@ -1,4 +1,4 @@
-import { useSharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
+import { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 
 export function useInputAnimation() {
   const scale = useSharedValue(1);

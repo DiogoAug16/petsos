@@ -5,33 +5,28 @@ export const useLocation = () => {
   const [location, setLocation] = useState(null);
 
   useEffect(() => {
-    let subscription;
-
     const getLocation = async () => {
-        try {
-            const { status } = await Location.requestForegroundPermissionsAsync();
-            
-            if (status !== 'granted') return;
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
 
-            const currentLocation = await Location.getCurrentPositionAsync({
-              accuracy: Location.LocationAccuracy.Highest,
-            });
+        if (status !== 'granted') return;
 
-            setLocation({
-              latitude: currentLocation.coords.latitude,
-              longitude: currentLocation.coords.longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            });
+        const currentLocation = await Location.getCurrentPositionAsync({
+          accuracy: Location.LocationAccuracy.Highest,
+        });
 
-        } catch (error) {
-            console.error('Erro ao obter localização:', error);
-        }
+        setLocation({
+          latitude: currentLocation.coords.latitude,
+          longitude: currentLocation.coords.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        });
+      } catch {
+        setLocation(null);
+      }
     };
 
     getLocation();
-
-    return () => subscription?.remove();
   }, []);
 
   return { location };

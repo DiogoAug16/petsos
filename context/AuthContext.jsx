@@ -1,8 +1,8 @@
-import { createContext, useState, useEffect, useContext } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth } from '@/config/firebase';
+import { deleteAuthToken, saveFirebaseUserToken } from '@/services/auth-token.service';
 import * as authService from '@/services/auth.service';
+import { onAuthStateChanged } from 'firebase/auth';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 const AuthContext = createContext({});
 
@@ -18,15 +18,15 @@ export function AuthProvider({ children }) {
         setIsAuthenticated(true);
 
         try {
-          const token = await firebaseUser.getIdToken();
-          await AsyncStorage.setItem('authToken', token);
-        } catch (error) {
-          console.log('Erro ao salvar token:', error);
+          await saveFirebaseUserToken(firebaseUser);
+        } catch(error) {
+          // arrumar isso depois, talvez seja melhor criar um serviço específico para lidar com erros de token
+          console.warn('Erro ao salvar token no SecureStore:', error);
         }
       } else {
         setUser(null);
         setIsAuthenticated(false);
-        await AsyncStorage.removeItem('authToken');
+        await deleteAuthToken();
       }
 
       setIsLoading(false);
@@ -37,20 +37,18 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const userCredential = await authService.login(email, password);
-    const token = await userCredential.user.getIdToken();
-    await AsyncStorage.setItem('authToken', token);
+    await saveFirebaseUserToken(userCredential.user);
     return userCredential;
   };
 
   const logout = async () => {
     await authService.logout();
-    await AsyncStorage.removeItem('authToken');
+    await deleteAuthToken();
   };
 
   const register = async (email, password, name, username) => {
     const userCredential = await authService.register(email, password, name, username);
-    const token = await userCredential.user.getIdToken();
-    await AsyncStorage.setItem('authToken', token);
+    await saveFirebaseUserToken(userCredential.user);
     return userCredential;
   };
 

@@ -1,4 +1,6 @@
 import { auth } from '@/config/firebase';
+import { deleteAuthToken } from '@/services/auth-token.service';
+import { logout as logoutAuth } from '@/services/auth.service';
 import { router } from 'expo-router';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -10,8 +12,8 @@ export async function apiFetch(endpoint, options = {}) {
     try {
       const token = await auth.currentUser.getIdToken();
       headers['Authorization'] = `Bearer ${token}`;
-    } catch (error) {
-      console.log('Erro ao obter token:', error);
+    } catch {
+      await deleteAuthToken();
     }
   }
 
@@ -21,7 +23,11 @@ export async function apiFetch(endpoint, options = {}) {
   });
 
   if (response.status === 401) {
-    await auth.signOut();
+    try {
+      await logoutAuth();
+    } finally {
+      await deleteAuthToken();
+    }
     router.replace('/(auth)/login');
     throw new Error('Sessão expirada. Faça login novamente.');
   }

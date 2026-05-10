@@ -47,13 +47,9 @@ export function useLoginForm() {
     if (isSubmitting) return;
 
     try {
-    const userCredential = await login(form.email.trim(), form.password);
-
-    const token = await userCredential.user.getIdToken();
-
-    console.log('TOKEN FIREBASE:', token);
-
-    router.replace('/(tabs)');
+      setIsSubmitting(true);
+      await login(form.email.trim(), form.password);
+      router.replace('/(tabs)');
     } catch (error) {
       if (
         error.code === 'auth/user-not-found' ||

@@ -109,11 +109,3 @@ export async function login(identifier, password) {
 export async function logout() {
   return await signOut(auth);
 }
-
-/**
- * Retorna usuário atualmente autenticado
- * @returns {User | null} Usuário autenticado ou null
- */
-export function getCurrentUser() {
-  return auth.currentUser;
-}

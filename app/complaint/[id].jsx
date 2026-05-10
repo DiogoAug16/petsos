@@ -1,133 +1,225 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useRef } from 'react';
-import { ScrollView, View } from 'react-native';
+import { useRef } from 'react';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 
-import { DetailActions } from '@/components/complaints/detail-actions';
-import { DetailDescriptionCard } from '@/components/complaints/detail-description-card';
-import { DetailHelpToast } from '@/components/complaints/detail-help-toast';
+import { CommentComposer } from '@/components/complaints/comment-composer';
+import { CommentsSection } from '@/components/complaints/comments-section';
+import { DetailFollowSummary } from '@/components/complaints/detail-follow-summary';
 import { DetailHero } from '@/components/complaints/detail-hero';
 import { DetailInfoBar } from '@/components/complaints/detail-info-bar';
+import { DetailMainCard } from '@/components/complaints/detail-main-card';
 import { DetailMapCard } from '@/components/complaints/detail-map-card';
 import { DetailMapModal } from '@/components/complaints/detail-map-modal';
 import { DetailPhotosCard } from '@/components/complaints/detail-photos-card';
-import { DetailRegistrarCard } from '@/components/complaints/detail-registrar-card';
-import { DetailTitleCard } from '@/components/complaints/detail-title-card';
 import { ErrorState } from '@/components/complaints/error-state';
 import { LoadingState } from '@/components/complaints/loading-state';
+import { UnfollowConfirmModal } from '@/components/complaints/unfollow-confirm-modal';
 import { complaintsStyles } from '@/styles/complaints';
 
 import { useAddress } from '@/hooks/useAddress';
 import { useAuth } from '@/context/AuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useComplaintConfig } from '@/hooks/useComplaintConfig';
-import { useComplaintDetail } from '@/hooks/useComplaintDetail';
-import { useFollowComplaint } from '@/hooks/useFollowComplaint';
+import { useComplaintDetailScreenData } from '@/hooks/useComplaintDetailScreenData';
+import { useSectionVisibility } from '@/hooks/useSectionVisibility';
 import Colors from '@/styles/theme/Colors';
 
 export default function ComplaintDetailScreen() {
   const { id } = useLocalSearchParams();
+  const complaintId = Array.isArray(id) ? id[0] : id;
   const router = useRouter();
   const { user } = useAuth();
   const colorScheme = useColorScheme();
   const styles = complaintsStyles(colorScheme);
   const theme = Colors[colorScheme ?? 'light'];
   const mapRef = useRef();
-  
+  const {
+    isVisible: isCommentComposerVisible,
+    handleViewportLayout,
+    handleScroll,
+    handleSectionLayout,
+  } = useSectionVisibility();
+
+  const {
+    detail,
+    followers: followersState,
+    comments: commentsState,
+    initialLoading,
+    initialError,
+    retryInitialLoad,
+  } = useComplaintDetailScreenData(complaintId);
+
   const {
     complaint,
     loading,
     error,
-    isHelping,
     showMapModal,
     fetchComplaintDetails,
-    handleToggleHelp,
     handleEdit,
     handleOpenMap,
     handleDelete,
-    handleShare,
     handleCloseMapModal,
-  } = useComplaintDetail(id);
+  } = detail;
 
-    const {
+  const {
     isFollowing,
-    followComplaint,
-    unfollowComplaint,
-    checkIsFollowing,
-    loading: followLoading,
-  } = useFollowComplaint();
+    followers,
+    totalFollowers,
+    loading: followersLoading,
+    actionLoading: followLoading,
+    unfollowModalVisible,
+    toggleFollow,
+    closeUnfollowModal,
+    confirmUnfollow,
+  } = followersState;
 
-    useEffect(() => {
-      if (id) {
-        checkIsFollowing(id);
-      }
-    }, [id, checkIsFollowing]);
+  const {
+    comments,
+    totalComments,
+    pageInfo: commentsPageInfo,
+    loading: commentsLoading,
+    loadingMore: commentsLoadingMore,
+    submitting: commentSubmitting,
+    loadMore: loadMoreComments,
+    addComment,
+    toggleLike,
+    incrementRepliesCount,
+  } = commentsState;
 
-      const handleToggleFollow = () => {
-
-      if (isFollowing) {
-        unfollowComplaint(id);
-      } else {
-        followComplaint(id);
-      }
-    };
   const { address } = useAddress(complaint?.location);
   const { status, type, emoji } = useComplaintConfig(complaint);
+  const isOwner = user?.uid === complaint?.createdById;
+  const renderScreenState = (children) => (
+    <>
+      <Stack.Screen options={{ headerShown: false }} />
+      {children}
+    </>
+  );
 
-  if (loading && !complaint) return <LoadingState />;
-  if (error) return <ErrorState message={error} onRetry={fetchComplaintDetails} />;
-  if (!complaint) return null;
-  
+  if (initialLoading || (loading && !complaint)) {
+    return renderScreenState(<LoadingState message="Carregando denúncia..." />);
+  }
+
+  if (initialError) {
+    return renderScreenState(
+      <ErrorState message={initialError} onRetry={retryInitialLoad} />
+    );
+  }
+
+  if (error && !complaint) {
+    return renderScreenState(
+      <ErrorState message={error} onRetry={fetchComplaintDetails} />
+    );
+  }
+
+  if (!complaint) return renderScreenState(null);
+
   return (
     <View style={styles.detailScreen}>
       <Stack.Screen options={{ headerShown: false }} />
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 80 }}>
-        <DetailHero 
-          complaint={complaint}
-          type={type}
-          emoji={emoji}
-          styles={styles}
-          theme={theme}
-          onBack={() => router.back()}
-          onShare={handleShare}
-        />
+      <KeyboardAvoidingView
+        style={styles.detailKeyboardContainer}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={0}
+      >
+        <ScrollView
+          style={styles.detailScroll}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 18 }}
+          onLayout={handleViewportLayout}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+        >
+          <DetailHero
+            complaint={complaint}
+            type={type}
+            emoji={emoji}
+            styles={styles}
+            theme={theme}
+            isOwner={isOwner}
+            onBack={() => router.back()}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
 
-        <DetailInfoBar 
-          complaint={complaint}
-          status={status}
-          type={type}
-          emoji={emoji}
-          isHelping={isFollowing}
-          styles={styles}
-          colorScheme={colorScheme}
-        />
+          {!isOwner && (
+            <DetailFollowSummary
+              followers={followers}
+              totalFollowers={totalFollowers}
+              followersLoading={followersLoading}
+              followLoading={followLoading}
+              isFollowing={isFollowing}
+              isOwner={isOwner}
+              onToggleFollow={toggleFollow}
+              styles={styles}
+            />
+          )}
 
-        <View style={styles.detailContent}>
-          <DetailTitleCard complaint={complaint} address={address} styles={styles} />
-          <DetailDescriptionCard description={complaint.description} styles={styles} />
-          <DetailPhotosCard photos={complaint.photos} styles={styles} />
-          <DetailMapCard 
-            location={complaint.location}
-            address={address}
-            onOpenMap={() => handleOpenMap(mapRef)}
+          <DetailInfoBar
+            complaint={complaint}
+            status={status}
+            type={type}
+            emoji={emoji}
+            styles={styles}
+            colorScheme={colorScheme}
+          />
+
+          <View style={styles.detailContent}>
+            <DetailMainCard
+              complaint={complaint}
+              address={address}
+              followers={followers}
+              totalFollowers={totalFollowers}
+              followersLoading={followersLoading}
+              showFollowers={isOwner}
+              styles={styles}
+            />
+            <DetailPhotosCard photos={complaint.photos} styles={styles} />
+            <DetailMapCard
+              location={complaint.location}
+              address={address}
+              onOpenMap={() => handleOpenMap(mapRef)}
+              styles={styles}
+            />
+          </View>
+
+          <CommentsSection
+            complaintId={complaintId}
+            comments={comments}
+            totalComments={totalComments}
+            pageInfo={commentsPageInfo}
+            loading={commentsLoading}
+            loadingMore={commentsLoadingMore}
+            loadMore={loadMoreComments}
+            toggleLike={toggleLike}
+            incrementRepliesCount={incrementRepliesCount}
+            onLayout={handleSectionLayout}
             styles={styles}
           />
-          <DetailRegistrarCard complaint={complaint} styles={styles} />
-          <DetailHelpToast isHelping={isFollowing} styles={styles} />
-        </View>
-      </ScrollView>
+        </ScrollView>
 
-        <DetailActions
-          isHelping={isFollowing}
-          isOwner={user?.uid === complaint.createdById}
-          onToggleHelp={handleToggleFollow}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          loading={followLoading}
-          styles={styles}
-        />
+        {isCommentComposerVisible && (
+          <View style={styles.detailCommentInputBar}>
+            <CommentComposer
+              placeholder="Adicionar comentário..."
+              submitting={commentSubmitting}
+              onSubmit={addComment}
+              styles={styles}
+            />
+          </View>
+        )}
+      </KeyboardAvoidingView>
 
-      <DetailMapModal 
+      <UnfollowConfirmModal
+        visible={unfollowModalVisible}
+        loading={followLoading}
+        onCancel={closeUnfollowModal}
+        onConfirm={confirmUnfollow}
+        styles={styles}
+      />
+
+      <DetailMapModal
         visible={showMapModal}
         location={complaint.location}
         mapRef={mapRef}

@@ -182,7 +182,7 @@ export async function getNearbyComplaints(lat, lng, radiusKm = 5) {
 
 // Função para assumir denuncia 
 export const assumeComplaint = (complaintId) => {
-  return apiFetch(`/complaints/${complaintId}/assumir`, {
+  return apiFetch(`/complaint-followers/${complaintId}/assumir`, {
     method: 'POST',
   });
 };

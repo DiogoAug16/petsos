@@ -2,9 +2,16 @@ import { Image } from 'expo-image';
 import { ScrollView, StyleSheet } from 'react-native';
 import { useUploadUrl } from '@/hooks/useUploadUrl';
 
-export default function ComplaintPhotos({ photos }) {
+const getPhotoPath = (photo) => {
+  if (typeof photo === 'string') return photo;
+  if (!photo || typeof photo !== 'object') return null;
+  return photo.url || photo.uri || photo.path || photo.filePath || null;
+};
+
+export default function ComplaintPhotos({ photos, onPhotoError }) {
   const UPLOAD_URL = useUploadUrl();
-  const resolvePhotoUri = (photoPath) => {
+  const resolvePhotoUri = (photo) => {
+    const photoPath = getPhotoPath(photo);
     if (!photoPath) return null;
     if (/^(https?:|file:|content:|data:)/i.test(photoPath)) return photoPath;
     if (!UPLOAD_URL) return photoPath;
@@ -13,19 +20,25 @@ export default function ComplaintPhotos({ photos }) {
     const normalizedPath = photoPath.startsWith('/') ? photoPath : `/${photoPath}`;
     return `${baseUrl}${normalizedPath}`;
   };
-  
+
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-      {photos.map((uri, index) => (
-        <Image 
-          key={`${uri}-${index}`} 
-          source={{ uri: resolvePhotoUri(uri) }} 
-          style={styles.photo} 
-          contentFit="cover"
-          cachePolicy="memory-disk"
-          transition={120}
-        />
-      ))}
+      {photos.map((uri, index) => {
+        const resolvedUri = resolvePhotoUri(uri);
+        if (!resolvedUri) return null;
+
+        return (
+          <Image
+            key={`${uri}-${index}`}
+            source={{ uri: resolvedUri }}
+            style={styles.photo}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+            transition={120}
+            onError={() => onPhotoError?.(uri)}
+          />
+        );
+      })}
     </ScrollView>
   );
 }

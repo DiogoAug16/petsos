@@ -146,8 +146,7 @@ export default function CreateComplaintScreen() {
           if (normalizedLocation) {
             setManualLocation(normalizedLocation);
           }
-        } catch (error) {
-          console.error('Erro ao carregar denúncia para edição:', error);
+        } catch {
           Alert.alert('Erro', 'Não foi possível carregar os dados da denúncia.');
           router.back();
         } finally {
@@ -251,10 +250,7 @@ export default function CreateComplaintScreen() {
             photos: form.photos,
           };
 
-      console.log('Payload da denúncia:', payload);
-
       if (isEdit) {
-        console.log('Calling updateComplaint with id:', complaintId);
         const result = await updateComplaint(complaintId, payload);
 
         if (result) {
@@ -268,7 +264,6 @@ export default function CreateComplaintScreen() {
           Alert.alert('Erro', 'O servidor não confirmou a alteração.');
         }
       } else {
-        console.log('Calling createComplaint');
         await createComplaint(payload);
         // Feedback + navegação
         Alert.alert('Sucesso', 'Denúncia criada com sucesso!', [
@@ -281,8 +276,7 @@ export default function CreateComplaintScreen() {
           },
         ]);
       }
-    } catch (error) {
-      console.log('Erro ao salvar denúncia:', error);
+    } catch {
       Alert.alert('Erro', 'Não foi possível salvar a denúncia.');
     } finally {
       setIsSubmitting(false);
@@ -413,9 +407,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 4,
     paddingRight: 8,
-  },
-  disabledText: {
-    opacity: 0.7,
   },
   loadingContainer: {
     flex: 1,

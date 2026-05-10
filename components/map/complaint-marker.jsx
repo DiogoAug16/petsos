@@ -42,10 +42,10 @@ export const ComplaintMarker = ({ complaint, onPress }) => {
           },
         ]}
       >
-        <MaterialCommunityIcons 
-          name={complaint.animal === 'Gato' ? 'cat' : 'dog'} 
-          size={16} 
-          color={themeColor} 
+        <MaterialCommunityIcons
+          name={complaint.animal === 'Gato' ? 'cat' : 'dog'}
+          size={16}
+          color={themeColor}
         />
         <Text style={[styles.label, { color: isDark ? '#F2F2F7' : '#333333' }]} numberOfLines={1}>
           {complaint.title}

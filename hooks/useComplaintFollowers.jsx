@@ -108,7 +108,7 @@ export function useComplaintFollowers(complaintId) {
       requireAuth(null, {
         title: 'Entre para acompanhar',
         message:
-          'Faca login ou crie uma conta para acompanhar denuncias e receber atualizacoes.',
+          'Faça login ou crie uma conta para acompanhar denúncias e receber atualizações.',
       });
       return false;
     }
@@ -161,7 +161,7 @@ export function useComplaintFollowers(complaintId) {
       requireAuth(null, {
         title: 'Entre para acompanhar',
         message:
-          'Faca login ou crie uma conta para acompanhar denuncias e receber atualizacoes.',
+          'Faça login ou crie uma conta para acompanhar denúncias e receber atualizações.',
       });
       return false;
     }

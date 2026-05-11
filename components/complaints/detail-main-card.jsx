@@ -34,14 +34,14 @@ export function DetailMainCard({
         <View style={styles.detailMainMetaRow}>
           <Ionicons name="location-outline" size={16} color="#8A8A8E" />
           <Text style={styles.detailMainMetaText} numberOfLines={2}>
-            {address || 'Localizacao'}
+            {address || 'Localização'}
           </Text>
         </View>
 
         {!!complaint.description && (
           <>
             <View style={styles.detailMainDivider} />
-            <Text style={styles.detailMainSectionLabel}>Descricao</Text>
+            <Text style={styles.detailMainSectionLabel}>Descrição</Text>
             <Text style={styles.detailMainDescription}>{complaint.description}</Text>
           </>
         )}
@@ -52,7 +52,7 @@ export function DetailMainCard({
             <UserAvatar username={username} size={36} textSize={15} />
             <View style={styles.detailMainRegistrarCopy}>
               <Text style={styles.detailRegistrarName}>
-                {username ? `@${username}` : 'Usuario desconhecido'}
+                {username ? `@${username}` : 'Usuário desconhecido'}
               </Text>
               <Text style={styles.detailRegistrarDate}>
                 {formatDate(complaint.createdAt)}
@@ -117,7 +117,7 @@ export function DetailMainCard({
                 ))
               ) : (
                 <Text style={styles.followersEmpty}>
-                  Ainda nao ha usuarios acompanhando esta denuncia.
+                  Ainda não há usuários acompanhando esta denúncia.
                 </Text>
               )}
             </ScrollView>

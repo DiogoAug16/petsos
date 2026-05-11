@@ -1,10 +1,10 @@
-import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
-import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { UserLink } from '@/components/ui/UserLink';
 import { useAuth } from '@/context/AuthContext';
 import { useRequireAuth } from '@/context/AuthPromptContext';
+import { Ionicons } from '@expo/vector-icons';
+import { useState } from 'react';
+import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 
 const formatFollowersCount = (total) => {
   if (total === 1) return '1 acompanhando';
@@ -35,7 +35,7 @@ export function DetailFollowSummary({
       {
         title: 'Entre para ver acompanhantes',
         message:
-          'Faca login ou crie uma conta para ver quem acompanha esta denuncia.',
+          'Faça login ou crie uma conta para ver quem acompanha esta denúncia.',
       },
     );
   };
@@ -62,7 +62,7 @@ export function DetailFollowSummary({
               requireAuth(onToggleFollow, {
                 title: 'Entre para acompanhar',
                 message:
-                  'Faca login ou crie uma conta para acompanhar denuncias e receber atualizacoes.',
+                  'Faça login ou crie uma conta para acompanhar denúncias e receber atualizações.',
               })
             }
             disabled={followLoading}

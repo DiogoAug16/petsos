@@ -25,7 +25,7 @@ export function BottomCard({ style, complaint, animation }) {
               { minHeight: 62, alignItems: 'center', justifyContent: 'center' },
             ]}
           >
-            <Text style={style.miniCardSub}>Não há denuncias proximas</Text>
+            <Text style={style.miniCardSub}>Não há denúncias próximas</Text>
           </View>
         )}
       </View>

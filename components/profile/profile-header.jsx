@@ -25,7 +25,7 @@ export function ProfileHeader({
 
   const handleEdit = () => {
     setMenuVisible(false);
-    Alert.alert('Editar perfil', 'Edicao de perfil em breve.');
+    Alert.alert('Editar perfil', 'Edição de perfil em breve.');
   };
 
   const handleBack = () => {
@@ -76,10 +76,10 @@ export function ProfileHeader({
         </View>
 
         <Text style={styles.name}>{displayName}</Text>
-        <Text style={styles.username}>@{profile.username} - Cuiaba, MT</Text>
+        <Text style={styles.username}>@{profile.username} - Cuiabá, MT</Text>
 
         <Text style={styles.bio}>
-          Voluntario animal desde 2026. Acredito que todo ser vivo merece
+          Voluntário animal desde 2026. Acredito que todo ser vivo merece
           respeito e cuidado.
         </Text>
 
@@ -116,9 +116,9 @@ export function ProfileHeader({
 
       <View style={styles.sectionHeader}>
         <View>
-          <Text style={styles.sectionKicker}>Denuncias acompanhadas</Text>
+          <Text style={styles.sectionKicker}>Denúncias acompanhadas</Text>
           <Text style={styles.sectionTitle}>
-            {followedCount} {followedCount === 1 ? 'denuncia' : 'denuncias'}
+            {followedCount} {followedCount === 1 ? 'denúncia' : 'denúncias'}
           </Text>
         </View>
       </View>

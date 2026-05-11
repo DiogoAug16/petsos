@@ -1,18 +1,18 @@
 import { BottomCard } from '@/components/bottom-card/bottom-card';
-import { FiltroDenuncias } from '@/components/map/filtro-denuncias';
-import { ComplaintMarkersLayer } from '@/components/map/complaint-markers-layer';
 import { FabButton } from '@/components/floating-buttons/create-complaint-button';
 import { CenterButton } from '@/components/floating-buttons/map-center-button';
-import { SearchBar } from '@/components/search-bar/search-bar';
-import { NoResultsBadge } from '@/components/map/no-results-badge';
 import { AutocompleteSuggestions } from '@/components/map/autocomplete-suggestions';
+import { ComplaintMarkersLayer } from '@/components/map/complaint-markers-layer';
+import { ComplaintsFilter } from '@/components/map/complaints-filter';
 import { HighlightedCircle } from '@/components/map/highlighted-circle';
-import { useMapHandlers } from '@/hooks/useMapHandlers';
+import { NoResultsBadge } from '@/components/map/no-results-badge';
+import { SearchBar } from '@/components/search-bar/search-bar';
 import { useComplaints } from '@/context/ComplaintsContext';
 import { useBottomCardAnimation } from '@/hooks/useBottomCardAnimation';
 import { useColorScheme } from '@/hooks/useColorScheme.jsx';
 import { useFloatingButtonsAnimation } from '@/hooks/useFloatingButtonsAnimation';
 import { useLocation } from '@/hooks/useLocation.jsx';
+import { useMapHandlers } from '@/hooks/useMapHandlers';
 import { useMapSearchAutocomplete } from '@/hooks/useMapSearchAutocomplete';
 import { useMapTypeFilter } from '@/hooks/useMapTypeFilter';
 import { useNearbyComplaints } from '@/hooks/useNearbyComplaints';
@@ -132,7 +132,7 @@ export default function MapScreen() {
         filterActive={Boolean(appliedType)}
       />
 
-      <FiltroDenuncias
+      <ComplaintsFilter
         style={styles}
         visible={isFilterOpen}
         selectedType={selectedType}

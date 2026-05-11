@@ -35,7 +35,7 @@ export function AuthPromptBottomSheet({
           </View>
 
           <Pressable style={styles.cancelButton} onPress={onClose}>
-            <Text style={styles.cancelText}>Agora nao</Text>
+            <Text style={styles.cancelText}>Agora não</Text>
           </Pressable>
         </View>
       </View>

@@ -46,7 +46,7 @@ export function ProfileComplaintCard({ complaint, styles }) {
           </View>
           <Ionicons name="location-outline" size={13} color="#8A8A8E" />
           <Text style={styles.cardAddress} numberOfLines={1}>
-            {address || 'Localizacao'}
+            {address || 'Localização'}
           </Text>
         </View>
       </View>

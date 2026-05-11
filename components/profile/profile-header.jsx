@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Alert, Modal, Pressable, Text, View } from 'react-native';
 import { useState } from 'react';
+import { Alert, Modal, Pressable, Text, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 
 import { ProfileBadge } from '@/components/profile/profile-badge';
 import { UserAvatar } from '@/components/ui/UserAvatar';
@@ -39,6 +40,10 @@ export function ProfileHeader({
   const handleLogout = async () => {
     setMenuVisible(false);
     await logout();
+    Toast.show({
+      type: 'success',
+      text1: 'Você saiu da conta',
+    });
     router.replace('/(tabs)');
   };
 

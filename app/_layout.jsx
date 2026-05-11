@@ -57,6 +57,7 @@ function RootLayoutNav() {
               <Stack.Screen name="complaint/[id]" options={{ headerShown: false }} />
               <Stack.Screen name="complaint/create" />
               <Stack.Screen name="users/[username]" options={{ headerShown: false }} />
+              <Stack.Screen name="notifications/index" options={{ headerShown: false }} />
             </Stack>
             <Toast config={toastConfig} topOffset={60} />
           </ComplaintsProvider>

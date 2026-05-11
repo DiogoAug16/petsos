@@ -15,6 +15,8 @@ import ComplaintLocation from '../../components/complaints/ComplaintLocation';
 import ComplaintTypeAnimal from '../../components/complaints/ComplaintTypeAnimal';
 import PhotoSection from '../../components/complaints/PhotoSection';
 
+import { useAuth } from '@/context/AuthContext';
+import { useAuthPrompt } from '@/context/AuthPromptContext';
 import { useLocation } from '../../hooks/useLocation';
 import { createComplaint, getComplaintById, updateComplaint } from '../../services/complaints.service';
 import { ANIMAL_TYPES, COMPLAINT_TYPES } from '../../constants/complaints.constants';
@@ -103,6 +105,8 @@ export default function CreateComplaintScreen() {
   const router = useRouter();
   const { edit, id } = useLocalSearchParams();
   const complaintId = Array.isArray(id) ? id[0] : id;
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { openAuthPrompt } = useAuthPrompt();
 
   // Hook que captura localização automática
   const { location } = useLocation();
@@ -120,8 +124,20 @@ export default function CreateComplaintScreen() {
 
   const isEdit = edit === 'true' && complaintId;
 
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      openAuthPrompt({
+        title: 'Entre para criar uma denúncia',
+        message:
+          'Faça login ou crie uma conta para registrar uma denúncia.',
+      });
+    }
+  }, [authLoading, isAuthenticated, openAuthPrompt]);
+
   // Carrega dados para edição
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     if (isEdit) {
       const loadComplaint = async () => {
         try {
@@ -155,7 +171,7 @@ export default function CreateComplaintScreen() {
       };
       loadComplaint();
     }
-  }, [complaintId, isEdit, router]);
+  }, [complaintId, isAuthenticated, isEdit, router]);
 
   // Atualiza qualquer campo do formulário
   const updateField = (field, value) => {
@@ -202,6 +218,15 @@ export default function CreateComplaintScreen() {
 
   // Função principal de envio da denúncia
   const handleSubmit = async () => {
+    if (!isAuthenticated) {
+      openAuthPrompt({
+        title: 'Entre para criar uma denúncia',
+        message:
+          'Faça login ou crie uma conta para registrar uma denúncia.',
+      });
+      return;
+    }
+
     // Validação do formulário
     const validationError = validateComplaintForm(form);
 
@@ -282,6 +307,43 @@ export default function CreateComplaintScreen() {
       setIsSubmitting(false);
     }
   };
+
+  if (authLoading) {
+    return (
+      <>
+        <Stack.Screen options={{ headerShown: false }} />
+        <View style={styles.authRequiredScreen}>
+          <Text style={styles.authRequiredText}>Carregando...</Text>
+        </View>
+      </>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <>
+        <Stack.Screen options={{ headerShown: false }} />
+        <View style={styles.authRequiredScreen}>
+          <Text style={styles.authRequiredTitle}>Criar denúncia</Text>
+          <Text style={styles.authRequiredText}>
+            Entre ou crie sua conta para registrar uma denúncia.
+          </Text>
+          <Pressable
+            style={styles.authRequiredButton}
+            onPress={() =>
+              openAuthPrompt({
+                title: 'Entre para criar uma denúncia',
+                message:
+                  'Faça login ou crie uma conta para registrar uma denúncia.',
+              })
+            }
+          >
+            <Text style={styles.authRequiredButtonText}>Entrar ou criar conta</Text>
+          </Pressable>
+        </View>
+      </>
+    );
+  }
 
   return (
     <>
@@ -440,5 +502,38 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 15,
     fontWeight: '700',
+  },
+  authRequiredScreen: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  authRequiredTitle: {
+    color: '#1C1C1E',
+    fontSize: 24,
+    fontWeight: '900',
+  },
+  authRequiredText: {
+    color: '#8A8A8E',
+    fontSize: 15,
+    lineHeight: 21,
+    textAlign: 'center',
+    marginTop: 8,
+    marginBottom: 18,
+  },
+  authRequiredButton: {
+    minHeight: 46,
+    paddingHorizontal: 18,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.orange,
+  },
+  authRequiredButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '900',
   },
 });

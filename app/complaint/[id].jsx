@@ -118,7 +118,7 @@ export default function ComplaintDetailScreen() {
   );
 
   if (initialLoading || (loading && !complaint)) {
-    return renderScreenState(<LoadingState message="Carregando denuncia..." />);
+    return renderScreenState(<LoadingState message="Carregando denúncia..." />);
   }
 
   if (initialError) {

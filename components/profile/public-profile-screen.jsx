@@ -13,11 +13,11 @@ const keyExtractor = (item) => String(item.id);
 function EmptyFollowedList({ styles, isCurrentUser }) {
   return (
     <View style={styles.emptyWrap}>
-      <Text style={styles.emptyTitle}>Nenhuma denuncia por aqui</Text>
+      <Text style={styles.emptyTitle}>Nenhuma denúncia por aqui</Text>
       <Text style={styles.emptyText}>
         {isCurrentUser
-          ? 'Quando voce acompanhar uma denuncia, ela aparecera aqui.'
-          : 'Este perfil ainda nao acompanha nenhuma denuncia.'}
+          ? 'Quando você acompanhar uma denúncia, ela aparecera aqui.'
+          : 'Este perfil ainda não acompanha nenhuma denúncia.'}
       </Text>
     </View>
   );

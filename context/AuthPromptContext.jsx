@@ -6,7 +6,7 @@ import { createContext, useCallback, useContext, useMemo, useState } from 'react
 const DEFAULT_PROMPT = {
   title: 'Entre para continuar',
   message:
-    'Crie uma conta ou faca login para participar das denuncias, comentar e acompanhar atualizacoes.',
+    'Crie uma conta ou faça login para participar das denúncias, comentar e acompanhar atualizações.',
 };
 
 const AuthPromptContext = createContext(null);

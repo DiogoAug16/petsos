@@ -1,7 +1,7 @@
 import { FILTER_CHIPS } from '@/constants/complaints.constants';
 import { Text, TouchableOpacity, View } from 'react-native';
 
-export function FiltroDenuncias({
+export function ComplaintsFilter({
   style,
   visible = false,
   selectedType = null,

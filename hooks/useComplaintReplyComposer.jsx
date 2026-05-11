@@ -8,7 +8,7 @@ export function useComplaintReplyComposer({ addComment, handleInputFocus }) {
   const initialText = replyTarget?.username ? `@${replyTarget.username} ` : '';
   const placeholder = replyTarget?.username
     ? `Responder @${replyTarget.username}`
-    : 'Adicionar comentario...';
+    : 'Adicionar comentário...';
 
   const handleReplyPress = useCallback(
     (target) => {

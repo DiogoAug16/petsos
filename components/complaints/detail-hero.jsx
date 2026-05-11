@@ -3,12 +3,7 @@ import { Image } from 'expo-image';
 import { Modal, Pressable, Text, useWindowDimensions, View } from 'react-native';
 import { useEffect, useRef, useState } from 'react';
 import { useUploadUrl } from '@/hooks/useUploadUrl';
-
-const getPhotoPath = (photo) => {
-  if (typeof photo === 'string') return photo;
-  if (!photo || typeof photo !== 'object') return null;
-  return photo.url || photo.uri || photo.path || photo.filePath || null;
-};
+import { buildUploadPhotoUri } from '@/utils/photo.utils';
 
 export function DetailHero({
   complaint,
@@ -27,17 +22,7 @@ export function DetailHero({
   const [coverFailed, setCoverFailed] = useState(false);
   const { width: windowWidth } = useWindowDimensions();
   const UPLOAD_URL = useUploadUrl();
-  const resolvePhotoUri = (photo) => {
-    const photoPath = getPhotoPath(photo);
-    if (!photoPath) return null;
-    if (/^(https?:|file:|content:|data:)/i.test(photoPath)) return photoPath;
-    if (!UPLOAD_URL) return photoPath;
-
-    const baseUrl = UPLOAD_URL.endsWith('/') ? UPLOAD_URL.slice(0, -1) : UPLOAD_URL;
-    const normalizedPath = photoPath.startsWith('/') ? photoPath : `/${photoPath}`;
-    return `${baseUrl}${normalizedPath}`;
-  };
-  const coverPhotoUri = resolvePhotoUri(complaint.photos?.[0]);
+  const coverPhotoUri = buildUploadPhotoUri(complaint.photos?.[0], UPLOAD_URL);
   const shouldShowCover = coverPhotoUri && !coverFailed;
 
   useEffect(() => {

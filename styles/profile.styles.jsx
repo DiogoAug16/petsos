@@ -295,5 +295,22 @@ export const profileStyles = (colorScheme) => {
       fontSize: 14,
       fontWeight: '700',
     },
+    notificationHeader: {
+      width: '100%',
+      alignItems: 'flex-end',
+      paddingTop: 12,
+      paddingRight: 16,
+    },
+    heroRightActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+},
   });
 };

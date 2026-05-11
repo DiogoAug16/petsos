@@ -15,6 +15,7 @@ export function ProfileHeader({
   styles,
   isCurrentUser,
   showBack,
+  rightComponent
 }) {
   const router = useRouter();
   const { logout } = useAuth();
@@ -75,7 +76,10 @@ export function ProfileHeader({
           <UserAvatar username={profile.username} size={96} textSize={36} />
         </View>
 
-        <Text style={styles.name}>{displayName}</Text>
+        <View style={styles.nameRow}>
+          <Text style={styles.name}>{displayName}</Text>
+          {rightComponent}
+        </View>
         <Text style={styles.username}>@{profile.username} - Cuiaba, MT</Text>
 
         <Text style={styles.bio}>

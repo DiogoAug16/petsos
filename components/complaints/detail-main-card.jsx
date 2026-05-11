@@ -1,7 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
+
 import { UserAvatar } from '@/components/ui/UserAvatar';
+import { UserLink } from '@/components/ui/UserLink';
 import { formatDate } from '@/utils/date.utils';
 
 const formatFollowersCount = (total) => {
@@ -32,29 +34,31 @@ export function DetailMainCard({
         <View style={styles.detailMainMetaRow}>
           <Ionicons name="location-outline" size={16} color="#8A8A8E" />
           <Text style={styles.detailMainMetaText} numberOfLines={2}>
-            {address || 'Localização'}
+            {address || 'Localizacao'}
           </Text>
         </View>
 
         {!!complaint.description && (
           <>
             <View style={styles.detailMainDivider} />
-            <Text style={styles.detailMainSectionLabel}>Descrição</Text>
+            <Text style={styles.detailMainSectionLabel}>Descricao</Text>
             <Text style={styles.detailMainDescription}>{complaint.description}</Text>
           </>
         )}
 
         <View style={styles.detailMainDivider} />
         <View style={styles.detailMainFooter}>
-          <View style={styles.detailMainRegistrar}>
+          <UserLink username={username} style={styles.detailMainRegistrar}>
             <UserAvatar username={username} size={36} textSize={15} />
             <View style={styles.detailMainRegistrarCopy}>
               <Text style={styles.detailRegistrarName}>
-                {username || 'Usuário desconhecido'}
+                {username ? `@${username}` : 'Usuario desconhecido'}
               </Text>
-              <Text style={styles.detailRegistrarDate}>{formatDate(complaint.createdAt)}</Text>
+              <Text style={styles.detailRegistrarDate}>
+                {formatDate(complaint.createdAt)}
+              </Text>
             </View>
-          </View>
+          </UserLink>
 
           {showFollowers && (
             <Pressable
@@ -100,14 +104,20 @@ export function DetailMainCard({
             <ScrollView style={styles.followersModalList}>
               {followerList.length > 0 ? (
                 followerList.map((followerUsername) => (
-                  <View key={followerUsername} style={styles.followersModalRow}>
+                  <UserLink
+                    key={followerUsername}
+                    username={followerUsername}
+                    style={styles.followersModalRow}
+                  >
                     <UserAvatar username={followerUsername} size={34} />
-                    <Text style={styles.followersModalUsername}>@{followerUsername}</Text>
-                  </View>
+                    <Text style={styles.followersModalUsername}>
+                      @{followerUsername}
+                    </Text>
+                  </UserLink>
                 ))
               ) : (
                 <Text style={styles.followersEmpty}>
-                  Ainda não há usuários acompanhando esta denúncia.
+                  Ainda nao ha usuarios acompanhando esta denuncia.
                 </Text>
               )}
             </ScrollView>

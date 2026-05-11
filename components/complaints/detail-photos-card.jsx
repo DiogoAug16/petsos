@@ -1,12 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import ComplaintPhotos from './complaint-photos';
-
-const getPhotoPath = (photo) => {
-  if (typeof photo === 'string') return photo;
-  if (!photo || typeof photo !== 'object') return null;
-  return photo.url || photo.uri || photo.path || photo.filePath || null;
-};
+import { getPhotoPath } from '@/utils/photo.utils';
 
 export function DetailPhotosCard({ photos, styles }) {
   const validPhotos = useMemo(

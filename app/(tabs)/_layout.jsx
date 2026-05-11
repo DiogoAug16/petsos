@@ -9,12 +9,27 @@ export default function TabLayout() {
 
   return (
     <Tabs
+      initialRouteName="index"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
         headerShown: false,
         lazy: true,
       }}
     >
+      <Tabs.Screen
+        name="complaints"
+        options={{
+          title: 'Denúncias',
+          tabBarIcon: ({ color, focused }) => (
+            <AnimatedTabIcon
+              name="warning-outline"
+              nameActive="warning"
+              color={color}
+              focused={focused}
+            />
+          ),
+        }}
+      />
       <Tabs.Screen
         name="index"
         options={{
@@ -30,13 +45,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="complaints"
+        name="profile"
         options={{
-          title: 'Denúncias',
+          title: 'Perfil',
           tabBarIcon: ({ color, focused }) => (
             <AnimatedTabIcon
-              name="warning-outline"
-              nameActive="warning"
+              name="person-outline"
+              nameActive="person"
               color={color}
               focused={focused}
             />

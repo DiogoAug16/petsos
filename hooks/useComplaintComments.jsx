@@ -4,6 +4,8 @@ import {
   likeComment,
   unlikeComment,
 } from '@/services/comments.service';
+import { useAuth } from '@/context/AuthContext';
+import { useRequireAuth } from '@/context/AuthPromptContext';
 import { useCallback, useEffect, useState } from 'react';
 
 export const COMMENTS_PAGE_SIZE = 10;
@@ -53,6 +55,8 @@ const getNextLikeState = (comment) => {
 };
 
 export function useComplaintComments(complaintId) {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const requireAuth = useRequireAuth();
   const [comments, setComments] = useState([]);
   const [pageInfo, setPageInfo] = useState(DEFAULT_PAGE_INFO);
   const [loading, setLoading] = useState(false);
@@ -63,10 +67,26 @@ export function useComplaintComments(complaintId) {
   const [initialError, setInitialError] = useState(null);
 
   const loadInitial = useCallback(async () => {
+    if (authLoading) {
+      setInitialReady(false);
+      setInitialError(null);
+      return false;
+    }
+
     if (!complaintId) {
       setInitialReady(false);
       setInitialError('Não foi possível identificar a denúncia.');
       return false;
+    }
+
+    if (!isAuthenticated) {
+      setComments([]);
+      setPageInfo(DEFAULT_PAGE_INFO);
+      setTotalComments(0);
+      setInitialError(null);
+      setInitialReady(true);
+      setLoading(false);
+      return true;
     }
 
     try {
@@ -93,7 +113,7 @@ export function useComplaintComments(complaintId) {
     } finally {
       setLoading(false);
     }
-  }, [complaintId]);
+  }, [authLoading, complaintId, isAuthenticated]);
 
   const loadMore = useCallback(async () => {
     if (!complaintId || loadingMore || !pageInfo?.hasMore) return;
@@ -121,7 +141,16 @@ export function useComplaintComments(complaintId) {
 
   const addComment = useCallback(
     async (text) => {
-      const trimmedText = text.trim();
+      if (!isAuthenticated) {
+        requireAuth(null, {
+          title: 'Entre para comentar',
+          message:
+            'Faça login ou crie uma conta para comentar nesta denúncia.',
+        });
+        return null;
+      }
+
+      const trimmedText = String(text ?? '').trim();
       if (!complaintId || !trimmedText || submitting) return null;
 
       try {
@@ -138,7 +167,7 @@ export function useComplaintComments(complaintId) {
         setSubmitting(false);
       }
     },
-    [complaintId, submitting],
+    [complaintId, isAuthenticated, requireAuth, submitting],
   );
 
   const updateComment = useCallback((commentId, updater) => {
@@ -158,6 +187,15 @@ export function useComplaintComments(complaintId) {
 
   const toggleLike = useCallback(
     async (comment) => {
+      if (!isAuthenticated) {
+        requireAuth(null, {
+          title: 'Entre para curtir',
+          message:
+            'Faça login ou crie uma conta para curtir comentários.',
+        });
+        return;
+      }
+
       if (!complaintId || !comment?.id) return;
 
       const previousComment = comment;
@@ -182,7 +220,7 @@ export function useComplaintComments(complaintId) {
         updateComment(comment.id, () => previousComment);
       }
     },
-    [complaintId, updateComment],
+    [complaintId, isAuthenticated, requireAuth, updateComment],
   );
 
   useEffect(() => {
@@ -201,6 +239,7 @@ export function useComplaintComments(complaintId) {
     loading,
     loadingMore,
     submitting,
+    isBlocked: !isAuthenticated,
     initialReady,
     initialError,
     loadInitial,

@@ -1,6 +1,12 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useRef } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import {
+  Animated,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  View,
+} from 'react-native';
 
 import { CommentComposer } from '@/components/complaints/comment-composer';
 import { CommentsSection } from '@/components/complaints/comments-section';
@@ -14,31 +20,35 @@ import { DetailPhotosCard } from '@/components/complaints/detail-photos-card';
 import { ErrorState } from '@/components/complaints/error-state';
 import { LoadingState } from '@/components/complaints/loading-state';
 import { UnfollowConfirmModal } from '@/components/complaints/unfollow-confirm-modal';
-import { complaintsStyles } from '@/styles/complaints';
-
-import { useAddress } from '@/hooks/useAddress';
 import { useAuth } from '@/context/AuthContext';
+import { useAddress } from '@/hooks/useAddress';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { useCommentComposerVisibility } from '@/hooks/useCommentComposerVisibility';
 import { useComplaintConfig } from '@/hooks/useComplaintConfig';
 import { useComplaintDetailScreenData } from '@/hooks/useComplaintDetailScreenData';
-import { useSectionVisibility } from '@/hooks/useSectionVisibility';
+import { useComplaintReplyComposer } from '@/hooks/useComplaintReplyComposer';
+import { complaintsStyles } from '@/styles/complaints';
 import Colors from '@/styles/theme/Colors';
 
 export default function ComplaintDetailScreen() {
   const { id } = useLocalSearchParams();
   const complaintId = Array.isArray(id) ? id[0] : id;
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const colorScheme = useColorScheme();
   const styles = complaintsStyles(colorScheme);
   const theme = Colors[colorScheme ?? 'light'];
   const mapRef = useRef();
   const {
     isVisible: isCommentComposerVisible,
+    animatedStyle: commentComposerAnimatedStyle,
     handleViewportLayout,
     handleScroll,
     handleSectionLayout,
-  } = useSectionVisibility();
+    handleComposerAnchorLayout,
+    handleInputFocus,
+    handleInputBlur,
+  } = useCommentComposerVisibility();
 
   const {
     detail,
@@ -84,11 +94,22 @@ export default function ComplaintDetailScreen() {
     addComment,
     toggleLike,
     incrementRepliesCount,
+    isBlocked: commentsBlocked,
   } = commentsState;
 
   const { address } = useAddress(complaint?.location);
   const { status, type, emoji } = useComplaintConfig(complaint);
-  const isOwner = user?.uid === complaint?.createdById;
+  const isOwner = Boolean(user?.uid && user.uid === complaint?.createdById);
+  const {
+    composerState,
+    handleReplyPress,
+    handleComposerSubmit,
+  } = useComplaintReplyComposer({ addComment, handleInputFocus });
+  const composerVisible = isCommentComposerVisible || composerState.isReplying;
+  const composerSubmitting = composerState.isReplying
+    ? composerState.submitting
+    : commentSubmitting;
+
   const renderScreenState = (children) => (
     <>
       <Stack.Screen options={{ headerShown: false }} />
@@ -97,7 +118,7 @@ export default function ComplaintDetailScreen() {
   );
 
   if (initialLoading || (loading && !complaint)) {
-    return renderScreenState(<LoadingState message="Carregando denúncia..." />);
+    return renderScreenState(<LoadingState message="Carregando denuncia..." />);
   }
 
   if (initialError) {
@@ -126,7 +147,9 @@ export default function ComplaintDetailScreen() {
         <ScrollView
           style={styles.detailScroll}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 18 }}
+          contentContainerStyle={{
+            paddingBottom: composerVisible && isAuthenticated ? 104 : 18,
+          }}
           onLayout={handleViewportLayout}
           onScroll={handleScroll}
           scrollEventThrottle={16}
@@ -191,23 +214,38 @@ export default function ComplaintDetailScreen() {
             pageInfo={commentsPageInfo}
             loading={commentsLoading}
             loadingMore={commentsLoadingMore}
+            isBlocked={commentsBlocked}
             loadMore={loadMoreComments}
             toggleLike={toggleLike}
             incrementRepliesCount={incrementRepliesCount}
-            onLayout={handleSectionLayout}
+            onReplyPress={handleReplyPress}
+            onSectionLayout={handleSectionLayout}
+            onComposerAnchorLayout={handleComposerAnchorLayout}
             styles={styles}
           />
         </ScrollView>
 
-        {isCommentComposerVisible && (
-          <View style={styles.detailCommentInputBar}>
+        {isAuthenticated && (
+          <Animated.View
+            pointerEvents={composerVisible ? 'auto' : 'none'}
+            style={[styles.detailCommentInputBar, commentComposerAnimatedStyle]}
+          >
             <CommentComposer
-              placeholder="Adicionar comentário..."
-              submitting={commentSubmitting}
-              onSubmit={addComment}
+              key={composerState.key}
+              placeholder={composerState.placeholder}
+              submitting={composerSubmitting}
+              initialText={composerState.initialText}
+              autoFocus={composerState.isReplying}
+              onSubmit={handleComposerSubmit}
+              onFocus={handleInputFocus}
+              onBlur={() => {
+                if (!composerState.isReplying) {
+                  handleInputBlur();
+                }
+              }}
               styles={styles}
             />
-          </View>
+          </Animated.View>
         )}
       </KeyboardAvoidingView>
 

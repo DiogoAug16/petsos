@@ -5,6 +5,8 @@ import {
   getIsFollowingComplaint,
   unfollowComplaint,
 } from '@/services/complaint-followers.service';
+import { useAuth } from '@/context/AuthContext';
+import { useRequireAuth } from '@/context/AuthPromptContext';
 import { useCallback, useEffect, useState } from 'react';
 
 const normalizeFollowers = (response) =>
@@ -17,6 +19,8 @@ const normalizeFollowersCount = (response) => {
 };
 
 export function useComplaintFollowers(complaintId) {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const requireAuth = useRequireAuth();
   const [isFollowing, setIsFollowing] = useState(false);
   const [followers, setFollowers] = useState([]);
   const [totalFollowers, setTotalFollowers] = useState(0);
@@ -29,14 +33,18 @@ export function useComplaintFollowers(complaintId) {
   const loadFollowers = useCallback(async () => {
     if (!complaintId) return;
 
-    const [countResponse, followersResponse] = await Promise.all([
-      getComplaintFollowersCount(complaintId),
-      getComplaintFollowers(complaintId),
-    ]);
+    const countResponse = await getComplaintFollowersCount(complaintId);
 
     setTotalFollowers(normalizeFollowersCount(countResponse));
+
+    if (!isAuthenticated) {
+      setFollowers([]);
+      return;
+    }
+
+    const followersResponse = await getComplaintFollowers(complaintId);
     setFollowers(normalizeFollowers(followersResponse));
-  }, [complaintId]);
+  }, [complaintId, isAuthenticated]);
 
   const refresh = useCallback(async () => {
     if (!complaintId) {
@@ -45,10 +53,22 @@ export function useComplaintFollowers(complaintId) {
       return false;
     }
 
+    if (authLoading) {
+      setInitialReady(false);
+      return false;
+    }
+
     try {
       setLoading(true);
       setInitialReady(false);
       setInitialError(null);
+
+      if (!isAuthenticated) {
+        await loadFollowers();
+        setIsFollowing(false);
+        setInitialReady(true);
+        return true;
+      }
 
       const [followingResponse] = await Promise.all([
         getIsFollowingComplaint(complaintId),
@@ -68,7 +88,7 @@ export function useComplaintFollowers(complaintId) {
     } finally {
       setLoading(false);
     }
-  }, [complaintId, loadFollowers]);
+  }, [authLoading, complaintId, isAuthenticated, loadFollowers]);
 
   const refreshFollowers = useCallback(async () => {
     if (!complaintId) return false;
@@ -83,6 +103,15 @@ export function useComplaintFollowers(complaintId) {
 
   const follow = useCallback(async () => {
     if (!complaintId || actionLoading) return false;
+
+    if (!isAuthenticated) {
+      requireAuth(null, {
+        title: 'Entre para acompanhar',
+        message:
+          'Faca login ou crie uma conta para acompanhar denuncias e receber atualizacoes.',
+      });
+      return false;
+    }
 
     const previousIsFollowing = isFollowing;
     const shouldIncrementFollowers = !previousIsFollowing;
@@ -116,10 +145,26 @@ export function useComplaintFollowers(complaintId) {
     } finally {
       setActionLoading(false);
     }
-  }, [actionLoading, complaintId, isFollowing, refreshFollowers]);
+  }, [
+    actionLoading,
+    complaintId,
+    isAuthenticated,
+    isFollowing,
+    refreshFollowers,
+    requireAuth,
+  ]);
 
   const unfollow = useCallback(async () => {
     if (!complaintId || actionLoading) return false;
+
+    if (!isAuthenticated) {
+      requireAuth(null, {
+        title: 'Entre para acompanhar',
+        message:
+          'Faca login ou crie uma conta para acompanhar denuncias e receber atualizacoes.',
+      });
+      return false;
+    }
 
     const previousIsFollowing = isFollowing;
     const shouldDecrementFollowers = previousIsFollowing;
@@ -143,16 +188,32 @@ export function useComplaintFollowers(complaintId) {
     } finally {
       setActionLoading(false);
     }
-  }, [actionLoading, complaintId, isFollowing, refreshFollowers]);
+  }, [
+    actionLoading,
+    complaintId,
+    isAuthenticated,
+    isFollowing,
+    refreshFollowers,
+    requireAuth,
+  ]);
 
   const toggleFollow = useCallback(() => {
-    if (isFollowing) {
-      setUnfollowModalVisible(true);
-      return;
-    }
+    requireAuth(
+      () => {
+        if (isFollowing) {
+          setUnfollowModalVisible(true);
+          return;
+        }
 
-    follow();
-  }, [follow, isFollowing]);
+        follow();
+      },
+      {
+        title: 'Entre para acompanhar',
+        message:
+          'Faça login ou crie uma conta para acompanhar denúncias e receber atualizações.',
+      },
+    );
+  }, [follow, isFollowing, requireAuth]);
 
   const closeUnfollowModal = useCallback(() => {
     setUnfollowModalVisible(false);

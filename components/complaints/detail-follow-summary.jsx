@@ -2,6 +2,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { UserAvatar } from '@/components/ui/UserAvatar';
+import { UserLink } from '@/components/ui/UserLink';
+import { useAuth } from '@/context/AuthContext';
+import { useRequireAuth } from '@/context/AuthPromptContext';
 
 const formatFollowersCount = (total) => {
   if (total === 1) return '1 acompanhando';
@@ -18,17 +21,31 @@ export function DetailFollowSummary({
   onToggleFollow,
   styles,
 }) {
+  const { isAuthenticated } = useAuth();
+  const requireAuth = useRequireAuth();
   const [modalVisible, setModalVisible] = useState(false);
   const followerList = Array.isArray(followers) ? followers : [];
   const canOpenFollowers = !followersLoading && totalFollowers > 0;
   const followersLabel = followersLoading ? '...' : formatFollowersCount(totalFollowers);
+  const openFollowers = () => {
+    if (!canOpenFollowers) return;
+
+    requireAuth(
+      () => setModalVisible(true),
+      {
+        title: 'Entre para ver acompanhantes',
+        message:
+          'Faca login ou crie uma conta para ver quem acompanha esta denuncia.',
+      },
+    );
+  };
 
   return (
     <>
       <View style={styles.detailFollowSummary}>
         <Pressable
           style={styles.followersSummaryButton}
-          onPress={() => setModalVisible(true)}
+          onPress={openFollowers}
           disabled={!canOpenFollowers}
         >
           <Text style={styles.followersSummaryText}>{followersLabel}</Text>
@@ -41,7 +58,13 @@ export function DetailFollowSummary({
               isFollowing && styles.detailFollowButtonActive,
               followLoading && styles.detailFollowButtonDisabled,
             ]}
-            onPress={onToggleFollow}
+            onPress={() =>
+              requireAuth(onToggleFollow, {
+                title: 'Entre para acompanhar',
+                message:
+                  'Faca login ou crie uma conta para acompanhar denuncias e receber atualizacoes.',
+              })
+            }
             disabled={followLoading}
           >
             <Text
@@ -86,12 +109,16 @@ export function DetailFollowSummary({
             </View>
 
             <ScrollView style={styles.followersModalList}>
-              {followerList.length > 0 ? (
+              {isAuthenticated && followerList.length > 0 ? (
                 followerList.map((username) => (
-                  <View key={username} style={styles.followersModalRow}>
+                  <UserLink
+                    key={username}
+                    username={username}
+                    style={styles.followersModalRow}
+                  >
                     <UserAvatar username={username} size={34} />
                     <Text style={styles.followersModalUsername}>@{username}</Text>
-                  </View>
+                  </UserLink>
                 ))
               ) : (
                 <Text style={styles.followersEmpty}>

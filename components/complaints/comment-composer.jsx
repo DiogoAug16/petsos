@@ -1,45 +1,51 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, TextInput, View } from 'react-native';
-import { useState } from 'react';
+import { ActivityIndicator, Pressable, TextInput, View } from 'react-native';
+import { useCommentComposer } from '@/hooks/useCommentComposer';
 
 export function CommentComposer({
   placeholder,
   submitting,
   onSubmit,
+  onFocus,
+  onBlur,
+  initialText = '',
+  autoFocus = false,
   styles,
 }) {
-  const [text, setText] = useState('');
-  const canSubmit = text.trim().length > 0 && !submitting;
-
-  const handleSubmit = async () => {
-    if (!canSubmit) return;
-
-    const submitted = await onSubmit(text);
-    if (submitted) {
-      setText('');
-    }
-  };
+  const { inputRef, text, setText, isEmpty, handleSubmit } = useCommentComposer({
+    initialText,
+    autoFocus,
+    submitting,
+    onSubmit,
+  });
 
   return (
     <View style={styles.commentComposer}>
       <TextInput
+        ref={inputRef}
         style={styles.commentInput}
         value={text}
         onChangeText={setText}
         placeholder={placeholder}
         placeholderTextColor="#8A8A8E"
         multiline
+        onFocus={onFocus}
+        onBlur={onBlur}
       />
 
       <Pressable
         style={[
           styles.commentSendButton,
-          !canSubmit && styles.commentSendButtonDisabled,
+          isEmpty && styles.commentSendButtonDisabled,
         ]}
         onPress={handleSubmit}
-        disabled={!canSubmit}
+        disabled={isEmpty || submitting}
       >
-        <Ionicons name="send" size={16} color="#fff" />
+        {submitting ? (
+          <ActivityIndicator size="small" color="#fff" />
+        ) : (
+          <Ionicons name="send" size={16} color="#fff" />
+        )}
       </Pressable>
     </View>
   );

@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, Text, View } from 'react-native';
-import { useState } from 'react';
-import { CommentComposer } from '@/components/complaints/comment-composer';
+
+import { MentionText } from '@/components/ui/MentionText';
 import { UserAvatar } from '@/components/ui/UserAvatar';
+import { UserLink } from '@/components/ui/UserLink';
 import { useCommentReplies } from '@/hooks/useCommentReplies';
 import { formatDate } from '@/utils/date.utils';
 
@@ -12,26 +13,30 @@ const formatRepliesLabel = (count, visible) => {
   return `Mostrar ${count} respostas`;
 };
 
-function CommentBody({
-  comment,
-  isReply,
-  onLike,
-  onReply,
-  styles,
-}) {
-  const username = comment.username || 'usuario';
+const getUsername = (comment) => comment?.username || 'usuario';
+
+function CommentBody({ comment, isReply, onLike, onReply, styles }) {
+  const username = getUsername(comment);
 
   return (
     <View style={[styles.commentRow, isReply && styles.replyRow]}>
-      <UserAvatar username={username} size={34} />
+      <UserLink username={username}>
+        <UserAvatar username={username} size={34} />
+      </UserLink>
 
       <View style={styles.commentBody}>
         <View style={styles.commentBubble}>
           <View style={styles.commentHeader}>
-            <Text style={styles.commentUsername}>@{username}</Text>
+            <UserLink username={username}>
+              <Text style={styles.commentUsername}>@{username}</Text>
+            </UserLink>
             <Text style={styles.commentDate}>{formatDate(comment.createdAt)}</Text>
           </View>
-          <Text style={styles.commentText}>{comment.text}</Text>
+          <MentionText
+            text={comment.text}
+            style={styles.commentText}
+            mentionStyle={styles.commentMentionText}
+          />
         </View>
 
         <View style={styles.commentActions}>
@@ -44,11 +49,9 @@ function CommentBody({
             <Text style={styles.commentActionText}>{comment.likes || 0}</Text>
           </Pressable>
 
-          {!isReply && (
-            <Pressable style={styles.commentActionButton} onPress={onReply}>
-              <Text style={styles.commentActionText}>Responder</Text>
-            </Pressable>
-          )}
+          <Pressable style={styles.commentActionButton} onPress={onReply}>
+            <Text style={styles.commentActionText}>Responder</Text>
+          </Pressable>
         </View>
       </View>
     </View>
@@ -60,16 +63,15 @@ export function CommentItem({
   comment,
   onLike,
   onReplyCreated,
+  onReplyPress,
   styles,
 }) {
-  const [replying, setReplying] = useState(false);
   const {
     visible,
     replies,
     pageInfo,
     loading,
     loadingMore,
-    submitting,
     toggleVisible,
     loadMore,
     addReply,
@@ -80,12 +82,13 @@ export function CommentItem({
     onReplyCreated,
   });
 
-  const handleAddReply = async (text) => {
-    const reply = await addReply(text);
-    if (reply) {
-      setReplying(false);
-    }
-    return reply;
+  const startReply = (target) => {
+    onReplyPress?.({
+      commentId: comment.id,
+      targetId: target.id,
+      username: getUsername(target),
+      submitReply: addReply,
+    });
   };
 
   return (
@@ -93,20 +96,9 @@ export function CommentItem({
       <CommentBody
         comment={comment}
         onLike={() => onLike(comment)}
-        onReply={() => setReplying((current) => !current)}
+        onReply={() => startReply(comment)}
         styles={styles}
       />
-
-      {replying && (
-        <View style={styles.replyComposerWrap}>
-          <CommentComposer
-            placeholder={`Responder @${comment.username || 'usuario'}`}
-            submitting={submitting}
-            onSubmit={handleAddReply}
-            styles={styles}
-          />
-        </View>
-      )}
 
       {comment.repliesCount > 0 && (
         <Pressable style={styles.showRepliesButton} onPress={toggleVisible}>
@@ -127,6 +119,7 @@ export function CommentItem({
               comment={reply}
               isReply
               onLike={() => toggleLike(reply)}
+              onReply={() => startReply(reply)}
               styles={styles}
             />
           ))}

@@ -28,12 +28,21 @@ export const detailCommentsStyles = (colorScheme) => {
       fontWeight: '700',
     },
     detailCommentInputBar: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: 0,
       paddingHorizontal: 12,
-      paddingTop: 8,
-      paddingBottom: 10,
-      backgroundColor: isDark ? '#000' : '#F7F4F0',
-      borderTopWidth: 0.5,
+      paddingTop: 10,
+      paddingBottom: 12,
+      backgroundColor: isDark ? '#111113' : '#FFFFFF',
+      borderTopWidth: 1,
       borderTopColor: border,
+      elevation: 8,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: -4 },
+      shadowOpacity: 0.12,
+      shadowRadius: 10,
     },
     commentComposer: {
       minHeight: 46,
@@ -70,6 +79,39 @@ export const detailCommentsStyles = (colorScheme) => {
       fontSize: 13,
       lineHeight: 19,
       paddingVertical: 4,
+    },
+    commentComposerAnchor: {
+      height: 1,
+      width: '100%',
+    },
+    commentsBlockedBox: {
+      gap: 8,
+      paddingVertical: 6,
+    },
+    commentsBlockedTitle: {
+      color: text,
+      fontSize: 15,
+      fontWeight: '800',
+    },
+    commentsBlockedText: {
+      color: muted,
+      fontSize: 13,
+      lineHeight: 19,
+    },
+    commentsBlockedButton: {
+      alignSelf: 'flex-start',
+      minHeight: 36,
+      paddingHorizontal: 14,
+      borderRadius: 999,
+      backgroundColor: '#FF6B35',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 2,
+    },
+    commentsBlockedButtonText: {
+      color: '#fff',
+      fontSize: 12,
+      fontWeight: '900',
     },
     commentsList: {
       gap: 14,
@@ -115,6 +157,10 @@ export const detailCommentsStyles = (colorScheme) => {
       fontSize: 14,
       lineHeight: 20,
     },
+    commentMentionText: {
+      color: '#FF6B35',
+      fontWeight: '800',
+    },
     commentActions: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -131,9 +177,6 @@ export const detailCommentsStyles = (colorScheme) => {
       color: muted,
       fontSize: 12,
       fontWeight: '700',
-    },
-    replyComposerWrap: {
-      marginLeft: 44,
     },
     showRepliesButton: {
       marginLeft: 44,

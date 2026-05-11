@@ -5,6 +5,8 @@ import {
   likeComment,
   unlikeComment,
 } from '@/services/comments.service';
+import { useAuth } from '@/context/AuthContext';
+import { useRequireAuth } from '@/context/AuthPromptContext';
 import { useCallback, useState } from 'react';
 
 const DEFAULT_PAGE_INFO = {
@@ -42,6 +44,8 @@ const getNextLikeState = (reply) => {
 };
 
 export function useCommentReplies({ complaintId, commentId, onReplyCreated }) {
+  const { isAuthenticated } = useAuth();
+  const requireAuth = useRequireAuth();
   const [visible, setVisible] = useState(false);
   const [replies, setReplies] = useState([]);
   const [pageInfo, setPageInfo] = useState(DEFAULT_PAGE_INFO);
@@ -50,6 +54,15 @@ export function useCommentReplies({ complaintId, commentId, onReplyCreated }) {
   const [submitting, setSubmitting] = useState(false);
 
   const loadReplies = useCallback(async ({ append = false } = {}) => {
+    if (!isAuthenticated) {
+      requireAuth(null, {
+        title: 'Entre para ver respostas',
+        message:
+          'Faça login ou crie uma conta para ver e responder comentários.',
+      });
+      return;
+    }
+
     if (!complaintId || !commentId) return;
 
     try {
@@ -82,7 +95,7 @@ export function useCommentReplies({ complaintId, commentId, onReplyCreated }) {
         setLoading(false);
       }
     }
-  }, [commentId, complaintId, pageInfo.nextCursor]);
+  }, [commentId, complaintId, isAuthenticated, pageInfo.nextCursor, requireAuth]);
 
   const toggleVisible = useCallback(async () => {
     if (visible) {
@@ -104,7 +117,16 @@ export function useCommentReplies({ complaintId, commentId, onReplyCreated }) {
 
   const addReply = useCallback(
     async (text) => {
-      const trimmedText = text.trim();
+      if (!isAuthenticated) {
+        requireAuth(null, {
+          title: 'Entre para responder',
+          message:
+            'Faça login ou crie uma conta para responder comentários.',
+        });
+        return null;
+      }
+
+      const trimmedText = String(text ?? '').trim();
       if (!complaintId || !commentId || !trimmedText || submitting) return null;
 
       try {
@@ -126,7 +148,7 @@ export function useCommentReplies({ complaintId, commentId, onReplyCreated }) {
         setSubmitting(false);
       }
     },
-    [commentId, complaintId, onReplyCreated, submitting],
+    [commentId, complaintId, isAuthenticated, onReplyCreated, requireAuth, submitting],
   );
 
   const updateReply = useCallback((replyId, updater) => {
@@ -139,6 +161,15 @@ export function useCommentReplies({ complaintId, commentId, onReplyCreated }) {
 
   const toggleLike = useCallback(
     async (reply) => {
+      if (!isAuthenticated) {
+        requireAuth(null, {
+          title: 'Entre para curtir',
+          message:
+            'Faça login ou crie uma conta para curtir comentários.',
+        });
+        return;
+      }
+
       if (!complaintId || !reply?.id) return;
 
       const previousReply = reply;
@@ -163,7 +194,7 @@ export function useCommentReplies({ complaintId, commentId, onReplyCreated }) {
         updateReply(reply.id, () => previousReply);
       }
     },
-    [complaintId, updateReply],
+    [complaintId, isAuthenticated, requireAuth, updateReply],
   );
 
   return {

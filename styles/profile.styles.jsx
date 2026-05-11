@@ -1,0 +1,299 @@
+import { StyleSheet } from 'react-native';
+
+export const profileStyles = (colorScheme) => {
+  const isDark = colorScheme === 'dark';
+  const background = isDark ? '#000' : '#F7F4F0';
+  const surface = isDark ? '#1C1C1E' : '#FFFFFF';
+  const surfaceSoft = isDark ? '#242427' : '#F0ECE7';
+  const text = isDark ? '#FFFFFF' : '#1C1C1E';
+  const muted = '#8A8A8E';
+  const border = isDark ? '#333333' : '#E8E4DF';
+
+  return StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: background,
+    },
+    listContent: {
+      paddingBottom: 96,
+    },
+    hero: {
+      height: 230,
+      backgroundColor: isDark ? '#19191D' : '#222228',
+      borderBottomLeftRadius: 22,
+      borderBottomRightRadius: 22,
+      overflow: 'hidden',
+    },
+    heroActions: {
+      position: 'absolute',
+      top: 50,
+      left: 14,
+      right: 14,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    heroIconButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 12,
+      backgroundColor: 'rgba(255,255,255,0.12)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 0.5,
+      borderColor: 'rgba(255,255,255,0.14)',
+    },
+    heroIconButtonPlaceholder: {
+      width: 40,
+      height: 40,
+    },
+    profileBody: {
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      marginTop: -52,
+      paddingBottom: 18,
+    },
+    avatarWrap: {
+      width: 104,
+      height: 104,
+      borderRadius: 52,
+      backgroundColor: 'transparent',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 12,
+    },
+    name: {
+      color: text,
+      fontSize: 26,
+      fontWeight: '900',
+      textAlign: 'center',
+    },
+    username: {
+      color: muted,
+      fontSize: 14,
+      fontWeight: '700',
+      marginTop: 5,
+      textAlign: 'center',
+    },
+    bio: {
+      color: isDark ? '#D7D7DC' : '#5D5D63',
+      fontSize: 15,
+      lineHeight: 22,
+      textAlign: 'center',
+      marginTop: 14,
+      maxWidth: 330,
+    },
+    badgesRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      gap: 8,
+      marginTop: 16,
+    },
+    badge: {
+      minHeight: 28,
+      paddingHorizontal: 12,
+      borderRadius: 999,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    badgeText: {
+      fontSize: 12,
+      fontWeight: '900',
+    },
+    orangeBadge: {
+      backgroundColor: 'rgba(255,107,53,0.16)',
+    },
+    orangeBadgeText: {
+      color: '#FF8A5C',
+    },
+    greenBadge: {
+      backgroundColor: 'rgba(46,204,154,0.16)',
+    },
+    greenBadgeText: {
+      color: '#2ECC9A',
+    },
+    blueBadge: {
+      backgroundColor: 'rgba(74,144,226,0.16)',
+    },
+    blueBadgeText: {
+      color: '#7FB0F0',
+    },
+    sectionHeader: {
+      marginHorizontal: 16,
+      marginTop: 8,
+      marginBottom: 8,
+      paddingHorizontal: 2,
+    },
+    sectionKicker: {
+      color: muted,
+      fontSize: 11,
+      fontWeight: '900',
+      letterSpacing: 0,
+      textTransform: 'uppercase',
+    },
+    sectionTitle: {
+      color: text,
+      fontSize: 18,
+      fontWeight: '900',
+      marginTop: 4,
+    },
+    emptyWrap: {
+      marginHorizontal: 16,
+      minHeight: 140,
+      borderRadius: 16,
+      backgroundColor: surface,
+      borderWidth: 0.5,
+      borderColor: border,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 18,
+    },
+    emptyTitle: {
+      color: text,
+      fontSize: 15,
+      fontWeight: '800',
+    },
+    emptyText: {
+      color: muted,
+      fontSize: 13,
+      textAlign: 'center',
+      marginTop: 6,
+      lineHeight: 18,
+    },
+    card: {
+      marginHorizontal: 16,
+      marginBottom: 10,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      minHeight: 82,
+      padding: 12,
+      borderRadius: 16,
+      backgroundColor: surface,
+      borderWidth: 0.5,
+      borderColor: border,
+    },
+    cardThumb: {
+      width: 58,
+      height: 58,
+      borderRadius: 14,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: surfaceSoft,
+      overflow: 'hidden',
+    },
+    cardEmoji: {
+      fontSize: 28,
+    },
+    cardBody: {
+      flex: 1,
+      minWidth: 0,
+    },
+    cardTitle: {
+      color: text,
+      fontSize: 15,
+      fontWeight: '900',
+      lineHeight: 20,
+    },
+    cardMetaRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      marginTop: 6,
+    },
+    statusPill: {
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      borderRadius: 999,
+      backgroundColor: 'rgba(255, 107, 53, 0.16)',
+    },
+    statusText: {
+      color: '#FF6B35',
+      fontSize: 11,
+      fontWeight: '900',
+    },
+    cardAddress: {
+      flex: 1,
+      color: muted,
+      fontSize: 12,
+    },
+    authRequiredScreen: {
+      flex: 1,
+      backgroundColor: background,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 24,
+    },
+    authRequiredTitle: {
+      color: text,
+      fontSize: 28,
+      fontWeight: '900',
+    },
+    authRequiredText: {
+      color: muted,
+      fontSize: 15,
+      lineHeight: 21,
+      textAlign: 'center',
+      marginTop: 8,
+      marginBottom: 18,
+    },
+    authRequiredButton: {
+      minHeight: 46,
+      paddingHorizontal: 18,
+      borderRadius: 999,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#FF6B35',
+    },
+    authRequiredButtonText: {
+      color: '#fff',
+      fontSize: 14,
+      fontWeight: '900',
+    },
+    profileMenuBackdrop: {
+      flex: 1,
+      backgroundColor: 'transparent',
+    },
+    profileMenuDismissArea: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+    },
+    profileMenu: {
+      position: 'absolute',
+      top: 94,
+      right: 14,
+      width: 164,
+      borderRadius: 14,
+      backgroundColor: isDark ? '#1C1C1E' : '#202024',
+      borderWidth: 0.5,
+      borderColor: isDark ? '#333333' : '#2F2F34',
+      overflow: 'hidden',
+      elevation: 8,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.18,
+      shadowRadius: 16,
+    },
+    profileMenuItem: {
+      minHeight: 48,
+      paddingHorizontal: 14,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+    },
+    profileMenuText: {
+      color: '#fff',
+      fontSize: 14,
+      fontWeight: '700',
+    },
+    profileMenuDangerText: {
+      color: '#E24B4A',
+      fontSize: 14,
+      fontWeight: '700',
+    },
+  });
+};

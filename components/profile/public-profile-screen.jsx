@@ -1,3 +1,5 @@
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 
 import { ErrorState } from '@/components/complaints/error-state';
@@ -38,8 +40,15 @@ export function PublicProfileScreen({
     refreshing,
     error,
     refresh,
+    softReload,
     reload,
   } = usePublicProfile(username);
+
+  useFocusEffect(
+    useCallback(() => {
+      softReload();
+    }, [softReload])
+  );
 
   if (loading) {
     return <LoadingState message="Carregando perfil..." />;

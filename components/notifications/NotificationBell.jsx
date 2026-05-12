@@ -13,7 +13,7 @@ export function NotificationBell() {
       style={styles.container}
       onPress={() => router.push('/notifications')}
     >
-      <Ionicons name="notifications-outline" size={24} color="#111827" />
+      <Ionicons name="notifications-outline" size={24} color="#FFFFFF" />
 
       {unreadCount > 0 && (
         <View style={styles.badge}>

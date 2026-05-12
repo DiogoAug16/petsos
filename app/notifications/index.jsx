@@ -4,7 +4,9 @@ import { useUnreadCount } from '@/hooks/useUnreadCount';
 import { markNotificationAsRead } from '@/services/notifications.service';
 import { styles } from '@/styles/notifications/screen.styles';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { Stack, useRouter } from 'expo-router';
+import { useCallback } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -24,6 +26,13 @@ export default function NotificationsScreen() {
     refresh,
     reload,
   } = useNotifications();
+
+  useFocusEffect(
+    useCallback(() => {
+      reload();
+      reloadUnreadCount();
+    }, [reload, reloadUnreadCount])
+  );
 
   async function handlePressNotification(notification) {
     try {

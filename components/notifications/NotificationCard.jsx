@@ -3,9 +3,19 @@ import { Ionicons } from '@expo/vector-icons';
 import { Pressable, Text, View } from 'react-native';
 
 function formatRelativeTime(createdAt) {
-  if (!createdAt?._seconds) return '';
+  if (!createdAt) return '';
 
-  const date = new Date(createdAt._seconds * 1000);
+  let date;
+  if (createdAt._seconds) {
+    date = new Date(createdAt._seconds * 1000);
+  } else if (createdAt.seconds) {
+    date = new Date(createdAt.seconds * 1000);
+  } else if (typeof createdAt === 'string' || typeof createdAt === 'number') {
+    date = new Date(createdAt);
+  } else {
+    return '';
+  }
+
   const now = new Date();
 
   const diffMs = now - date;

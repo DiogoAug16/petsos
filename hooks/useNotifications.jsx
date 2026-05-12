@@ -12,11 +12,12 @@ export function useNotifications() {
 
       const data = response?.data || [];
 
-      const groupedNotifications = data.filter(
-        (notification) => notification.grouped === true
+      const visibleNotifications = data.filter(
+        (notification) =>
+          !(notification.type === 'new_comment' && notification.grouped === true)
       );
 
-      setNotifications(groupedNotifications);
+      setNotifications(visibleNotifications);
     } catch (error) {
       console.log('Erro ao buscar notificações:', error);
     } finally {

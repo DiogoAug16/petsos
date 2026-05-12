@@ -22,7 +22,7 @@ export function ProfileHeader({
   const [menuVisible, setMenuVisible] = useState(false);
   const joinedYear = getJoinedYear(profile.createdAt);
   const displayName = profile.name || profile.username;
-  const shouldShowBack = showBack || isCurrentUser;
+  const shouldShowBack = showBack && !isCurrentUser;
 
   const handleEdit = () => {
     setMenuVisible(false);
@@ -60,14 +60,17 @@ export function ProfileHeader({
             <View style={styles.heroIconButtonPlaceholder} />
           )}
 
-          {isCurrentUser && (
-            <Pressable
-              style={styles.heroIconButton}
-              onPress={() => setMenuVisible(true)}
-            >
-              <Ionicons name="ellipsis-vertical" size={20} color="#fff" />
-            </Pressable>
-          )}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            {isCurrentUser && rightComponent}
+            {isCurrentUser && (
+              <Pressable
+                style={styles.heroIconButton}
+                onPress={() => setMenuVisible(true)}
+              >
+                <Ionicons name="ellipsis-vertical" size={20} color="#fff" />
+              </Pressable>
+            )}
+          </View>
         </View>
       </View>
 
@@ -78,7 +81,6 @@ export function ProfileHeader({
 
         <View style={styles.nameRow}>
           <Text style={styles.name}>{displayName}</Text>
-          {rightComponent}
         </View>
         <Text style={styles.username}>@{profile.username} - Cuiaba, MT</Text>
 

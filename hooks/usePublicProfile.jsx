@@ -50,6 +50,18 @@ export function usePublicProfile(username) {
     return loadProfile({ silent: true });
   }, [loadProfile]);
 
+  const softReload = useCallback(async () => {
+    if (!username) return;
+    try {
+      const [profileResult, complaintsResult] = await Promise.all([
+        getPublicUserProfile(username),
+        getUserFollowedComplaints(username),
+      ]);
+      setProfile(profileResult);
+      setFollowedComplaints(complaintsResult);
+    } catch {}
+  }, [username]);
+
   useEffect(() => {
     loadProfile();
   }, [loadProfile]);
@@ -61,6 +73,7 @@ export function usePublicProfile(username) {
     refreshing,
     error,
     refresh,
+    softReload,
     reload: loadProfile,
   };
 }

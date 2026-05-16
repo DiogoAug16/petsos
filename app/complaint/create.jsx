@@ -15,6 +15,8 @@ import ComplaintLocation from '../../components/complaints/ComplaintLocation';
 import ComplaintTypeAnimal from '../../components/complaints/ComplaintTypeAnimal';
 import PhotoSection from '../../components/complaints/PhotoSection';
 
+import { useAuth } from '@/context/AuthContext';
+import { useAuthPrompt } from '@/context/AuthPromptContext';
 import { useLocation } from '../../hooks/useLocation';
 import { createComplaint, getComplaintById, updateComplaint } from '../../services/complaints.service';
 import { ANIMAL_TYPES, COMPLAINT_TYPES } from '../../constants/complaints.constants';
@@ -103,6 +105,8 @@ export default function CreateComplaintScreen() {
   const router = useRouter();
   const { edit, id } = useLocalSearchParams();
   const complaintId = Array.isArray(id) ? id[0] : id;
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { openAuthPrompt } = useAuthPrompt();
 
   // Hook que captura localização automática
   const { location } = useLocation();
@@ -120,8 +124,20 @@ export default function CreateComplaintScreen() {
 
   const isEdit = edit === 'true' && complaintId;
 
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      openAuthPrompt({
+        title: 'Entre para criar uma denúncia',
+        message:
+          'Faça login ou crie uma conta para registrar uma denúncia.',
+      });
+    }
+  }, [authLoading, isAuthenticated, openAuthPrompt]);
+
   // Carrega dados para edição
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     if (isEdit) {
       const loadComplaint = async () => {
         try {
@@ -146,8 +162,7 @@ export default function CreateComplaintScreen() {
           if (normalizedLocation) {
             setManualLocation(normalizedLocation);
           }
-        } catch (error) {
-          console.error('Erro ao carregar denúncia para edição:', error);
+        } catch {
           Alert.alert('Erro', 'Não foi possível carregar os dados da denúncia.');
           router.back();
         } finally {
@@ -156,7 +171,7 @@ export default function CreateComplaintScreen() {
       };
       loadComplaint();
     }
-  }, [complaintId, isEdit, router]);
+  }, [complaintId, isAuthenticated, isEdit, router]);
 
   // Atualiza qualquer campo do formulário
   const updateField = (field, value) => {
@@ -203,6 +218,15 @@ export default function CreateComplaintScreen() {
 
   // Função principal de envio da denúncia
   const handleSubmit = async () => {
+    if (!isAuthenticated) {
+      openAuthPrompt({
+        title: 'Entre para criar uma denúncia',
+        message:
+          'Faça login ou crie uma conta para registrar uma denúncia.',
+      });
+      return;
+    }
+
     // Validação do formulário
     const validationError = validateComplaintForm(form);
 
@@ -251,24 +275,20 @@ export default function CreateComplaintScreen() {
             photos: form.photos,
           };
 
-      console.log('Payload da denúncia:', payload);
-
       if (isEdit) {
-        console.log('Calling updateComplaint with id:', complaintId);
         const result = await updateComplaint(complaintId, payload);
 
         if (result) {
           Alert.alert('Sucesso', 'Denúncia atualizada com sucesso!', [
             {
               text: 'OK',
-              onPress: () => router.replace('/'),
+              onPress: () => router.back(),
             },
           ]);
         } else {
           Alert.alert('Erro', 'O servidor não confirmou a alteração.');
         }
       } else {
-        console.log('Calling createComplaint');
         await createComplaint(payload);
         // Feedback + navegação
         Alert.alert('Sucesso', 'Denúncia criada com sucesso!', [
@@ -281,13 +301,49 @@ export default function CreateComplaintScreen() {
           },
         ]);
       }
-    } catch (error) {
-      console.log('Erro ao salvar denúncia:', error);
+    } catch {
       Alert.alert('Erro', 'Não foi possível salvar a denúncia.');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (authLoading) {
+    return (
+      <>
+        <Stack.Screen options={{ headerShown: false }} />
+        <View style={styles.authRequiredScreen}>
+          <Text style={styles.authRequiredText}>Carregando...</Text>
+        </View>
+      </>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <>
+        <Stack.Screen options={{ headerShown: false }} />
+        <View style={styles.authRequiredScreen}>
+          <Text style={styles.authRequiredTitle}>Criar denúncia</Text>
+          <Text style={styles.authRequiredText}>
+            Entre ou crie sua conta para registrar uma denúncia.
+          </Text>
+          <Pressable
+            style={styles.authRequiredButton}
+            onPress={() =>
+              openAuthPrompt({
+                title: 'Entre para criar uma denúncia',
+                message:
+                  'Faça login ou crie uma conta para registrar uma denúncia.',
+              })
+            }
+          >
+            <Text style={styles.authRequiredButtonText}>Entrar ou criar conta</Text>
+          </Pressable>
+        </View>
+      </>
+    );
+  }
 
   return (
     <>
@@ -414,9 +470,6 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingRight: 8,
   },
-  disabledText: {
-    opacity: 0.7,
-  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -449,5 +502,38 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 15,
     fontWeight: '700',
+  },
+  authRequiredScreen: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  authRequiredTitle: {
+    color: '#1C1C1E',
+    fontSize: 24,
+    fontWeight: '900',
+  },
+  authRequiredText: {
+    color: '#8A8A8E',
+    fontSize: 15,
+    lineHeight: 21,
+    textAlign: 'center',
+    marginTop: 8,
+    marginBottom: 18,
+  },
+  authRequiredButton: {
+    minHeight: 46,
+    paddingHorizontal: 18,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.orange,
+  },
+  authRequiredButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '900',
   },
 });

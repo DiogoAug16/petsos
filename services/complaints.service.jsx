@@ -100,7 +100,7 @@ export async function getComplaintById(id, signal) {
 
 export async function deleteComplaint(id) {
   return await apiFetch(`/complaints/${id}`, { method: 'DELETE' });
-  
+
 }
 
 export async function updateComplaint(id, data) {

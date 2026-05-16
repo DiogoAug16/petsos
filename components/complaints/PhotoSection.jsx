@@ -47,8 +47,7 @@ export default function PhotoSection({ photos, setPhotos, maxPhotos = 5 }) {
           return unique.slice(0, maxPhotos);
         });
       }
-    } catch (error) {
-      console.log('Erro ao abrir galeria:', error);
+    } catch {
       Alert.alert('Erro', 'Não foi possível abrir a galeria.');
     }
   };
@@ -82,8 +81,7 @@ export default function PhotoSection({ photos, setPhotos, maxPhotos = 5 }) {
           return unique.slice(0, maxPhotos);
         });
       }
-    } catch (error) {
-      console.log('Erro ao abrir câmera:', error);
+    } catch {
       Alert.alert('Erro', 'Não foi possível abrir a câmera.');
     }
   };

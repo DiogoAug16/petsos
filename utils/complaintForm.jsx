@@ -1,26 +1,3 @@
-export function buildComplaintLocation(locationMode, address) {
-  if (locationMode === 'auto') {
-    return {
-      latitude: -15.6014,
-      longitude: -56.0979,
-    };
-  }
-
-  if (locationMode === 'text') {
-    return {
-      latitude: -15.6014,
-      longitude: -56.0979,
-      address: address.trim(),
-    };
-  }
-
-  return {
-    latitude: -15.6014,
-    longitude: -56.0979,
-    source: 'map',
-  };
-}
-
 export function validateComplaintForm({
   title,
   description,

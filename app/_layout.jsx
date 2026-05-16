@@ -4,14 +4,19 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import Toast from 'react-native-toast-message';
 
+import { toastConfig } from '@/config/toast.config';
+import { AuthProvider } from '@/context/AuthContext';
+import { AuthPromptProvider } from '@/context/AuthPromptContext';
 import { ComplaintsProvider } from '@/context/ComplaintsContext';
+import { UnreadCountProvider } from '@/context/UnreadCountContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 export { ErrorBoundary } from 'expo-router';
 
 export const unstable_settings = {
-  initialRouteName: '(tabs)',
+  initialRouteName: 'index',
 };
 
 SplashScreen.preventAutoHideAsync();
@@ -43,11 +48,24 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <ComplaintsProvider>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack>
-      </ComplaintsProvider>
+      <AuthProvider>
+        <UnreadCountProvider>
+          <AuthPromptProvider>
+            <ComplaintsProvider>
+              <Stack screenOptions={{ detachInactiveScreens: true, animation: 'none' }}>
+                <Stack.Screen name="index" options={{ headerShown: false }} />
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="complaint/[id]" options={{ headerShown: false }} />
+                <Stack.Screen name="complaint/create" />
+                <Stack.Screen name="users/[username]" options={{ headerShown: false }} />
+                <Stack.Screen name="notifications/index" options={{ headerShown: false }} />
+              </Stack>
+              <Toast config={toastConfig} topOffset={60} />
+            </ComplaintsProvider>
+          </AuthPromptProvider>
+        </UnreadCountProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

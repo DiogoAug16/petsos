@@ -2,13 +2,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { Text, View } from 'react-native';
 import { formatDate } from '@/utils/date.utils';
 
-export function DetailInfoBar({ complaint, status, type, emoji, isHelping, styles, colorScheme }) {
+export function DetailInfoBar({ complaint, status, type, emoji, styles, colorScheme }) {
   return (
     <View style={styles.detailHeroFooter}>
       <View style={{ flexDirection: 'row', gap: 8 }}>
-        <View style={[styles.detailStatusPill, { backgroundColor: isHelping ? '#1A936F' : '#E24B4A' }]}>
+        <View style={[styles.detailStatusPill, { backgroundColor: '#E24B4A' }]}>
           <Text style={styles.detailStatusPillText}>
-            {isHelping ? 'Em curso' : status.label.replace('● ', '')}
+            {status.label.replace('● ', '')}
           </Text>
         </View>
 

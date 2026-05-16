@@ -1,30 +1,60 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { Pressable, Text, View } from 'react-native';
+import { Modal, Pressable, Text, useWindowDimensions, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
 import { useUploadUrl } from '@/hooks/useUploadUrl';
+import { buildUploadPhotoUri } from '@/utils/photo.utils';
 
-export function DetailHero({ complaint, type, emoji, styles, theme, onBack, onShare }) {
+export function DetailHero({
+  complaint,
+  type,
+  emoji,
+  styles,
+  theme,
+  isOwner,
+  onBack,
+  onEdit,
+  onDelete,
+}) {
+  const menuButtonRef = useRef(null);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [menuPosition, setMenuPosition] = useState({ top: 88, right: 12 });
+  const [coverFailed, setCoverFailed] = useState(false);
+  const { width: windowWidth } = useWindowDimensions();
   const UPLOAD_URL = useUploadUrl();
-  const resolvePhotoUri = (photoPath) => {
-    if (!photoPath) return null;
-    if (/^(https?:|file:|content:|data:)/i.test(photoPath)) return photoPath;
-    if (!UPLOAD_URL) return photoPath;
+  const coverPhotoUri = buildUploadPhotoUri(complaint.photos?.[0], UPLOAD_URL);
+  const shouldShowCover = coverPhotoUri && !coverFailed;
 
-    const baseUrl = UPLOAD_URL.endsWith('/') ? UPLOAD_URL.slice(0, -1) : UPLOAD_URL;
-    const normalizedPath = photoPath.startsWith('/') ? photoPath : `/${photoPath}`;
-    return `${baseUrl}${normalizedPath}`;
+  useEffect(() => {
+    setCoverFailed(false);
+  }, [coverPhotoUri]);
+
+  const openMenu = () => {
+    if (!menuButtonRef.current?.measureInWindow) {
+      setMenuVisible(true);
+      return;
+    }
+
+    menuButtonRef.current.measureInWindow((x, y, width, height) => {
+      setMenuPosition({
+        top: y,
+        right: Math.max(12, windowWidth - x - width),
+      });
+
+      setMenuVisible(true);
+    });
   };
-  const coverPhotoUri = resolvePhotoUri(complaint.photos?.[0]);
 
   return (
     <View style={styles.detailHero}>
-      {coverPhotoUri ? (
-        <Image 
-          source={{ uri: coverPhotoUri }} 
+      {shouldShowCover ? (
+        <Image
+          source={{ uri: coverPhotoUri }}
           style={styles.detailHeroImage}
           contentFit="cover"
           cachePolicy="memory-disk"
           transition={120}
+          onError={() => setCoverFailed(true)}
         />
       ) : (
         <View style={[styles.detailHeroContent, { backgroundColor: type.photoColor }]}>
@@ -37,10 +67,57 @@ export function DetailHero({ complaint, type, emoji, styles, theme, onBack, onSh
           <Ionicons name="arrow-back" size={20} color={theme.text} />
         </Pressable>
         
-        <Pressable style={styles.detailIconButton} onPress={onShare}>
-          <Ionicons name="share-outline" size={20} color={theme.text} />
-        </Pressable>
+        {isOwner ? (
+          <Pressable
+            ref={menuButtonRef}
+            collapsable={false}
+            style={styles.detailIconButton}
+            onPress={openMenu}
+          >
+            <Ionicons name="ellipsis-vertical" size={20} color={theme.text} />
+          </Pressable>
+        ) : (
+          <View style={styles.detailIconButtonPlaceholder} />
+        )}
       </View>
+
+      <Modal
+        transparent
+        visible={menuVisible}
+        animationType="fade"
+        onRequestClose={() => setMenuVisible(false)}
+      >
+        <View style={styles.detailMenuBackdrop}>
+          <Pressable
+            style={styles.detailMenuDismissArea}
+            onPress={() => setMenuVisible(false)}
+          />
+
+          <View style={[styles.detailHeroMenu, menuPosition]}>
+            <Pressable
+              style={styles.detailHeroMenuItem}
+              onPress={() => {
+                setMenuVisible(false);
+                onEdit();
+              }}
+            >
+              <Ionicons name="create-outline" size={18} color={theme.text} />
+              <Text style={styles.detailHeroMenuText}>Editar</Text>
+            </Pressable>
+
+            <Pressable
+              style={styles.detailHeroMenuItem}
+              onPress={() => {
+                setMenuVisible(false);
+                onDelete();
+              }}
+            >
+              <Ionicons name="trash-outline" size={18} color="#E24B4A" />
+              <Text style={styles.detailHeroMenuDangerText}>Excluir</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

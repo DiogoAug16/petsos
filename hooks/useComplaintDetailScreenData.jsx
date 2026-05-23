@@ -7,11 +7,14 @@ import { useComplaintVolunteers } from '@/hooks/useComplaintVolunteers';
 
 export function useComplaintDetailScreenData(complaintId) {
   const detail = useComplaintDetail(complaintId);
+  const { fetchComplaintDetails } = detail;
   const followers = useComplaintFollowers(complaintId);
-  const volunteers = useComplaintVolunteers(complaintId);
+  const volunteers = useComplaintVolunteers(complaintId, {
+    onStatusChanged: fetchComplaintDetails,
+  });
   const comments = useComplaintComments(complaintId);
 
-  const { complaint, error, fetchComplaintDetails } = detail;
+  const { complaint, error } = detail;
   const { initialError: followersError, initialReady: followersReady, refresh } = followers;
   const {
     initialError: volunteersError,

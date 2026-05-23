@@ -17,7 +17,7 @@ const normalizeCount = (response) => {
   return Number(response?.data?.totalVolunteers ?? response?.data?.count ?? 0);
 };
 
-export function useComplaintVolunteers(complaintId) {
+export function useComplaintVolunteers(complaintId, { onStatusChanged } = {}) {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const requireAuth = useRequireAuth();
   const [isVolunteer, setIsVolunteer] = useState(false);
@@ -124,6 +124,7 @@ export function useComplaintVolunteers(complaintId) {
 
       await volunteerForComplaint(complaintId);
       await refreshVolunteers();
+      onStatusChanged?.();
       return true;
     } catch (err) {
       if (err?.message?.includes('409')) {
@@ -148,6 +149,7 @@ export function useComplaintVolunteers(complaintId) {
     complaintId,
     isAuthenticated,
     isVolunteer,
+    onStatusChanged,
     refreshVolunteers,
     requireAuth,
   ]);
@@ -176,6 +178,7 @@ export function useComplaintVolunteers(complaintId) {
 
       await unvolunteerFromComplaint(complaintId);
       await refreshVolunteers();
+      onStatusChanged?.();
       return true;
     } catch {
       setIsVolunteer(previousState);
@@ -191,6 +194,7 @@ export function useComplaintVolunteers(complaintId) {
     complaintId,
     isAuthenticated,
     isVolunteer,
+    onStatusChanged,
     refreshVolunteers,
     requireAuth,
   ]);

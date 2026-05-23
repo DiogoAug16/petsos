@@ -1,18 +1,28 @@
 import { useState, useCallback } from 'react';
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import { updateComplaintStatus } from '@/services/complaints.service';
 import { STATUS_CONFIG } from '@/constants/complaints.constants';
+import { StatusConfirmModal } from '@/components/complaints/status-confirm-modal';
 
 export function StatusUpdateButton({ complaint, isOwner, onStatusUpdated, styles }) {
   const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const statusConfig = STATUS_CONFIG[complaint?.status];
   const nextStatus = statusConfig?.nextStatus;
   const nextLabel = statusConfig?.nextLabel;
 
-  const handlePress = useCallback(async () => {
+  const handleOpenModal = useCallback(() => {
+    setModalVisible(true);
+  }, []);
+
+  const handleCancel = useCallback(() => {
+    if (!loading) setModalVisible(false);
+  }, [loading]);
+
+  const handleConfirm = useCallback(async () => {
     if (loading || !nextStatus) return;
 
     setLoading(true);
@@ -26,6 +36,7 @@ export function StatusUpdateButton({ complaint, isOwner, onStatusUpdated, styles
         text2: `Denúncia marcada como "${STATUS_CONFIG[nextStatus]?.label.replace('● ', '')}"`,
       });
 
+      setModalVisible(false);
       onStatusUpdated?.(updated);
     } catch (err) {
       const message = err?.message || 'Não foi possível atualizar o status.';
@@ -47,18 +58,22 @@ export function StatusUpdateButton({ complaint, isOwner, onStatusUpdated, styles
         style={({ pressed }) => [
           styles.statusUpdateButton,
           pressed && { opacity: 0.8 },
-          loading && { opacity: 0.6 },
         ]}
-        onPress={handlePress}
-        disabled={loading}
+        onPress={handleOpenModal}
       >
-        {loading ? (
-          <ActivityIndicator size="small" color="#fff" />
-        ) : (
-          <Ionicons name="arrow-forward-circle-outline" size={18} color="#fff" />
-        )}
+        <Ionicons name="arrow-forward-circle-outline" size={18} color="#fff" />
         <Text style={styles.statusUpdateButtonText}>{nextLabel}</Text>
       </Pressable>
+
+      <StatusConfirmModal
+        visible={modalVisible}
+        currentStatus={complaint.status}
+        nextStatus={nextStatus}
+        loading={loading}
+        onCancel={handleCancel}
+        onConfirm={handleConfirm}
+        styles={styles}
+      />
     </View>
   );
 }

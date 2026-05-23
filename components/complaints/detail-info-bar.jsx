@@ -1,16 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Text, View } from 'react-native';
 import { formatDate } from '@/utils/date.utils';
+import { StatusBadge } from '@/components/complaints/status-badge';
 
 export function DetailInfoBar({ complaint, status, type, emoji, styles, colorScheme }) {
   return (
     <View style={styles.detailHeroFooter}>
       <View style={{ flexDirection: 'row', gap: 8 }}>
-        <View style={[styles.detailStatusPill, { backgroundColor: status.color || '#E24B4A' }]}>
-          <Text style={styles.detailStatusPillText}>
-            {status.label.replace('● ', '')}
-          </Text>
-        </View>
+        <StatusBadge status={complaint.status} styles={styles} />
 
         <View style={styles.detailTypePill}>
           <Text style={styles.detailTypePillText}>{type.label}</Text>

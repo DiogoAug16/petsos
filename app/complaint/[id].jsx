@@ -17,6 +17,7 @@ import { DetailMainCard } from '@/components/complaints/detail-main-card';
 import { DetailMapCard } from '@/components/complaints/detail-map-card';
 import { DetailMapModal } from '@/components/complaints/detail-map-modal';
 import { DetailPhotosCard } from '@/components/complaints/detail-photos-card';
+import { StatusUpdateButton } from '@/components/complaints/status-update-button';
 import { ErrorState } from '@/components/complaints/error-state';
 import { LoadingState } from '@/components/complaints/loading-state';
 import { UnfollowConfirmModal } from '@/components/complaints/unfollow-confirm-modal';
@@ -69,6 +70,7 @@ export default function ComplaintDetailScreen() {
     handleOpenMap,
     handleDelete,
     handleCloseMapModal,
+    handleStatusUpdated,
   } = detail;
 
   const {
@@ -186,6 +188,13 @@ export default function ComplaintDetailScreen() {
             emoji={emoji}
             styles={styles}
             colorScheme={colorScheme}
+          />
+
+          <StatusUpdateButton
+            complaint={complaint}
+            isOwner={isOwner}
+            onStatusUpdated={handleStatusUpdated}
+            styles={styles}
           />
 
           <View style={styles.detailContent}>

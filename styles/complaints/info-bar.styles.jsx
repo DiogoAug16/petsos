@@ -46,5 +46,24 @@ export const infoBarStyles = (colorScheme) => {
     detailMetaIcon: {
       fontSize: 14,
     },
+    statusUpdateContainer: {
+      paddingHorizontal: 16,
+      paddingBottom: 8,
+    },
+    statusUpdateButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      backgroundColor: '#FF6B35',
+      paddingVertical: 12,
+      paddingHorizontal: 20,
+      borderRadius: 12,
+    },
+    statusUpdateButtonText: {
+      color: '#fff',
+      fontSize: 14,
+      fontWeight: '600',
+    },
   };
 };

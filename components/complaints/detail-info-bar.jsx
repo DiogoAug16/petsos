@@ -6,7 +6,7 @@ export function DetailInfoBar({ complaint, status, type, emoji, styles, colorSch
   return (
     <View style={styles.detailHeroFooter}>
       <View style={{ flexDirection: 'row', gap: 8 }}>
-        <View style={[styles.detailStatusPill, { backgroundColor: '#E24B4A' }]}>
+        <View style={[styles.detailStatusPill, { backgroundColor: status.color || '#E24B4A' }]}>
           <Text style={styles.detailStatusPillText}>
             {status.label.replace('● ', '')}
           </Text>

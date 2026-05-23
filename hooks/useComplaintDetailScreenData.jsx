@@ -3,14 +3,21 @@ import { useCallback } from 'react';
 import { useComplaintComments } from '@/hooks/useComplaintComments';
 import { useComplaintDetail } from '@/hooks/useComplaintDetail';
 import { useComplaintFollowers } from '@/hooks/useComplaintFollowers';
+import { useComplaintVolunteers } from '@/hooks/useComplaintVolunteers';
 
 export function useComplaintDetailScreenData(complaintId) {
   const detail = useComplaintDetail(complaintId);
   const followers = useComplaintFollowers(complaintId);
+  const volunteers = useComplaintVolunteers(complaintId);
   const comments = useComplaintComments(complaintId);
 
   const { complaint, error, fetchComplaintDetails } = detail;
   const { initialError: followersError, initialReady: followersReady, refresh } = followers;
+  const {
+    initialError: volunteersError,
+    initialReady: volunteersReady,
+    refresh: refreshVolunteers,
+  } = volunteers;
   const {
     initialError: commentsError,
     initialReady: commentsReady,
@@ -19,10 +26,10 @@ export function useComplaintDetailScreenData(complaintId) {
 
   const hasComplaint = Boolean(complaint);
   const complaintError = !hasComplaint ? error : null;
-  const socialError = followersError || commentsError;
+  const socialError = followersError || volunteersError || commentsError;
   const initialError = complaintError || socialError;
   const initialLoading =
-    !initialError && (!hasComplaint || !followersReady || !commentsReady);
+    !initialError && (!hasComplaint || !followersReady || !volunteersReady || !commentsReady);
 
   const retryInitialLoad = useCallback(() => {
     if (!complaint) {
@@ -30,12 +37,14 @@ export function useComplaintDetailScreenData(complaintId) {
     }
 
     refresh();
+    refreshVolunteers();
     loadInitial();
-  }, [complaint, fetchComplaintDetails, loadInitial, refresh]);
+  }, [complaint, fetchComplaintDetails, loadInitial, refresh, refreshVolunteers]);
 
   return {
     detail,
     followers,
+    volunteers,
     comments,
     initialLoading,
     initialError,

@@ -182,6 +182,7 @@ export async function updateComplaintStatus(id, status) {
   });
 }
 
+
 export async function getNearbyComplaints(lat, lng, radiusKm = 5) {
   return apiFetch(`/complaints/nearest?lat=${lat}&lng=${lng}&radiusKm=${radiusKm}`);
 }

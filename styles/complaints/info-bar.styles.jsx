@@ -10,25 +10,15 @@ export const infoBarStyles = (colorScheme) => {
       paddingVertical: 12,
       paddingHorizontal: 16,
     },
-    detailStatusPill: {
-      paddingVertical: 4,
-      paddingHorizontal: 12,
-      borderRadius: 20,
-    },
-    detailStatusPillText: {
-      fontSize: 11,
-      fontWeight: '600',
-      color: '#fff',
-    },
-    detailTypePill: {
-      backgroundColor: isDark ? 'rgba(42,42,42,0.9)' : 'rgba(255,255,255,0.9)',
+    detailPill: {
       paddingVertical: 4,
       paddingHorizontal: 12,
       borderRadius: 20,
       borderWidth: 0.5,
       borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+      backgroundColor: isDark ? 'rgba(42,42,42,0.9)' : 'rgba(255,255,255,0.9)',
     },
-    detailTypePillText: {
+    detailPillText: {
       fontSize: 11,
       fontWeight: '600',
       color: isDark ? '#fff' : '#712B13',
@@ -64,6 +54,29 @@ export const infoBarStyles = (colorScheme) => {
       color: '#fff',
       fontSize: 14,
       fontWeight: '600',
+    },
+    volunteerButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      backgroundColor: '#10B981',
+      paddingVertical: 12,
+      paddingHorizontal: 20,
+      borderRadius: 12,
+    },
+    volunteerButtonActive: {
+      backgroundColor: isDark ? 'rgba(16,185,129,0.15)' : 'rgba(16,185,129,0.1)',
+      borderWidth: 1,
+      borderColor: '#10B981',
+    },
+    volunteerButtonText: {
+      color: '#fff',
+      fontSize: 14,
+      fontWeight: '600',
+    },
+    volunteerButtonActiveText: {
+      color: '#10B981',
     },
     statusModalBackdrop: {
       flex: 1,

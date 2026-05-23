@@ -26,6 +26,7 @@ export function useComplaintFollowers(complaintId) {
   const [totalFollowers, setTotalFollowers] = useState(0);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [followModalVisible, setFollowModalVisible] = useState(false);
   const [unfollowModalVisible, setUnfollowModalVisible] = useState(false);
   const [initialReady, setInitialReady] = useState(false);
   const [initialError, setInitialError] = useState(null);
@@ -204,8 +205,7 @@ export function useComplaintFollowers(complaintId) {
           setUnfollowModalVisible(true);
           return;
         }
-
-        follow();
+        setFollowModalVisible(true);
       },
       {
         title: 'Entre para acompanhar',
@@ -213,7 +213,18 @@ export function useComplaintFollowers(complaintId) {
           'Faça login ou crie uma conta para acompanhar denúncias e receber atualizações.',
       },
     );
-  }, [follow, isFollowing, requireAuth]);
+  }, [isFollowing, requireAuth]);
+
+  const closeFollowModal = useCallback(() => {
+    setFollowModalVisible(false);
+  }, []);
+
+  const confirmFollow = useCallback(async () => {
+    const followed = await follow();
+    if (followed) {
+      setFollowModalVisible(false);
+    }
+  }, [follow]);
 
   const closeUnfollowModal = useCallback(() => {
     setUnfollowModalVisible(false);
@@ -238,12 +249,15 @@ export function useComplaintFollowers(complaintId) {
     totalFollowers,
     loading,
     actionLoading,
+    followModalVisible,
     unfollowModalVisible,
     initialReady,
     initialError,
     follow,
     unfollow,
     toggleFollow,
+    closeFollowModal,
+    confirmFollow,
     closeUnfollowModal,
     confirmUnfollow,
     refresh,

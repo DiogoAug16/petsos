@@ -68,10 +68,30 @@ export const STATUS_CONFIG = {
     container: 'statusAberto',
     text: 'statusAbertoText',
     label: '● Aberto',
+    color: '#E24B4A',
+  },
+  em_andamento: {
+    container: 'statusEmAndamento',
+    text: 'statusEmAndamentoText',
+    label: '● Em andamento',
+    color: '#3B82F6',
+  },
+  aguardando_validacao: {
+    container: 'statusAguardandoValidacao',
+    text: 'statusAguardandoValidacaoText',
+    label: '● Aguardando validação',
+    color: '#F59E0B',
   },
   resolvido: {
     container: 'statusResolvido',
     text: 'statusResolvidoText',
     label: '● Resolvido',
+    color: '#10B981',
+  },
+  fechado: {
+    container: 'statusFechado',
+    text: 'statusFechadoText',
+    label: '● Fechado',
+    color: '#6B7280',
   },
 };

@@ -4,6 +4,7 @@ import { useHaptics } from '@/hooks/useHaptics';
 import { usePressAnimation } from '@/hooks/usePressAnimation';
 import { useUploadUrl } from '@/hooks/useUploadUrl';
 import { useComplaintConfig } from '@/hooks/useComplaintConfig';
+import { StatusBadge } from '@/components/complaints/status-badge';
 import { complaintsStyles } from '@/styles/complaints';
 import { formatDate } from '@/utils/date.utils';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,7 +22,7 @@ function ComplaintCardComponent({ complaint }) {
   const colorScheme = useColorScheme();
   const styles = complaintsStyles(colorScheme);
   const UPLOAD_URL = useUploadUrl();
-  const { status, type, emoji } = useComplaintConfig(complaint);
+  const { type, emoji } = useComplaintConfig(complaint);
 
   const resolvePhotoUri = (photoPath) => {
     if (!photoPath) return null;
@@ -95,9 +96,7 @@ function ComplaintCardComponent({ complaint }) {
             <Text style={styles.cardDate}>{formatDate(complaint.createdAt)}</Text>
           </View>
 
-          <View style={styles[status.container]}>
-            <Text style={styles[status.text]}>{status.label}</Text>
-          </View>
+          <StatusBadge status={complaint.status} styles={styles} />
         </View>
       </Animated.View>
     </Pressable>

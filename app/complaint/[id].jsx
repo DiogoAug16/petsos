@@ -17,9 +17,13 @@ import { DetailMainCard } from '@/components/complaints/detail-main-card';
 import { DetailMapCard } from '@/components/complaints/detail-map-card';
 import { DetailMapModal } from '@/components/complaints/detail-map-modal';
 import { DetailPhotosCard } from '@/components/complaints/detail-photos-card';
+import { VolunteerButton } from '@/components/complaints/volunteer-button';
 import { ErrorState } from '@/components/complaints/error-state';
 import { LoadingState } from '@/components/complaints/loading-state';
+import { FollowConfirmModal } from '@/components/complaints/follow-confirm-modal';
 import { UnfollowConfirmModal } from '@/components/complaints/unfollow-confirm-modal';
+import { VolunteerConfirmModal } from '@/components/complaints/volunteer-confirm-modal';
+import { UnvolunteerConfirmModal } from '@/components/complaints/unvolunteer-confirm-modal';
 import { useAuth } from '@/context/AuthContext';
 import { useAddress } from '@/hooks/useAddress';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -53,6 +57,7 @@ export default function ComplaintDetailScreen() {
   const {
     detail,
     followers: followersState,
+    volunteers: volunteersState,
     comments: commentsState,
     initialLoading,
     initialError,
@@ -77,11 +82,26 @@ export default function ComplaintDetailScreen() {
     totalFollowers,
     loading: followersLoading,
     actionLoading: followLoading,
+    followModalVisible,
     unfollowModalVisible,
     toggleFollow,
+    closeFollowModal,
+    confirmFollow,
     closeUnfollowModal,
     confirmUnfollow,
   } = followersState;
+
+  const {
+    isVolunteer,
+    actionLoading: volunteerLoading,
+    volunteerModalVisible,
+    unvolunteerModalVisible,
+    toggleVolunteer,
+    closeVolunteerModal,
+    confirmVolunteer,
+    closeUnvolunteerModal,
+    confirmUnvolunteer,
+  } = volunteersState;
 
   const {
     comments,
@@ -188,6 +208,15 @@ export default function ComplaintDetailScreen() {
             colorScheme={colorScheme}
           />
 
+          <VolunteerButton
+            complaint={complaint}
+            isOwner={isOwner}
+            isVolunteer={isVolunteer}
+            volunteerLoading={volunteerLoading}
+            onToggleVolunteer={toggleVolunteer}
+            styles={styles}
+          />
+
           <View style={styles.detailContent}>
             <DetailMainCard
               complaint={complaint}
@@ -249,11 +278,35 @@ export default function ComplaintDetailScreen() {
         )}
       </KeyboardAvoidingView>
 
+      <FollowConfirmModal
+        visible={followModalVisible}
+        loading={followLoading}
+        onCancel={closeFollowModal}
+        onConfirm={confirmFollow}
+        styles={styles}
+      />
+
       <UnfollowConfirmModal
         visible={unfollowModalVisible}
         loading={followLoading}
         onCancel={closeUnfollowModal}
         onConfirm={confirmUnfollow}
+        styles={styles}
+      />
+
+      <VolunteerConfirmModal
+        visible={volunteerModalVisible}
+        loading={volunteerLoading}
+        onCancel={closeVolunteerModal}
+        onConfirm={confirmVolunteer}
+        styles={styles}
+      />
+
+      <UnvolunteerConfirmModal
+        visible={unvolunteerModalVisible}
+        loading={volunteerLoading}
+        onCancel={closeUnvolunteerModal}
+        onConfirm={confirmUnvolunteer}
         styles={styles}
       />
 

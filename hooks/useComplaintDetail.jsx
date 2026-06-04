@@ -116,6 +116,10 @@ export function useComplaintDetail(id) {
     setShowMapModal(false);
   }, []);
 
+  const handleStatusUpdated = useCallback((updatedComplaint) => {
+    setComplaint((prev) => ({ ...prev, ...updatedComplaint }));
+  }, []);
+
   return {
     complaint,
     loading,
@@ -126,5 +130,6 @@ export function useComplaintDetail(id) {
     handleOpenMap,
     handleDelete,
     handleCloseMapModal,
+    handleStatusUpdated,
   };
 }

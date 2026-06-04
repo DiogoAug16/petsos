@@ -6,14 +6,14 @@ export function DetailInfoBar({ complaint, status, type, emoji, styles, colorSch
   return (
     <View style={styles.detailHeroFooter}>
       <View style={{ flexDirection: 'row', gap: 8 }}>
-        <View style={[styles.detailStatusPill, { backgroundColor: '#E24B4A' }]}>
-          <Text style={styles.detailStatusPillText}>
+        <View style={[styles.detailPill, { borderColor: status.color }]}>
+          <Text style={[styles.detailPillText, { color: status.color }]}>
             {status.label.replace('● ', '')}
           </Text>
         </View>
 
-        <View style={styles.detailTypePill}>
-          <Text style={styles.detailTypePillText}>{type.label}</Text>
+        <View style={styles.detailPill}>
+          <Text style={styles.detailPillText}>{type.label}</Text>
         </View>
       </View>
 

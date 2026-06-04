@@ -1,5 +1,5 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import {
   Animated,
   KeyboardAvoidingView,
@@ -17,6 +17,9 @@ import { DetailMainCard } from '@/components/complaints/detail-main-card';
 import { DetailMapCard } from '@/components/complaints/detail-map-card';
 import { DetailMapModal } from '@/components/complaints/detail-map-modal';
 import { DetailPhotosCard } from '@/components/complaints/detail-photos-card';
+import { EvidenceSection } from '@/components/complaints/evidence-section';
+import { EvidenceSubmitModal } from '@/components/complaints/evidence-submit-modal';
+import { EvidenceValidationSection } from '@/components/complaints/evidence-validation-section';
 import { VolunteerButton } from '@/components/complaints/volunteer-button';
 import { ErrorState } from '@/components/complaints/error-state';
 import { LoadingState } from '@/components/complaints/loading-state';
@@ -30,6 +33,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { useCommentComposerVisibility } from '@/hooks/useCommentComposerVisibility';
 import { useComplaintConfig } from '@/hooks/useComplaintConfig';
 import { useComplaintDetailScreenData } from '@/hooks/useComplaintDetailScreenData';
+import { useComplaintEvidence } from '@/hooks/useComplaintEvidence';
 import { useComplaintReplyComposer } from '@/hooks/useComplaintReplyComposer';
 import { complaintsStyles } from '@/styles/complaints';
 import Colors from '@/styles/theme/Colors';
@@ -116,6 +120,9 @@ export default function ComplaintDetailScreen() {
     incrementRepliesCount,
     isBlocked: commentsBlocked,
   } = commentsState;
+
+  const { evidences, refresh: refreshEvidence } = useComplaintEvidence(complaintId, complaint?.status);
+  const [evidenceModalVisible, setEvidenceModalVisible] = useState(false);
 
   const { address } = useAddress(complaint?.location);
   const { status, type, emoji } = useComplaintConfig(complaint);
@@ -214,6 +221,7 @@ export default function ComplaintDetailScreen() {
             isVolunteer={isVolunteer}
             volunteerLoading={volunteerLoading}
             onToggleVolunteer={toggleVolunteer}
+            onSubmitEvidence={() => setEvidenceModalVisible(true)}
             styles={styles}
           />
 
@@ -234,7 +242,20 @@ export default function ComplaintDetailScreen() {
               onOpenMap={() => handleOpenMap(mapRef)}
               styles={styles}
             />
+            <EvidenceSection evidences={evidences} styles={styles} />
           </View>
+
+          <EvidenceValidationSection
+            complaint={complaint}
+            isOwner={isOwner}
+            isVolunteer={isVolunteer}
+            isFollowing={isFollowing}
+            evidences={evidences}
+            onStatusChanged={() => {
+              fetchComplaintDetails();
+              refreshEvidence();
+            }}
+          />
 
           <CommentsSection
             complaintId={complaintId}
@@ -317,6 +338,16 @@ export default function ComplaintDetailScreen() {
         onClose={handleCloseMapModal}
         styles={styles}
         theme={theme}
+      />
+
+      <EvidenceSubmitModal
+        visible={evidenceModalVisible}
+        complaintId={complaintId}
+        onClose={() => setEvidenceModalVisible(false)}
+        onSubmitted={() => {
+          fetchComplaintDetails();
+          refreshEvidence();
+        }}
       />
     </View>
   );

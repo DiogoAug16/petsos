@@ -23,8 +23,8 @@ import { ANIMAL_TYPES, COMPLAINT_TYPES } from '../../constants/complaints.consta
 import { validateComplaintForm } from '../../utils/complaintForm';
 
 const COLORS = {
-  background: '#F7F4F0',
-  border: '#E8E4DF',
+  background: '#E8F4F8',
+  border: '#F0F0F0',
   orange: '#FF6B35',
 };
 

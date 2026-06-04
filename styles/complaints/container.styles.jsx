@@ -6,7 +6,7 @@ export const containerStyles = (colorScheme) => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: isDark ? '#000' : '#F7F4F0',
+      backgroundColor: isDark ? '#1A1F2E' : '#E8F4F8',
     },
   });
 };

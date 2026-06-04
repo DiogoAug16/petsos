@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 export const createRegisterStyles = (colors) => {
-  const isDark = colors.background === '#000';
+  const isDark = colors.background !== '#E8F4F8';
 
   return StyleSheet.create({
     container: {

@@ -4,7 +4,7 @@ export const heroStyles = (colorScheme) => {
   return {
     detailHero: {
       height: 220,
-      backgroundColor: isDark ? '#1C1C1E' : '#FFD4B8',
+      backgroundColor: isDark ? '#242B3D' : '#B8E0ED',
       position: 'relative',
       overflow: 'hidden',
     },
@@ -37,7 +37,7 @@ export const heroStyles = (colorScheme) => {
     detailIconButton: {
       width: 36,
       height: 36,
-      backgroundColor: isDark ? 'rgba(42,42,42,0.9)' : 'rgba(255,255,255,0.9)',
+      backgroundColor: isDark ? 'rgba(36,43,61,0.9)' : 'rgba(255,255,255,0.9)',
       borderRadius: 10,
       alignItems: 'center',
       justifyContent: 'center',
@@ -50,7 +50,7 @@ export const heroStyles = (colorScheme) => {
       left: 15,
       width: 36,
       height: 36,
-      backgroundColor: isDark ? 'rgba(42,42,42,0.9)' : 'rgba(255,255,255,0.9)',
+      backgroundColor: isDark ? 'rgba(36,43,61,0.9)' : 'rgba(255,255,255,0.9)',
       borderRadius: 10,
       alignItems: 'center',
       justifyContent: 'center',

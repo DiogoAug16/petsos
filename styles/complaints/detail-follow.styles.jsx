@@ -1,10 +1,10 @@
 export const detailFollowStyles = (colorScheme) => {
   const isDark = colorScheme === 'dark';
-  const card = isDark ? '#1C1C1E' : '#fff';
+  const card = isDark ? '#242B3D' : '#FFFFFF';
   const text = isDark ? '#fff' : '#1C1C1E';
   const muted = '#8A8A8E';
-  const border = isDark ? '#3A3A3A' : '#E8E4DF';
-  const soft = isDark ? '#2A2A2A' : '#F7F4F0';
+  const border = isDark ? '#2F3749' : '#F0F0F0';
+  const soft = isDark ? '#2F3749' : '#E8F4F8';
 
   return {
     detailFollowSummary: {

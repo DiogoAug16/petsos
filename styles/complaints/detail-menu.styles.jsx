@@ -1,8 +1,8 @@
 export const detailMenuStyles = (colorScheme) => {
   const isDark = colorScheme === 'dark';
-  const card = isDark ? '#1C1C1E' : '#fff';
+  const card = isDark ? '#242B3D' : '#FFFFFF';
   const text = isDark ? '#fff' : '#1C1C1E';
-  const border = isDark ? '#3A3A3A' : '#E8E4DF';
+  const border = isDark ? '#2F3749' : '#F0F0F0';
 
   return {
     detailIconButtonPlaceholder: {

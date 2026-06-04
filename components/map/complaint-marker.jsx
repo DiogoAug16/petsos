@@ -37,7 +37,7 @@ export const ComplaintMarker = ({ complaint, onPress }) => {
           styles.container,
           {
             borderColor: themeColor,
-            backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
+            backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
             shadowOpacity: isDark ? 0.4 : 0.2,
           },
         ]}

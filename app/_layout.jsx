@@ -13,6 +13,28 @@ import { ComplaintsProvider } from '@/context/ComplaintsContext';
 import { UnreadCountProvider } from '@/context/UnreadCountContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
+const LightTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: '#E8F4F8',
+    card: '#FFFFFF',
+    border: '#F0F0F0',
+    primary: '#FF6B35',
+  },
+};
+
+const CustomDarkTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    background: '#1A1F2E',
+    card: '#242B3D',
+    border: '#2F3749',
+    primary: '#FF6B35',
+  },
+};
+
 export { ErrorBoundary } from 'expo-router';
 
 export const unstable_settings = {
@@ -47,7 +69,7 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={colorScheme === 'dark' ? CustomDarkTheme : LightTheme}>
       <AuthProvider>
         <UnreadCountProvider>
           <AuthPromptProvider>

@@ -7,11 +7,16 @@ export const cardStyles = (colorScheme) => {
 
   return StyleSheet.create({
     card: {
-      backgroundColor: isDark ? '#1C1C1E' : '#fff',
+      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
       borderRadius: 16,
       padding: 14,
-      borderWidth: 0.5,
-      borderColor: isDark ? '#3A3A3A' : '#E8E4DF',
+      borderWidth: 1,
+      borderColor: isDark ? '#2F3749' : '#F0F0F0',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: isDark ? 0.3 : 0.06,
+      shadowRadius: 12,
+      elevation: 6,
     },
 
     cardPressed: {
@@ -58,7 +63,7 @@ export const cardStyles = (colorScheme) => {
 
     cardDivider: {
       height: 0.5,
-      backgroundColor: isDark ? '#3A3A3A' : '#E8E4DF',
+      backgroundColor: isDark ? '#2F3749' : '#F0F0F0',
       marginTop: 10,
       marginBottom: 10,
     },

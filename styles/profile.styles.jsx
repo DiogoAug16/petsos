@@ -2,12 +2,12 @@ import { StyleSheet } from 'react-native';
 
 export const profileStyles = (colorScheme) => {
   const isDark = colorScheme === 'dark';
-  const background = isDark ? '#000' : '#F7F4F0';
-  const surface = isDark ? '#1C1C1E' : '#FFFFFF';
-  const surfaceSoft = isDark ? '#242427' : '#F0ECE7';
+  const background = isDark ? '#1A1F2E' : '#E8F4F8';
+  const surface = isDark ? '#242B3D' : '#FFFFFF';
+  const surfaceSoft = isDark ? '#2F3749' : '#E0EDF2';
   const text = isDark ? '#FFFFFF' : '#1C1C1E';
   const muted = '#8A8A8E';
-  const border = isDark ? '#333333' : '#E8E4DF';
+  const border = isDark ? '#2F3749' : '#F0F0F0';
 
   return StyleSheet.create({
     screen: {
@@ -19,7 +19,7 @@ export const profileStyles = (colorScheme) => {
     },
     hero: {
       height: 230,
-      backgroundColor: isDark ? '#19191D' : '#222228',
+      backgroundColor: isDark ? '#1A1F2E' : '#2C3E50',
       borderBottomLeftRadius: 22,
       borderBottomRightRadius: 22,
       overflow: 'hidden',
@@ -143,11 +143,16 @@ export const profileStyles = (colorScheme) => {
       minHeight: 140,
       borderRadius: 16,
       backgroundColor: surface,
-      borderWidth: 0.5,
+      borderWidth: 1,
       borderColor: border,
       alignItems: 'center',
       justifyContent: 'center',
       padding: 18,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: isDark ? 0.3 : 0.06,
+      shadowRadius: 12,
+      elevation: 6,
     },
     emptyTitle: {
       color: text,
@@ -171,8 +176,13 @@ export const profileStyles = (colorScheme) => {
       padding: 12,
       borderRadius: 16,
       backgroundColor: surface,
-      borderWidth: 0.5,
+      borderWidth: 1,
       borderColor: border,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: isDark ? 0.3 : 0.06,
+      shadowRadius: 12,
+      elevation: 6,
     },
     cardThumb: {
       width: 58,
@@ -268,9 +278,9 @@ export const profileStyles = (colorScheme) => {
       right: 14,
       width: 164,
       borderRadius: 14,
-      backgroundColor: isDark ? '#1C1C1E' : '#202024',
+      backgroundColor: isDark ? '#242B3D' : '#2C3E50',
       borderWidth: 0.5,
-      borderColor: isDark ? '#333333' : '#2F2F34',
+      borderColor: isDark ? '#2F3749' : '#34495E',
       overflow: 'hidden',
       elevation: 8,
       shadowColor: '#000',

@@ -7,6 +7,7 @@ export function VolunteerButton({
   isVolunteer,
   volunteerLoading,
   onToggleVolunteer,
+  onSubmitEvidence,
   styles,
 }) {
   if (isOwner) return null;
@@ -37,6 +38,16 @@ export function VolunteerButton({
           {isVolunteer ? 'Voluntariado' : 'Voluntariar-se'}
         </Text>
       </Pressable>
+
+      {isVolunteer && complaint?.status === 'em_andamento' && (
+        <Pressable
+          style={[styles.volunteerButton, { marginTop: 8, backgroundColor: '#FF6B35' }]}
+          onPress={onSubmitEvidence}
+        >
+          <Ionicons name="camera-outline" size={18} color="#fff" />
+          <Text style={styles.volunteerButtonText}>Enviar Evidência</Text>
+        </Pressable>
+      )}
     </View>
   );
 }

@@ -25,7 +25,7 @@ export function DetailPhotosCard({ photos, styles }) {
 
   return (
     <View style={styles.detailCard}>
-      <Text style={styles.detailSectionLabel}>Fotos de evidência</Text>
+      <Text style={styles.detailSectionLabel}>Imagens</Text>
       <ComplaintPhotos
         photos={visiblePhotos}
         onPhotoError={(photo) => {

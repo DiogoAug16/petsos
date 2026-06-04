@@ -13,7 +13,7 @@ export const searchStyles = (colorScheme) => {
     },
 
     searchBar: {
-      backgroundColor: isDark ? '#1C1C1E' : '#fff',
+      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
       borderRadius: 16,
       paddingHorizontal: 14,
       paddingVertical: 10,
@@ -53,7 +53,7 @@ export const searchStyles = (colorScheme) => {
       right: 16,
       zIndex: 12,
       borderRadius: 14,
-      backgroundColor: isDark ? '#1C1C1E' : '#fff',
+      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
       paddingHorizontal: 14,
       paddingVertical: 12,
       shadowColor: '#000',
@@ -87,8 +87,8 @@ export const searchStyles = (colorScheme) => {
       paddingVertical: 8,
       borderRadius: 16,
       borderWidth: 1,
-      borderColor: isDark ? '#3A3A3C' : '#E8E4DF',
-      backgroundColor: isDark ? '#2C2C2E' : '#F7F4F0',
+      borderColor: isDark ? '#2F3749' : '#F0F0F0',
+      backgroundColor: isDark ? '#2F3749' : '#E8F4F8',
     },
 
     filterStatusOptionActive: {
@@ -118,7 +118,7 @@ export const searchStyles = (colorScheme) => {
       paddingHorizontal: 12,
       paddingVertical: 8,
       borderRadius: 10,
-      backgroundColor: isDark ? '#2C2C2E' : '#F1F1F1',
+      backgroundColor: isDark ? '#2F3749' : '#E0EDF2',
     },
 
     filterClearButtonText: {
@@ -147,7 +147,7 @@ export const searchStyles = (colorScheme) => {
       right: 16,
       zIndex: 11,
       borderRadius: 14,
-      backgroundColor: isDark ? '#1C1C1E' : '#fff',
+      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.12,
@@ -160,7 +160,7 @@ export const searchStyles = (colorScheme) => {
       paddingHorizontal: 14,
       paddingVertical: 10,
       borderBottomWidth: 1,
-      borderBottomColor: isDark ? '#2C2C2E' : '#F0F0F0',
+      borderBottomColor: isDark ? '#2F3749' : '#E0EDF2',
       gap: 2,
     },
 
@@ -186,11 +186,11 @@ export const searchStyles = (colorScheme) => {
       right: 16,
       zIndex: 11,
       borderRadius: 12,
-      backgroundColor: isDark ? '#2C2C2E' : '#FFFFFF',
+      backgroundColor: isDark ? '#2F3749' : '#FFFFFF',
       paddingHorizontal: 12,
       paddingVertical: 10,
       borderWidth: 1,
-      borderColor: isDark ? '#3A3A3C' : '#E8E4DF',
+      borderColor: isDark ? '#2F3749' : '#F0F0F0',
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 3 },
       shadowOpacity: 0.1,

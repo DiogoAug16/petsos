@@ -12,7 +12,7 @@ export const bottomCardStyles = (colorScheme) => {
 
       height: 158,
       overflow: 'hidden',
-      backgroundColor: isDark ? '#1C1C1E' : '#fff',
+      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
       borderTopLeftRadius: 24,
       borderTopRightRadius: 24,
       paddingHorizontal: 20,
@@ -29,7 +29,7 @@ export const bottomCardStyles = (colorScheme) => {
     bottomHandle: {
       width: 36,
       height: 6,
-      backgroundColor: isDark ? '#3A3A3A' : '#E8E4DF',
+      backgroundColor: isDark ? '#2F3749' : '#F0F0F0',
       borderRadius: 2,
       alignSelf: 'center',
       marginBottom: 14,
@@ -61,12 +61,12 @@ export const bottomCardStyles = (colorScheme) => {
     },
 
     innerBorder: {
-     flex: 1, // importante pra ocupar tudo
+     flex: 1,
      borderRadius: 14,
      borderWidth: 1,
-     borderColor: isDark ? '#3A3A3A' : '#E8E4DF',
+     borderColor: isDark ? '#2F3749' : '#F0F0F0',
      padding: 1,
-    backgroundColor: isDark ? '#1C1C1E' : '#fff',
+    backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
     },
 
     miniCardPhoto: {

@@ -52,7 +52,7 @@ function ComplaintNearbyCardComponent({ complaint }) {
             alignItems: 'center',
             padding: 12,
             borderRadius: 20,
-            backgroundColor: colorScheme === 'dark' ? '#1C1C1E' : '#FFFFFF',
+            backgroundColor: colorScheme === 'dark' ? '#242B3D' : '#FFFFFF',
           },
           animatedStyle,
         ]}

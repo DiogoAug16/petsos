@@ -8,10 +8,12 @@ export const headerStyles = (colorScheme) => {
       paddingTop: 60,
       paddingBottom: 16,
       paddingHorizontal: 20,
-      backgroundColor: isDark ? '#1C1C1E' : '#fff',
-      flexDirection: 'row',              
-      justifyContent: 'space-between',  
-      alignItems: 'flex-start',        
+      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      borderBottomWidth: 0.5,
+      borderBottomColor: isDark ? '#2F3749' : '#F0F0F0',
     },
 
     headerTitle: {

@@ -15,8 +15,8 @@ export const infoBarStyles = (colorScheme) => {
       paddingHorizontal: 12,
       borderRadius: 20,
       borderWidth: 0.5,
-      borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
-      backgroundColor: isDark ? 'rgba(42,42,42,0.9)' : 'rgba(255,255,255,0.9)',
+      borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#F0F0F0',
+      backgroundColor: isDark ? 'rgba(36,43,61,0.9)' : 'rgba(255,255,255,0.9)',
     },
     detailPillText: {
       fontSize: 11,
@@ -84,7 +84,7 @@ export const infoBarStyles = (colorScheme) => {
       justifyContent: 'flex-end',
     },
     statusModalCard: {
-      backgroundColor: isDark ? '#1C1C1E' : '#fff',
+      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
       borderTopLeftRadius: 20,
       borderTopRightRadius: 20,
       padding: 18,
@@ -109,7 +109,7 @@ export const infoBarStyles = (colorScheme) => {
       marginTop: 16,
       marginBottom: 8,
       paddingVertical: 12,
-      backgroundColor: isDark ? '#2A2A2A' : '#F7F4F0',
+      backgroundColor: isDark ? '#2F3749' : '#E8F4F8',
       borderRadius: 12,
     },
     statusModalArrow: {
@@ -127,10 +127,10 @@ export const infoBarStyles = (colorScheme) => {
       minHeight: 46,
       borderRadius: 12,
       borderWidth: 0.5,
-      borderColor: isDark ? '#3A3A3A' : '#E8E4DF',
+      borderColor: isDark ? '#2F3749' : '#F0F0F0',
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: isDark ? '#2A2A2A' : '#F7F4F0',
+      backgroundColor: isDark ? '#2F3749' : '#E8F4F8',
     },
     statusModalCancelText: {
       color: isDark ? '#fff' : '#1C1C1E',

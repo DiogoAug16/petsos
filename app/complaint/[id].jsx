@@ -300,31 +300,38 @@ export default function ComplaintDetailScreen() {
           onComposerAnchorLayout={handleComposerAnchorLayout}
           styles={styles}
         />
-      </ScrollView>
+        </ScrollView>
 
-      {isAuthenticated && (
-        <Animated.View
-          pointerEvents={composerVisible ? 'auto' : 'none'}
-          style={[styles.detailCommentInputBar, commentComposerAnimatedStyle]}
-        >
-          <CommentComposer
-            key={composerState.key}
-            placeholder={composerState.placeholder}
-            submitting={composerSubmitting}
-            initialText={composerState.initialText}
-            autoFocus={composerState.isReplying}
-            onSubmit={handleComposerSubmit}
-            onFocus={handleInputFocus}
-            onBlur={() => {
-              if (!composerState.isReplying) {
-                handleInputBlur();
-              }
-            }}
-            styles={styles}
-          />
-        </Animated.View>
-      )}
-    </KeyboardAvoidingView>
+        {isAuthenticated && (
+          <Animated.View
+            pointerEvents={composerVisible ? 'auto' : 'none'}
+            style={[styles.detailCommentInputBar, commentComposerAnimatedStyle]}
+          >
+            <CommentComposer
+              key={composerState.key}
+              placeholder={composerState.placeholder}
+              submitting={composerSubmitting}
+              initialText={composerState.initialText}
+              autoFocus={composerState.isReplying}
+              onSubmit={async (text) => {
+                const result = await handleComposerSubmit(text);
+                if (result) {
+                  fetchComplaintDetails();
+                  refreshEvidence();
+                }
+                return result;
+              }}
+              onFocus={handleInputFocus}
+              onBlur={() => {
+                if (!composerState.isReplying) {
+                  handleInputBlur();
+                }
+              }}
+              styles={styles}
+            />
+          </Animated.View>
+        )}
+      </KeyboardAvoidingView> 
 
     <FollowConfirmModal
       visible={followModalVisible}

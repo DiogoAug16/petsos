@@ -2,7 +2,10 @@ import { Text, View } from 'react-native';
 import { STATUS_CONFIG } from '@/constants/complaints.constants';
 
 export function StatusBadge({ status, styles }) {
-  const config = STATUS_CONFIG[status];
+  let statusKey = status;
+  if (statusKey === 'resolved') statusKey = 'resolvido';
+
+  const config = STATUS_CONFIG[statusKey];
   if (!config) return null;
 
   return (

@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Modal,
@@ -8,13 +10,11 @@ import {
   Text,
   View,
 } from 'react-native';
-import { Image } from 'expo-image';
-import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 
 import { useUploadUrl } from '@/hooks/useUploadUrl';
 import { validateEvidence } from '@/services/complaint-evidence.service';
-import { voteOnComplaint, getVoteStatus } from '@/services/complaint-votes.service';
+import { getVoteStatus, voteOnComplaint } from '@/services/complaint-votes.service';
 
 export function EvidenceValidationSection({
   complaint,
@@ -30,11 +30,18 @@ export function EvidenceValidationSection({
   const [voteStatus, setVoteStatus] = useState(null);
   const [voteLoading, setVoteLoading] = useState(false);
   const [fullscreenPhoto, setFullscreenPhoto] = useState(null);
+  const [communityResolved, setCommunityResolved] = useState(false);
 
   const evidenceList = Array.isArray(evidencesProp) ? evidencesProp : [];
   const pendingEvidences = evidenceList.filter((e) => !e.status || e.status === 'pending');
 
-  if (complaint?.status !== 'aguardando_validacao') return null;
+  // Resetar state quando a reclamação muda de status
+  useEffect(() => {
+    if (complaint?.status !== 'aguardando_validacao') {
+      setCommunityResolved(false);
+      setVoteStatus(null);
+    }
+  }, [complaint?.id, complaint?.status]);
 
   const resolveUri = (uri) => {
     if (!uri) return '';
@@ -69,17 +76,39 @@ export function EvidenceValidationSection({
     try {
       const response = await validateEvidence(complaint.id, { approved, evidenceIds: selectedIds });
       const data = response?.data || response;
-      Toast.show({
-        type: 'success',
-        text1: approved ? 'Evidências aprovadas' : 'Evidências rejeitadas',
-        text2: approved
-          ? 'Denúncia marcada como resolvida.'
-          : data.hasPending
-            ? 'Ainda há evidências pendentes.'
-            : 'Denúncia voltou para em andamento.',
-      });
-      setSelectedIds([]);
-      onStatusChanged?.();
+      const resolvedByCommunity = data?.autoResolved || data?.resolvedBy === 'community';
+
+      // Verificar se a tarefa foi resolvida
+      if (data?.status === 'resolved') {
+        Toast.show({
+          type: 'success',
+          text1: 'Denúncia Resolvida! 🎉',
+          text2: approved
+            ? resolvedByCommunity
+              ? `✅ Denúncia resolvida automaticamente pela comunidade! (${data?.autoResolveThreshold ?? 1} validações atingidas)`
+              : '✅ Denúncia resolvida por você!'
+            : 'Evidências rejeitadas. Denúncia voltou para em andamento.',
+        });
+
+        if (resolvedByCommunity) {
+          setCommunityResolved(true);
+        }
+
+        setSelectedIds([]);
+        onStatusChanged?.();
+      } else {
+        Toast.show({
+          type: 'success',
+          text1: approved ? 'Evidências aprovadas' : 'Evidências rejeitadas',
+          text2: approved
+            ? 'Denúncia marcada como resolvida.'
+            : data?.hasPending
+              ? 'Ainda há evidências pendentes.'
+              : 'Denúncia voltou para em andamento.',
+        });
+        setSelectedIds([]);
+        onStatusChanged?.();
+      }
     } catch (err) {
       Toast.show({
         type: 'error',
@@ -106,18 +135,30 @@ export function EvidenceValidationSection({
       const response = await voteOnComplaint(complaint.id, approved);
       const data = response?.data || response;
 
-      Toast.show({
-        type: 'success',
-        text1: 'Voto registrado',
-        text2: data.resolved
-          ? 'Denúncia resolvida pela comunidade.'
-          : 'Seu voto foi contabilizado.',
-      });
-
-      if (data.resolved) {
+      // Verificar se a tarefa foi resolvida pela comunidade
+      if (data?.status === 'resolved' && data?.resolvedBy === 'community') {
+        setCommunityResolved(true);
+        Toast.show({
+          type: 'success',
+          text1: 'Denúncia Resolvida! 🎉',
+          text2: 'Sua validação atingiu o limite e a tarefa foi marcada como resolvida pela comunidade.',
+        });
+        // Recarregar os dados da denúncia
         onStatusChanged?.();
       } else {
-        await loadVoteStatus();
+        Toast.show({
+          type: 'success',
+          text1: 'Voto registrado',
+          text2: data?.resolved || data?.validationCount >= 5
+            ? 'Denúncia resolvida pela comunidade.'
+            : 'Seu voto foi contabilizado.',
+        });
+
+        if (data?.resolved || data?.validationCount >= 5) {
+          onStatusChanged?.();
+        } else {
+          await loadVoteStatus();
+        }
       }
     } catch (err) {
       Toast.show({
@@ -130,7 +171,7 @@ export function EvidenceValidationSection({
     }
   };
 
-  if (isOwner) {
+  if (isOwner && complaint?.status === 'aguardando_validacao') {
     const hasSelection = selectedIds.length > 0;
     const allSelected = pendingEvidences.length > 0 && selectedIds.length === pendingEvidences.length;
 
@@ -261,6 +302,28 @@ export function EvidenceValidationSection({
 
   if (!isFollowing && !isVolunteer) return null;
 
+  // Se foi resolvido pela comunidade, mostrar mensagem de sucesso
+  if (
+    communityResolved ||
+    ((complaint?.status === 'resolved' || complaint?.status === 'resolvido') && complaint?.resolvedBy === 'community')
+  ) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Ionicons name="checkmark-circle" size={18} color="#10B981" />
+          <Text style={styles.headerText}>Resolvido pela Comunidade</Text>
+        </View>
+        <Text style={styles.description}>
+          Esta tarefa foi marcada como resolvida através da validação comunitária.
+        </Text>
+        <View style={styles.resolvedSuccessContainer}>
+          <Ionicons name="checkmark" size={32} color="#10B981" />
+          <Text style={styles.resolvedSuccessText}>Tarefa concluída!</Text>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -281,7 +344,7 @@ export function EvidenceValidationSection({
         </Text>
       ) : voteStatus.hasVoted ? (
         <Text style={styles.votedText}>
-          Você já votou. {voteStatus.votes.approved}/{voteStatus.threshold} votos para resolver.
+          Você já votou. {voteStatus.votes?.approved || voteStatus.votes}/{voteStatus.threshold} votos para resolver.
         </Text>
       ) : (
         <View style={styles.actions}>
@@ -451,5 +514,19 @@ const styles = StyleSheet.create({
   fullscreenImage: {
     width: '100%',
     height: '80%',
+  },
+  resolvedSuccessContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+    backgroundColor: '#ECFDF5',
+    borderRadius: 10,
+    marginTop: 12,
+  },
+  resolvedSuccessText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#10B981',
+    marginTop: 8,
   },
 });

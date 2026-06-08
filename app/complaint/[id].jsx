@@ -286,7 +286,14 @@ export default function ComplaintDetailScreen() {
               submitting={composerSubmitting}
               initialText={composerState.initialText}
               autoFocus={composerState.isReplying}
-              onSubmit={handleComposerSubmit}
+              onSubmit={async (text) => {
+                const result = await handleComposerSubmit(text);
+                if (result) {
+                  fetchComplaintDetails();
+                  refreshEvidence();
+                }
+                return result;
+              }}
               onFocus={handleInputFocus}
               onBlur={() => {
                 if (!composerState.isReplying) {

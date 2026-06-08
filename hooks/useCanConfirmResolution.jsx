@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { getComplaintValidationsCount } from '@/services/complaints.service';
 
@@ -8,20 +8,20 @@ const VALID_STATUSES = ['awaiting_validation', 'aguardando_validacao'];
 export function useCanConfirmResolution({ complaintId, complaint, isOwner }) {
   const [validationsCount, setValidationsCount] = useState(0);
 
-  useEffect(() => {
-    async function loadValidationsCount() {
-      try {
-        const response = await getComplaintValidationsCount(complaintId);
-        setValidationsCount(response?.data?.count ?? 0);
-      } catch (error) {
-        console.log('Erro ao buscar validações', error);
-      }
+  const loadValidationsCount = useCallback(async () => {
+    try {
+      const response = await getComplaintValidationsCount(complaintId);
+      setValidationsCount(response?.data?.count ?? 0);
+    } catch (error) {
+      console.log('Erro ao buscar validações', error);
     }
+  }, [complaintId]);
 
+  useEffect(() => {
     if (complaintId) {
       loadValidationsCount();
     }
-  }, [complaintId]);
+  }, [complaintId, loadValidationsCount]);
 
   const canConfirmResolution =
     isOwner &&
@@ -32,5 +32,6 @@ export function useCanConfirmResolution({ complaintId, complaint, isOwner }) {
     canConfirmResolution,
     validationsCount,
     minimumValidations: MINIMUM_VALIDATIONS,
+    refreshValidationsCount: loadValidationsCount,
   };
 }

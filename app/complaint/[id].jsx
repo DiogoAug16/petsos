@@ -10,6 +10,7 @@ import {
 
 import { CommentComposer } from '@/components/complaints/comment-composer';
 import { CommentsSection } from '@/components/complaints/comments-section';
+import { ConfirmResolutionButton } from '@/components/complaints/confirm-resolution-button';
 import { DetailFollowSummary } from '@/components/complaints/detail-follow-summary';
 import { DetailHero } from '@/components/complaints/detail-hero';
 import { DetailInfoBar } from '@/components/complaints/detail-info-bar';
@@ -17,18 +18,19 @@ import { DetailMainCard } from '@/components/complaints/detail-main-card';
 import { DetailMapCard } from '@/components/complaints/detail-map-card';
 import { DetailMapModal } from '@/components/complaints/detail-map-modal';
 import { DetailPhotosCard } from '@/components/complaints/detail-photos-card';
+import { ErrorState } from '@/components/complaints/error-state';
 import { EvidenceSection } from '@/components/complaints/evidence-section';
 import { EvidenceSubmitModal } from '@/components/complaints/evidence-submit-modal';
 import { EvidenceValidationSection } from '@/components/complaints/evidence-validation-section';
-import { VolunteerButton } from '@/components/complaints/volunteer-button';
-import { ErrorState } from '@/components/complaints/error-state';
-import { LoadingState } from '@/components/complaints/loading-state';
 import { FollowConfirmModal } from '@/components/complaints/follow-confirm-modal';
+import { LoadingState } from '@/components/complaints/loading-state';
 import { UnfollowConfirmModal } from '@/components/complaints/unfollow-confirm-modal';
-import { VolunteerConfirmModal } from '@/components/complaints/volunteer-confirm-modal';
 import { UnvolunteerConfirmModal } from '@/components/complaints/unvolunteer-confirm-modal';
+import { VolunteerButton } from '@/components/complaints/volunteer-button';
+import { VolunteerConfirmModal } from '@/components/complaints/volunteer-confirm-modal';
 import { useAuth } from '@/context/AuthContext';
 import { useAddress } from '@/hooks/useAddress';
+import { useCanConfirmResolution } from '@/hooks/useCanConfirmResolution';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useCommentComposerVisibility } from '@/hooks/useCommentComposerVisibility';
 import { useComplaintConfig } from '@/hooks/useComplaintConfig';
@@ -127,6 +129,9 @@ export default function ComplaintDetailScreen() {
   const { address } = useAddress(complaint?.location);
   const { status, type, emoji } = useComplaintConfig(complaint);
   const isOwner = Boolean(user?.uid && user.uid === complaint?.createdById);
+
+  const { canConfirmResolution } = useCanConfirmResolution({ complaintId, complaint, isOwner,});
+ 
   const {
     composerState,
     handleReplyPress,
@@ -256,6 +261,16 @@ export default function ComplaintDetailScreen() {
               refreshEvidence();
             }}
           />
+            {canConfirmResolution && (
+            <ConfirmResolutionButton
+              complaintId={complaintId}
+              onConfirmed={() => {
+                fetchComplaintDetails();
+                refreshEvidence();
+              }}
+              styles={styles}
+            />
+            )}
 
           <CommentsSection
             complaintId={complaintId}

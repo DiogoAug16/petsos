@@ -186,3 +186,13 @@ export async function updateComplaintStatus(id, status) {
 export async function getNearbyComplaints(lat, lng, radiusKm = 5) {
   return apiFetch(`/complaints/nearest?lat=${lat}&lng=${lng}&radiusKm=${radiusKm}`);
 }
+
+export async function confirmComplaintResolution(id) {
+  return apiFetch(`/complaints/${id}/confirm-resolution`, {
+    method: 'POST',
+  });
+}
+
+export async function getComplaintValidationsCount(id) {
+  return apiFetch(`/complaints/${id}/validations/count`);
+}

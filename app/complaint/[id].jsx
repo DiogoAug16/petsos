@@ -10,6 +10,7 @@ import {
 
 import { CommentComposer } from '@/components/complaints/comment-composer';
 import { CommentsSection } from '@/components/complaints/comments-section';
+import { ConfirmResolutionButton } from '@/components/complaints/confirm-resolution-button';
 import { DetailFollowSummary } from '@/components/complaints/detail-follow-summary';
 import { DetailHero } from '@/components/complaints/detail-hero';
 import { DetailInfoBar } from '@/components/complaints/detail-info-bar';
@@ -17,18 +18,20 @@ import { DetailMainCard } from '@/components/complaints/detail-main-card';
 import { DetailMapCard } from '@/components/complaints/detail-map-card';
 import { DetailMapModal } from '@/components/complaints/detail-map-modal';
 import { DetailPhotosCard } from '@/components/complaints/detail-photos-card';
+import { ErrorState } from '@/components/complaints/error-state';
 import { EvidenceSection } from '@/components/complaints/evidence-section';
 import { EvidenceSubmitModal } from '@/components/complaints/evidence-submit-modal';
 import { EvidenceValidationSection } from '@/components/complaints/evidence-validation-section';
-import { VolunteerButton } from '@/components/complaints/volunteer-button';
-import { ErrorState } from '@/components/complaints/error-state';
-import { LoadingState } from '@/components/complaints/loading-state';
 import { FollowConfirmModal } from '@/components/complaints/follow-confirm-modal';
+import { LoadingState } from '@/components/complaints/loading-state';
 import { UnfollowConfirmModal } from '@/components/complaints/unfollow-confirm-modal';
-import { VolunteerConfirmModal } from '@/components/complaints/volunteer-confirm-modal';
 import { UnvolunteerConfirmModal } from '@/components/complaints/unvolunteer-confirm-modal';
+import { ValidationCounter } from '@/components/complaints/validation-counter';
+import { VolunteerButton } from '@/components/complaints/volunteer-button';
+import { VolunteerConfirmModal } from '@/components/complaints/volunteer-confirm-modal';
 import { useAuth } from '@/context/AuthContext';
 import { useAddress } from '@/hooks/useAddress';
+import { useCanConfirmResolution } from '@/hooks/useCanConfirmResolution';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useCommentComposerVisibility } from '@/hooks/useCommentComposerVisibility';
 import { useComplaintConfig } from '@/hooks/useComplaintConfig';
@@ -127,6 +130,10 @@ export default function ComplaintDetailScreen() {
   const { address } = useAddress(complaint?.location);
   const { status, type, emoji } = useComplaintConfig(complaint);
   const isOwner = Boolean(user?.uid && user.uid === complaint?.createdById);
+
+  
+  const { canConfirmResolution, validationsCount, refreshValidationsCount,} = useCanConfirmResolution({ complaintId, complaint, isOwner });
+ 
   const {
     composerState,
     handleReplyPress,
@@ -163,116 +170,136 @@ export default function ComplaintDetailScreen() {
   if (!complaint) return renderScreenState(null);
 
   return (
-    <View style={styles.detailScreen}>
-      <Stack.Screen options={{ headerShown: false }} />
+  <View style={styles.detailScreen}>
+    <Stack.Screen options={{ headerShown: false }} />
 
-      <KeyboardAvoidingView
-        style={styles.detailKeyboardContainer}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={0}
+    <KeyboardAvoidingView
+      style={styles.detailKeyboardContainer}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={0}
+    >
+      <ScrollView
+        style={styles.detailScroll}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingBottom: composerVisible && isAuthenticated ? 104 : 18,
+        }}
+        onLayout={handleViewportLayout}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
       >
-        <ScrollView
-          style={styles.detailScroll}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingBottom: composerVisible && isAuthenticated ? 104 : 18,
-          }}
-          onLayout={handleViewportLayout}
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
-        >
-          <DetailHero
-            complaint={complaint}
-            type={type}
-            emoji={emoji}
-            styles={styles}
-            theme={theme}
-            isOwner={isOwner}
-            onBack={() => router.back()}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
+        <DetailHero
+          complaint={complaint}
+          type={type}
+          emoji={emoji}
+          styles={styles}
+          theme={theme}
+          isOwner={isOwner}
+          onBack={() => router.back()}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
 
-          {!isOwner && (
-            <DetailFollowSummary
-              followers={followers}
-              totalFollowers={totalFollowers}
-              followersLoading={followersLoading}
-              followLoading={followLoading}
-              isFollowing={isFollowing}
-              isOwner={isOwner}
-              onToggleFollow={toggleFollow}
-              styles={styles}
-            />
-          )}
-
-          <DetailInfoBar
-            complaint={complaint}
-            status={status}
-            type={type}
-            emoji={emoji}
-            styles={styles}
-            colorScheme={colorScheme}
-          />
-
-          <VolunteerButton
-            complaint={complaint}
-            isOwner={isOwner}
-            isVolunteer={isVolunteer}
-            volunteerLoading={volunteerLoading}
-            onToggleVolunteer={toggleVolunteer}
-            onSubmitEvidence={() => setEvidenceModalVisible(true)}
-            styles={styles}
-          />
-
-          <View style={styles.detailContent}>
-            <DetailMainCard
-              complaint={complaint}
-              address={address}
-              followers={followers}
-              totalFollowers={totalFollowers}
-              followersLoading={followersLoading}
-              showFollowers={isOwner}
-              styles={styles}
-            />
-            <DetailPhotosCard photos={complaint.photos} styles={styles} />
-            <DetailMapCard
-              location={complaint.location}
-              address={address}
-              onOpenMap={() => handleOpenMap(mapRef)}
-              styles={styles}
-            />
-            <EvidenceSection evidences={evidences} styles={styles} />
-          </View>
-
-          <EvidenceValidationSection
-            complaint={complaint}
-            isOwner={isOwner}
-            isVolunteer={isVolunteer}
+        {!isOwner && (
+          <DetailFollowSummary
+            followers={followers}
+            totalFollowers={totalFollowers}
+            followersLoading={followersLoading}
+            followLoading={followLoading}
             isFollowing={isFollowing}
-            evidences={evidences}
-            onStatusChanged={() => {
+            isOwner={isOwner}
+            onToggleFollow={toggleFollow}
+            styles={styles}
+          />
+        )}
+
+        <DetailInfoBar
+          complaint={complaint}
+          status={status}
+          type={type}
+          emoji={emoji}
+          styles={styles}
+          colorScheme={colorScheme}
+        />
+
+        {['awaiting_validation', 'aguardando_validacao', 'resolved', 'resolvido'].includes(complaint.status) && (
+          <ValidationCounter current={validationsCount} />
+        )}
+
+        <VolunteerButton
+          complaint={complaint}
+          isOwner={isOwner}
+          isVolunteer={isVolunteer}
+          volunteerLoading={volunteerLoading}
+          onToggleVolunteer={toggleVolunteer}
+          onSubmitEvidence={() => setEvidenceModalVisible(true)}
+          styles={styles}
+        />
+
+        <View style={styles.detailContent}>
+          <DetailMainCard
+            complaint={complaint}
+            address={address}
+            followers={followers}
+            totalFollowers={totalFollowers}
+            followersLoading={followersLoading}
+            showFollowers={isOwner}
+            styles={styles}
+          />
+
+          <DetailPhotosCard photos={complaint.photos} styles={styles} />
+
+          <DetailMapCard
+            location={complaint.location}
+            address={address}
+            onOpenMap={() => handleOpenMap(mapRef)}
+            styles={styles}
+          />
+
+          <EvidenceSection evidences={evidences} styles={styles} />
+        </View>
+
+        <EvidenceValidationSection
+          complaint={complaint}
+          isOwner={isOwner}
+          isVolunteer={isVolunteer}
+          isFollowing={isFollowing}
+          evidences={evidences}
+          onStatusChanged={() => {
+            fetchComplaintDetails();
+            refreshEvidence();
+            refreshValidationsCount();
+          }}
+        />
+
+        {canConfirmResolution && (
+          <ConfirmResolutionButton
+            complaintId={complaintId}
+            onConfirmed={() => {
               fetchComplaintDetails();
               refreshEvidence();
+              refreshValidationsCount();
             }}
-          />
-
-          <CommentsSection
-            complaintId={complaintId}
-            comments={comments}
-            totalComments={totalComments}
-            pageInfo={commentsPageInfo}
-            loading={commentsLoading}
-            loadingMore={commentsLoadingMore}
-            isBlocked={commentsBlocked}
-            loadMore={loadMoreComments}
-            toggleLike={toggleLike}
-            incrementRepliesCount={incrementRepliesCount}
-            onReplyPress={handleReplyPress}
-            onSectionLayout={handleSectionLayout}
-            onComposerAnchorLayout={handleComposerAnchorLayout}
             styles={styles}
           />
+        )}
+
+        <CommentsSection
+          complaintId={complaintId}
+          comments={comments}
+          totalComments={totalComments}
+          pageInfo={commentsPageInfo}
+          loading={commentsLoading}
+          loadingMore={commentsLoadingMore}
+          isBlocked={commentsBlocked}
+          loadMore={loadMoreComments}
+          toggleLike={toggleLike}
+          incrementRepliesCount={incrementRepliesCount}
+          onReplyPress={handleReplyPress}
+          onSectionLayout={handleSectionLayout}
+          onComposerAnchorLayout={handleComposerAnchorLayout}
+          styles={styles}
+        />
         </ScrollView>
 
         {isAuthenticated && (
@@ -304,58 +331,58 @@ export default function ComplaintDetailScreen() {
             />
           </Animated.View>
         )}
-      </KeyboardAvoidingView>
+      </KeyboardAvoidingView> 
 
-      <FollowConfirmModal
-        visible={followModalVisible}
-        loading={followLoading}
-        onCancel={closeFollowModal}
-        onConfirm={confirmFollow}
-        styles={styles}
-      />
+    <FollowConfirmModal
+      visible={followModalVisible}
+      loading={followLoading}
+      onCancel={closeFollowModal}
+      onConfirm={confirmFollow}
+      styles={styles}
+    />
 
-      <UnfollowConfirmModal
-        visible={unfollowModalVisible}
-        loading={followLoading}
-        onCancel={closeUnfollowModal}
-        onConfirm={confirmUnfollow}
-        styles={styles}
-      />
+    <UnfollowConfirmModal
+      visible={unfollowModalVisible}
+      loading={followLoading}
+      onCancel={closeUnfollowModal}
+      onConfirm={confirmUnfollow}
+      styles={styles}
+    />
 
-      <VolunteerConfirmModal
-        visible={volunteerModalVisible}
-        loading={volunteerLoading}
-        onCancel={closeVolunteerModal}
-        onConfirm={confirmVolunteer}
-        styles={styles}
-      />
+    <VolunteerConfirmModal
+      visible={volunteerModalVisible}
+      loading={volunteerLoading}
+      onCancel={closeVolunteerModal}
+      onConfirm={confirmVolunteer}
+      styles={styles}
+    />
 
-      <UnvolunteerConfirmModal
-        visible={unvolunteerModalVisible}
-        loading={volunteerLoading}
-        onCancel={closeUnvolunteerModal}
-        onConfirm={confirmUnvolunteer}
-        styles={styles}
-      />
+    <UnvolunteerConfirmModal
+      visible={unvolunteerModalVisible}
+      loading={volunteerLoading}
+      onCancel={closeUnvolunteerModal}
+      onConfirm={confirmUnvolunteer}
+      styles={styles}
+    />
 
-      <DetailMapModal
-        visible={showMapModal}
-        location={complaint.location}
-        mapRef={mapRef}
-        onClose={handleCloseMapModal}
-        styles={styles}
-        theme={theme}
-      />
+    <DetailMapModal
+      visible={showMapModal}
+      location={complaint.location}
+      mapRef={mapRef}
+      onClose={handleCloseMapModal}
+      styles={styles}
+      theme={theme}
+    />
 
-      <EvidenceSubmitModal
-        visible={evidenceModalVisible}
-        complaintId={complaintId}
-        onClose={() => setEvidenceModalVisible(false)}
-        onSubmitted={() => {
-          fetchComplaintDetails();
-          refreshEvidence();
-        }}
-      />
-    </View>
-  );
+    <EvidenceSubmitModal
+      visible={evidenceModalVisible}
+      complaintId={complaintId}
+      onClose={() => setEvidenceModalVisible(false)}
+      onSubmitted={() => {
+        fetchComplaintDetails();
+        refreshEvidence();
+      }}
+    />
+  </View>
+);
 }

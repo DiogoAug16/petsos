@@ -247,6 +247,7 @@ export default function ComplaintDetailScreen() {
           <RequestValidationButton
             complaint={complaint}
             isVolunteer={isVolunteer}
+            evidences={evidences}
             onRequested={() => {
               fetchComplaintDetails();
             }}

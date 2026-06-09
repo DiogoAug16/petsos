@@ -9,8 +9,15 @@ export function useComplaintDetailScreenData(complaintId) {
   const detail = useComplaintDetail(complaintId);
   const { fetchComplaintDetails } = detail;
   const followers = useComplaintFollowers(complaintId);
+  const { refresh: refreshFollowers } = followers;
+
+  const onVolunteerStatusChanged = useCallback(() => {
+    fetchComplaintDetails();
+    refreshFollowers();
+  }, [fetchComplaintDetails, refreshFollowers]);
+
   const volunteers = useComplaintVolunteers(complaintId, {
-    onStatusChanged: fetchComplaintDetails,
+    onStatusChanged: onVolunteerStatusChanged,
   });
   const comments = useComplaintComments(complaintId);
 

@@ -1,9 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { useState } from "react";
 import {
   ActivityIndicator,
   Modal,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -11,6 +13,7 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 
+import { useUploadUrl } from "@/hooks/useUploadUrl";
 import { requestComplaintValidation } from "@/services/complaints.service";
 
 const ALLOWED_STATUSES = ["aberto", "em_andamento", "aguardando_validacao"];
@@ -28,31 +31,71 @@ const REASONS = [
     type: "needs_community_review",
     label: "Precisa de revisão da comunidade",
   },
+  {
+    type: "evidence_selection",
+    label: "Selecionar evidências para resolução",
+  },
 ];
 
-export function RequestValidationButton({ complaint, isVolunteer, onRequested }) {
+export function RequestValidationButton({ complaint, isVolunteer, onRequested, evidences }) {
+  const uploadUrl = useUploadUrl();
   const [visible, setVisible] = useState(false);
   const [selectedReason, setSelectedReason] = useState(REASONS[0].type);
   const [reasonText, setReasonText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState("reason");
+  const [selectedEvidenceIds, setSelectedEvidenceIds] = useState([]);
 
   if (!complaint || !isVolunteer || !ALLOWED_STATUSES.includes(complaint.status)) {
     return null;
   }
+
+  const evidenceList = Array.isArray(evidences) ? evidences : [];
+  const pendingEvidences = evidenceList.filter(
+    (e) => !e.status || e.status === "pending",
+  );
+  const hasPendingEvidences = pendingEvidences.length > 0;
 
   const alreadyRequested = Boolean(complaint.validationRequestedAt);
   const selectedLabel = REASONS.find((reason) => reason.type === selectedReason)?.label;
 
   if (alreadyRequested) return null;
 
+  const resolveUri = (uri) => {
+    if (!uri) return "";
+    if (/^(https?:|file:)/i.test(uri)) return uri;
+    if (!uploadUrl) return uri;
+    const base = uploadUrl.endsWith("/") ? uploadUrl.slice(0, -1) : uploadUrl;
+    const path = uri.startsWith("/") ? uri : `/${uri}`;
+    return `${base}${path}`;
+  };
+
+  const handleNext = () => {
+    if (selectedReason === "evidence_selection") {
+      setStep("evidence");
+    } else {
+      handleSubmit();
+    }
+  };
+
   const handleSubmit = async () => {
     if (loading || alreadyRequested) return;
+
+    if (selectedReason === "evidence_selection" && selectedEvidenceIds.length === 0) {
+      Toast.show({
+        type: "info",
+        text1: "Selecione evidências",
+        text2: "Escolha ao menos uma evidência para propor à comunidade.",
+      });
+      return;
+    }
 
     setLoading(true);
     try {
       await requestComplaintValidation(complaint.id, {
         reasonType: selectedReason,
         reasonText: reasonText.trim() || null,
+        evidenceIds: selectedReason === "evidence_selection" ? selectedEvidenceIds : undefined,
       });
 
       Toast.show({
@@ -62,6 +105,8 @@ export function RequestValidationButton({ complaint, isVolunteer, onRequested })
 
       setVisible(false);
       setReasonText("");
+      setStep("reason");
+      setSelectedEvidenceIds([]);
       onRequested?.();
     } catch (error) {
       Toast.show({
@@ -94,66 +139,188 @@ export function RequestValidationButton({ complaint, isVolunteer, onRequested })
         transparent
         visible={visible}
         animationType="fade"
-        onRequestClose={() => setVisible(false)}
+        onRequestClose={() => {
+          if (step === "evidence") {
+            setStep("reason");
+          } else {
+            setVisible(false);
+          }
+        }}
       >
         <View style={styles.backdrop}>
           <View style={styles.card}>
-            <Text style={styles.modalTitle}>Solicitar votação</Text>
-            <Text style={styles.modalDescription}>
-              Escolha por que a comunidade deve revisar esta denúncia.
-            </Text>
+            {step === "reason" ? (
+              <>
+                <Text style={styles.modalTitle}>Solicitar votação</Text>
+                <Text style={styles.modalDescription}>
+                  Escolha por que a comunidade deve revisar esta denúncia.
+                </Text>
 
-            {REASONS.map((reason) => {
-              const selected = reason.type === selectedReason;
-              return (
-                <Pressable
-                  key={reason.type}
-                  style={[styles.reasonOption, selected && styles.reasonOptionSelected]}
-                  onPress={() => setSelectedReason(reason.type)}
-                  disabled={loading}
-                >
-                  <Ionicons
-                    name={selected ? "radio-button-on" : "radio-button-off"}
-                    size={18}
-                    color={selected ? "#F59E0B" : "#78716C"}
-                  />
-                  <Text style={styles.reasonOptionText}>{reason.label}</Text>
-                </Pressable>
-              );
-            })}
+                {REASONS.map((reason) => {
+                  const selected = reason.type === selectedReason;
+                  const isDisabled =
+                    loading ||
+                    (reason.type === "evidence_selection" && !hasPendingEvidences);
+                  return (
+                    <Pressable
+                      key={reason.type}
+                      style={[
+                        styles.reasonOption,
+                        selected && styles.reasonOptionSelected,
+                        isDisabled && styles.reasonOptionDisabled,
+                      ]}
+                      onPress={() => setSelectedReason(reason.type)}
+                      disabled={isDisabled}
+                    >
+                      <Ionicons
+                        name={selected ? "radio-button-on" : "radio-button-off"}
+                        size={18}
+                        color={isDisabled ? "#D6D3D1" : selected ? "#F59E0B" : "#78716C"}
+                      />
+                      <Text
+                        style={[
+                          styles.reasonOptionText,
+                          isDisabled && styles.reasonOptionTextDisabled,
+                        ]}
+                      >
+                        {reason.label}
+                      </Text>
+                      {reason.type === "evidence_selection" && !hasPendingEvidences && (
+                        <Text style={styles.reasonOptionHint}>Sem evidências</Text>
+                      )}
+                    </Pressable>
+                  );
+                })}
 
-            <TextInput
-              value={reasonText}
-              onChangeText={setReasonText}
-              placeholder={`Detalhe o motivo: ${selectedLabel}`}
-              placeholderTextColor="#A8A29E"
-              multiline
-              maxLength={500}
-              editable={!loading}
-              style={styles.input}
-            />
+                <TextInput
+                  value={reasonText}
+                  onChangeText={setReasonText}
+                  placeholder={`Detalhe o motivo: ${selectedLabel}`}
+                  placeholderTextColor="#A8A29E"
+                  multiline
+                  maxLength={500}
+                  editable={!loading}
+                  style={styles.input}
+                />
 
-            <View style={styles.actions}>
-              <Pressable
-                style={styles.cancelButton}
-                onPress={() => setVisible(false)}
-                disabled={loading}
-              >
-                <Text style={styles.cancelText}>Cancelar</Text>
-              </Pressable>
+                <View style={styles.actions}>
+                  <Pressable
+                    style={styles.cancelButton}
+                    onPress={() => setVisible(false)}
+                    disabled={loading}
+                  >
+                    <Text style={styles.cancelText}>Cancelar</Text>
+                  </Pressable>
 
-              <Pressable
-                style={[styles.confirmButton, loading && styles.disabledButton]}
-                onPress={handleSubmit}
-                disabled={loading}
-              >
-                {loading ? (
-                  <ActivityIndicator size="small" color="#fff" />
-                ) : (
-                  <Text style={styles.confirmText}>Solicitar</Text>
+                  <Pressable
+                    style={[styles.confirmButton, loading && styles.disabledButton]}
+                    onPress={handleNext}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      <Text style={styles.confirmText}>
+                        {selectedReason === "evidence_selection" ? "Próximo" : "Solicitar"}
+                      </Text>
+                    )}
+                  </Pressable>
+                </View>
+              </>
+            ) : (
+              <>
+                <Text style={styles.modalTitle}>Selecionar evidências</Text>
+                <Text style={styles.modalDescription}>
+                  Escolha as evidências que você propõe como resolução. A comunidade
+                  votará se concorda ou não.
+                </Text>
+
+                <ScrollView style={styles.evidenceScrollView}>
+                  {pendingEvidences.map((evidence) => {
+                    const isSelected = selectedEvidenceIds.includes(evidence.id);
+                    return (
+                      <Pressable
+                        key={evidence.id}
+                        style={[
+                          styles.evidenceCard,
+                          isSelected && styles.evidenceCardSelected,
+                        ]}
+                        onPress={() =>
+                          setSelectedEvidenceIds((prev) =>
+                            prev.includes(evidence.id)
+                              ? prev.filter((x) => x !== evidence.id)
+                              : [...prev, evidence.id],
+                          )
+                        }
+                      >
+                        <View style={styles.evidenceCardHeader}>
+                          <Ionicons
+                            name={isSelected ? "checkbox" : "square-outline"}
+                            size={20}
+                            color={isSelected ? "#F59E0B" : "#A8A29E"}
+                          />
+                          <Text style={styles.evidenceAuthor}>
+                            @{evidence.username || "anônimo"}
+                          </Text>
+                        </View>
+                        <Text style={styles.evidenceCardDescription}>
+                          {evidence.description}
+                        </Text>
+                        {evidence.photos?.length > 0 && (
+                          <ScrollView
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            style={styles.evidencePhotos}
+                          >
+                            {evidence.photos.map((photo, i) => (
+                              <Image
+                                key={`${evidence.id}-${i}`}
+                                source={{ uri: resolveUri(photo) }}
+                                style={styles.evidencePhoto}
+                                contentFit="cover"
+                              />
+                            ))}
+                          </ScrollView>
+                        )}
+                      </Pressable>
+                    );
+                  })}
+                </ScrollView>
+
+                {selectedEvidenceIds.length > 0 && (
+                  <Text style={styles.evidenceSelectionCount}>
+                    {selectedEvidenceIds.length} evidência
+                    {selectedEvidenceIds.length > 1 ? "s" : ""} selecionada
+                    {selectedEvidenceIds.length > 1 ? "s" : ""}
+                  </Text>
                 )}
-              </Pressable>
-            </View>
+
+                <View style={styles.actions}>
+                  <Pressable
+                    style={styles.cancelButton}
+                    onPress={() => setStep("reason")}
+                    disabled={loading}
+                  >
+                    <Text style={styles.cancelText}>Voltar</Text>
+                  </Pressable>
+
+                  <Pressable
+                    style={[
+                      styles.confirmButton,
+                      (loading || selectedEvidenceIds.length === 0) && styles.disabledButton,
+                    ]}
+                    onPress={handleSubmit}
+                    disabled={loading || selectedEvidenceIds.length === 0}
+                  >
+                    {loading ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      <Text style={styles.confirmText}>Solicitar votação</Text>
+                    )}
+                  </Pressable>
+                </View>
+              </>
+            )}
           </View>
         </View>
       </Modal>
@@ -256,6 +423,17 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "600",
   },
+  reasonOptionDisabled: {
+    opacity: 0.5,
+  },
+  reasonOptionTextDisabled: {
+    color: "#A8A29E",
+  },
+  reasonOptionHint: {
+    fontSize: 11,
+    color: "#A8A29E",
+    fontStyle: "italic",
+  },
   input: {
     borderColor: "#E7E5E4",
     borderRadius: 10,
@@ -298,5 +476,54 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     opacity: 0.7,
+  },
+  evidenceScrollView: {
+    maxHeight: 300,
+    marginBottom: 10,
+  },
+  evidenceCard: {
+    backgroundColor: "#FEF3C7",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 10,
+    borderWidth: 1.5,
+    borderColor: "transparent",
+  },
+  evidenceCardSelected: {
+    borderColor: "#F59E0B",
+    backgroundColor: "#FEF9C3",
+  },
+  evidenceCardHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 6,
+  },
+  evidenceAuthor: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#92400E",
+  },
+  evidenceCardDescription: {
+    fontSize: 13,
+    color: "#1C1C1E",
+    lineHeight: 18,
+    marginBottom: 6,
+  },
+  evidencePhotos: {
+    marginTop: 4,
+  },
+  evidencePhoto: {
+    width: 70,
+    height: 70,
+    borderRadius: 8,
+    marginRight: 6,
+  },
+  evidenceSelectionCount: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#92400E",
+    textAlign: "center",
+    marginBottom: 8,
   },
 });

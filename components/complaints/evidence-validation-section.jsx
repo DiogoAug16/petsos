@@ -1,6 +1,6 @@
-import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
-import { useEffect, useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Modal,
@@ -9,12 +9,43 @@ import {
   StyleSheet,
   Text,
   View,
-} from 'react-native';
-import Toast from 'react-native-toast-message';
+} from "react-native";
+import Toast from "react-native-toast-message";
 
-import { useUploadUrl } from '@/hooks/useUploadUrl';
-import { validateEvidence } from '@/services/complaint-evidence.service';
-import { getVoteStatus, voteOnComplaint } from '@/services/complaint-votes.service';
+import { useUploadUrl } from "@/hooks/useUploadUrl";
+import { validateEvidence } from "@/services/complaint-evidence.service";
+import { getVoteStatus, voteOnComplaint } from "@/services/complaint-votes.service";
+
+const VALIDATION_STATUSES = ["awaiting_validation", "aguardando_validacao"];
+const DISPLAY_STATUSES = [...VALIDATION_STATUSES, "resolved", "resolvido"];
+
+const REQUEST_REASON_LABELS = {
+  already_resolved: "Denúncia já resolvida",
+  false_report: "Denúncia falsa",
+  needs_community_review: "Precisa de revisão da comunidade",
+  owner_inactive: "Autor não respondeu em 7 dias",
+};
+
+const isResolvedByCommunity = (
+  complaint,
+  responseData,
+  { allowResolvedFlag, allowStatusFlag } = {},
+) => {
+  return (
+    (allowResolvedFlag && responseData?.resolved === true) ||
+    (allowStatusFlag &&
+      (responseData?.status === "resolved" || responseData?.status === "resolvido")) ||
+    responseData?.resolvedBy === "community" ||
+    ((complaint?.status === "resolved" || complaint?.status === "resolvido") &&
+      complaint?.resolvedBy === "community")
+  );
+};
+
+const formatPercent = (value) => {
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) return "0%";
+  return `${Math.round(numericValue * 100)}%`;
+};
 
 export function EvidenceValidationSection({
   complaint,
@@ -33,22 +64,50 @@ export function EvidenceValidationSection({
   const [communityResolved, setCommunityResolved] = useState(false);
 
   const evidenceList = Array.isArray(evidencesProp) ? evidencesProp : [];
-  const pendingEvidences = evidenceList.filter((e) => !e.status || e.status === 'pending');
+  const pendingEvidences = evidenceList.filter(
+    (e) => !e.status || e.status === "pending",
+  );
 
-  // Resetar state quando a reclamação muda de status
-  useEffect(() => {
-    if (complaint?.status !== 'aguardando_validacao') {
-      setCommunityResolved(false);
+  const loadVoteStatus = useCallback(async () => {
+    if (!complaint?.id) return;
+
+    try {
+      const response = await getVoteStatus(complaint.id);
+      setVoteStatus(response?.data || response);
+    } catch {
       setVoteStatus(null);
     }
-  }, [complaint?.id, complaint?.status]);
+  }, [complaint?.id]);
+
+  useEffect(() => {
+    if (!DISPLAY_STATUSES.includes(complaint?.status)) {
+      setCommunityResolved(false);
+      setVoteStatus(null);
+      return;
+    }
+
+    if (complaint?.validationRequestedAt && !isOwner) {
+      loadVoteStatus();
+    }
+  }, [
+    complaint?.id,
+    complaint?.status,
+    complaint?.validationRequestedAt,
+    isOwner,
+    loadVoteStatus,
+  ]);
+
+  if (!DISPLAY_STATUSES.includes(complaint?.status)) return null;
+
+  const requestReason =
+    REQUEST_REASON_LABELS[complaint?.validationRequestReasonType] || null;
 
   const resolveUri = (uri) => {
-    if (!uri) return '';
+    if (!uri) return "";
     if (/^(https?:|file:)/i.test(uri)) return uri;
     if (!uploadUrl) return uri;
-    const base = uploadUrl.endsWith('/') ? uploadUrl.slice(0, -1) : uploadUrl;
-    const path = uri.startsWith('/') ? uri : `/${uri}`;
+    const base = uploadUrl.endsWith("/") ? uploadUrl.slice(0, -1) : uploadUrl;
+    const path = uri.startsWith("/") ? uri : `/${uri}`;
     return `${base}${path}`;
   };
 
@@ -65,67 +124,52 @@ export function EvidenceValidationSection({
   const handleValidate = async (approved) => {
     if (selectedIds.length === 0) {
       Toast.show({
-        type: 'info',
-        text1: 'Selecione evidências',
-        text2: 'Toque nas evidências que deseja validar.',
+        type: "info",
+        text1: "Selecione evidências",
+        text2: "Toque nas evidências que deseja validar.",
       });
       return;
     }
 
     setLoading(true);
     try {
-      const response = await validateEvidence(complaint.id, { approved, evidenceIds: selectedIds });
+      const response = await validateEvidence(complaint.id, {
+        approved,
+        evidenceIds: selectedIds,
+      });
       const data = response?.data || response;
-      const resolvedByCommunity = data?.autoResolved || data?.resolvedBy === 'community';
+      const resolvedByCommunity = isResolvedByCommunity(complaint, data);
 
-      // Verificar se a tarefa foi resolvida
-      if (data?.status === 'resolved') {
-        Toast.show({
-          type: 'success',
-          text1: 'Denúncia Resolvida! 🎉',
-          text2: approved
-            ? resolvedByCommunity
-              ? `✅ Denúncia resolvida automaticamente pela comunidade! (${data?.autoResolveThreshold ?? 1} validações atingidas)`
-              : '✅ Denúncia resolvida por você!'
-            : 'Evidências rejeitadas. Denúncia voltou para em andamento.',
-        });
-
-        if (resolvedByCommunity) {
-          setCommunityResolved(true);
-        }
-
-        setSelectedIds([]);
-        onStatusChanged?.();
-      } else {
-        Toast.show({
-          type: 'success',
-          text1: approved ? 'Evidências aprovadas' : 'Evidências rejeitadas',
-          text2: approved
-            ? 'Denúncia marcada como resolvida.'
+      Toast.show({
+        type: "success",
+        text1: resolvedByCommunity
+          ? "Denúncia resolvida"
+          : approved
+            ? "Evidências aprovadas"
+            : "Evidências rejeitadas",
+        text2: resolvedByCommunity
+          ? "Denúncia resolvida pela comunidade."
+          : approved
+            ? "Denúncia marcada como resolvida."
             : data?.hasPending
-              ? 'Ainda há evidências pendentes.'
-              : 'Denúncia voltou para em andamento.',
-        });
-        setSelectedIds([]);
-        onStatusChanged?.();
+              ? "Ainda há evidências pendentes."
+              : "Denúncia voltou para em andamento.",
+      });
+
+      if (resolvedByCommunity) {
+        setCommunityResolved(true);
       }
+
+      setSelectedIds([]);
+      onStatusChanged?.();
     } catch (err) {
       Toast.show({
-        type: 'error',
-        text1: 'Erro',
-        text2: err?.message || 'Não foi possível validar.',
+        type: "error",
+        text1: "Erro",
+        text2: err?.message || "Não foi possível validar.",
       });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const loadVoteStatus = async () => {
-    try {
-      const response = await getVoteStatus(complaint.id);
-      setVoteStatus(response?.data || response);
-    } catch {
-      setVoteStatus(null);
     }
   };
 
@@ -134,46 +178,40 @@ export function EvidenceValidationSection({
     try {
       const response = await voteOnComplaint(complaint.id, approved);
       const data = response?.data || response;
+      const resolvedByCommunity = isResolvedByCommunity(complaint, data, {
+        allowResolvedFlag: true,
+        allowStatusFlag: true,
+      });
 
-      // Verificar se a tarefa foi resolvida pela comunidade
-      if (data?.status === 'resolved' && data?.resolvedBy === 'community') {
+      Toast.show({
+        type: "success",
+        text1: resolvedByCommunity ? "Denúncia resolvida" : "Voto registrado",
+        text2: resolvedByCommunity
+          ? "Denúncia resolvida pela comunidade."
+          : "Seu voto foi contabilizado.",
+      });
+
+      if (resolvedByCommunity) {
         setCommunityResolved(true);
-        Toast.show({
-          type: 'success',
-          text1: 'Denúncia Resolvida! 🎉',
-          text2: 'Sua validação atingiu o limite e a tarefa foi marcada como resolvida pela comunidade.',
-        });
-        // Recarregar os dados da denúncia
         onStatusChanged?.();
       } else {
-        Toast.show({
-          type: 'success',
-          text1: 'Voto registrado',
-          text2: data?.resolved || data?.validationCount >= 5
-            ? 'Denúncia resolvida pela comunidade.'
-            : 'Seu voto foi contabilizado.',
-        });
-
-        if (data?.resolved || data?.validationCount >= 5) {
-          onStatusChanged?.();
-        } else {
-          await loadVoteStatus();
-        }
+        await loadVoteStatus();
       }
     } catch (err) {
       Toast.show({
-        type: 'error',
-        text1: 'Erro',
-        text2: err?.message || 'Não foi possível votar.',
+        type: "error",
+        text1: "Erro",
+        text2: err?.message || "Não foi possível votar.",
       });
     } finally {
       setVoteLoading(false);
     }
   };
 
-  if (isOwner && complaint?.status === 'aguardando_validacao') {
+  if (isOwner && VALIDATION_STATUSES.includes(complaint?.status)) {
     const hasSelection = selectedIds.length > 0;
-    const allSelected = pendingEvidences.length > 0 && selectedIds.length === pendingEvidences.length;
+    const allSelected =
+      pendingEvidences.length > 0 && selectedIds.length === pendingEvidences.length;
 
     return (
       <>
@@ -187,14 +225,17 @@ export function EvidenceValidationSection({
           </Text>
 
           {pendingEvidences.length > 1 && (
-            <Pressable style={styles.selectAllButton} onPress={allSelected ? () => setSelectedIds([]) : selectAll}>
+            <Pressable
+              style={styles.selectAllButton}
+              onPress={allSelected ? () => setSelectedIds([]) : selectAll}
+            >
               <Ionicons
-                name={allSelected ? 'checkbox' : 'square-outline'}
+                name={allSelected ? "checkbox" : "square-outline"}
                 size={18}
-                color={allSelected ? '#F59E0B' : '#78716C'}
+                color={allSelected ? "#F59E0B" : "#78716C"}
               />
               <Text style={styles.selectAllText}>
-                {allSelected ? 'Desmarcar todas' : 'Selecionar todas'}
+                {allSelected ? "Desmarcar todas" : "Selecionar todas"}
               </Text>
             </Pressable>
           )}
@@ -209,12 +250,12 @@ export function EvidenceValidationSection({
               >
                 <View style={styles.evidenceCardHeader}>
                   <Ionicons
-                    name={isSelected ? 'checkbox' : 'square-outline'}
+                    name={isSelected ? "checkbox" : "square-outline"}
                     size={20}
-                    color={isSelected ? '#F59E0B' : '#A8A29E'}
+                    color={isSelected ? "#F59E0B" : "#A8A29E"}
                   />
                   <Text style={styles.evidenceAuthor}>
-                    @{evidence.username || 'anônimo'}
+                    @{evidence.username || "anônimo"}
                   </Text>
                 </View>
                 <Text style={styles.evidenceDescription}>{evidence.description}</Text>
@@ -244,13 +285,17 @@ export function EvidenceValidationSection({
 
           {hasSelection && (
             <Text style={styles.selectionCount}>
-              {selectedIds.length} evidência{selectedIds.length > 1 ? 's' : ''} selecionada{selectedIds.length > 1 ? 's' : ''}
+              {selectedIds.length} evidência{selectedIds.length > 1 ? "s" : ""}{" "}
+              selecionada{selectedIds.length > 1 ? "s" : ""}
             </Text>
           )}
 
           <View style={styles.actions}>
             <Pressable
-              style={[styles.rejectButton, (loading || !hasSelection) && { opacity: 0.5 }]}
+              style={[
+                styles.rejectButton,
+                (loading || !hasSelection) && { opacity: 0.5 },
+              ]}
               onPress={() => handleValidate(false)}
               disabled={loading || !hasSelection}
             >
@@ -261,7 +306,10 @@ export function EvidenceValidationSection({
               )}
             </Pressable>
             <Pressable
-              style={[styles.approveButton, (loading || !hasSelection) && { opacity: 0.5 }]}
+              style={[
+                styles.approveButton,
+                (loading || !hasSelection) && { opacity: 0.5 },
+              ]}
               onPress={() => handleValidate(true)}
               disabled={loading || !hasSelection}
             >
@@ -302,11 +350,9 @@ export function EvidenceValidationSection({
 
   if (!isFollowing && !isVolunteer) return null;
 
-  // Se foi resolvido pela comunidade, mostrar mensagem de sucesso
-  if (
-    communityResolved ||
-    ((complaint?.status === 'resolved' || complaint?.status === 'resolvido') && complaint?.resolvedBy === 'community')
-  ) {
+  if (!complaint?.validationRequestedAt) return null;
+
+  if (communityResolved || isResolvedByCommunity(complaint)) {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
@@ -314,25 +360,45 @@ export function EvidenceValidationSection({
           <Text style={styles.headerText}>Resolvido pela Comunidade</Text>
         </View>
         <Text style={styles.description}>
-          Esta tarefa foi marcada como resolvida através da validação comunitária.
+          Esta denúncia foi marcada como resolvida através da votação comunitária.
         </Text>
         <View style={styles.resolvedSuccessContainer}>
           <Ionicons name="checkmark" size={32} color="#10B981" />
-          <Text style={styles.resolvedSuccessText}>Tarefa concluída!</Text>
+          <Text style={styles.resolvedSuccessText}>Denúncia concluída!</Text>
         </View>
       </View>
     );
   }
 
+  const totalVotes =
+    typeof voteStatus?.votes === "number"
+      ? voteStatus.votes
+      : (voteStatus?.votes?.total ?? 0);
+  const quorumRequired = voteStatus?.quorumRequired ?? 0;
+  const approvalRate = voteStatus?.approvalRate ?? 0;
+  const approvalRateRequired = voteStatus?.approvalRateRequired ?? 0.7;
+  const missingQuorumVotes = Math.max(quorumRequired - totalVotes, 0);
+  const quorumReached = voteStatus?.quorumReached ?? totalVotes >= quorumRequired;
+  const approvalRateReached = voteStatus?.approvalRateReached ?? approvalRate >= approvalRateRequired;
+  const canShowVoteProgress = voteStatus !== null && voteStatus.votingEnabled;
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Ionicons name="people-outline" size={18} color="#F59E0B" />
-        <Text style={styles.headerText}>Votação da Comunidade</Text>
+        <Ionicons name="people-circle-outline" size={18} color="#F59E0B" />
+        <Text style={styles.headerText}>Votação da comunidade</Text>
       </View>
       <Text style={styles.description}>
-        Se o criador não validar em 7 dias, a comunidade pode votar para resolver.
+        Seguidores e voluntários podem votar para revisar e resolver esta denúncia.
       </Text>
+      {requestReason && (
+        <Text style={styles.requestReason}>Motivo da votação: {requestReason}</Text>
+      )}
+      {complaint.validationRequestReasonText && (
+        <Text style={styles.requestReasonText}>
+          {complaint.validationRequestReasonText}
+        </Text>
+      )}
 
       {voteStatus === null ? (
         <Pressable style={styles.loadVoteButton} onPress={loadVoteStatus}>
@@ -340,29 +406,96 @@ export function EvidenceValidationSection({
         </Pressable>
       ) : !voteStatus.votingEnabled ? (
         <Text style={styles.voteDisabled}>
-          Votação será liberada após 7 dias sem resposta do criador.
-        </Text>
-      ) : voteStatus.hasVoted ? (
-        <Text style={styles.votedText}>
-          Você já votou. {voteStatus.votes?.approved || voteStatus.votes}/{voteStatus.threshold} votos para resolver.
+          Votação será liberada após abertura por voluntário ou 7 dias sem resposta.
         </Text>
       ) : (
-        <View style={styles.actions}>
-          <Pressable
-            style={[styles.rejectButton, voteLoading && { opacity: 0.5 }]}
-            onPress={() => handleVote(false)}
-            disabled={voteLoading}
-          >
-            <Text style={styles.rejectText}>Não resolvido</Text>
-          </Pressable>
-          <Pressable
-            style={[styles.approveButton, voteLoading && { opacity: 0.5 }]}
-            onPress={() => handleVote(true)}
-            disabled={voteLoading}
-          >
-            <Text style={styles.approveText}>Resolvido</Text>
-          </Pressable>
-        </View>
+        <>
+          {canShowVoteProgress && (
+            <View style={styles.voteProgress}>
+              <View>
+                <View style={styles.voteProgressRow}>
+                  <Text style={styles.voteProgressLabel}>Participação</Text>
+                  <Text style={styles.voteProgressValue}>
+                    {totalVotes}/{quorumRequired} votos necessários
+                  </Text>
+                </View>
+                <View style={styles.progressBackground}>
+                  <View
+                    style={[
+                      styles.participationProgressFill,
+                      {
+                        width: `${Math.min(
+                          quorumRequired === 0 ? 0 : totalVotes / quorumRequired,
+                          1,
+                        ) * 100}%`,
+                      },
+                    ]}
+                  />
+                </View>
+              </View>
+              <View>
+                <View style={styles.voteProgressRow}>
+                  <Text style={styles.voteProgressLabel}>Aprovação</Text>
+                  <Text style={styles.voteProgressValue}>
+                    {formatPercent(approvalRate)} / {formatPercent(approvalRateRequired)}
+                  </Text>
+                </View>
+                <View style={styles.progressBackground}>
+                  <View
+                    style={[
+                      styles.approvalProgressFill,
+                      {
+                        width: `${Math.min(
+                          approvalRateRequired === 0
+                            ? 0
+                            : approvalRate / approvalRateRequired,
+                          1,
+                        ) * 100}%`,
+                      },
+                    ]}
+                  />
+                </View>
+              </View>
+              {!quorumReached ? (
+                <Text style={styles.voteProgressHint}>
+                  Ainda faltam {missingQuorumVotes} voto
+                  {missingQuorumVotes === 1 ? "" : "s"} para atingir participação
+                  mínima.
+                </Text>
+              ) : !approvalRateReached ? (
+                <Text style={styles.voteProgressHint}>
+                  A participação mínima foi atingida, mas a aprovação ainda está
+                  abaixo de {formatPercent(approvalRateRequired)}.
+                </Text>
+              ) : (
+                <Text style={styles.voteProgressHint}>
+                  Quórum e aprovação mínima atingidos.
+                </Text>
+              )}
+            </View>
+          )}
+
+          {voteStatus.hasVoted ? (
+            <Text style={styles.votedText}>Você já votou.</Text>
+          ) : (
+            <View style={styles.actions}>
+              <Pressable
+                style={[styles.rejectButton, voteLoading && { opacity: 0.5 }]}
+                onPress={() => handleVote(false)}
+                disabled={voteLoading}
+              >
+                <Text style={styles.rejectText}>Não resolvido</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.approveButton, voteLoading && { opacity: 0.5 }]}
+                onPress={() => handleVote(true)}
+                disabled={voteLoading}
+              >
+                <Text style={styles.approveText}>Resolvido</Text>
+              </Pressable>
+            </View>
+          )}
+        </>
       )}
     </View>
   );
@@ -372,31 +505,43 @@ const styles = StyleSheet.create({
   container: {
     marginHorizontal: 16,
     marginTop: 16,
-    backgroundColor: '#FFFBEB',
+    backgroundColor: "#FFFBEB",
     borderRadius: 12,
     padding: 14,
     borderWidth: 0.5,
-    borderColor: '#F59E0B',
+    borderColor: "#F59E0B",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     marginBottom: 8,
   },
   headerText: {
     fontSize: 14,
-    fontWeight: '700',
-    color: '#92400E',
+    fontWeight: "700",
+    color: "#92400E",
   },
   description: {
     fontSize: 13,
-    color: '#78716C',
+    color: "#78716C",
+    lineHeight: 18,
+    marginBottom: 12,
+  },
+  requestReason: {
+    color: "#57534E",
+    fontSize: 13,
+    fontWeight: "700",
+    marginBottom: 6,
+  },
+  requestReasonText: {
+    color: "#78716C",
+    fontSize: 13,
     lineHeight: 18,
     marginBottom: 12,
   },
   actions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 10,
   },
   rejectButton: {
@@ -404,89 +549,137 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#E24B4A',
-    alignItems: 'center',
+    borderColor: "#E24B4A",
+    alignItems: "center",
   },
   rejectText: {
-    color: '#E24B4A',
-    fontWeight: '700',
+    color: "#E24B4A",
+    fontWeight: "700",
     fontSize: 13,
   },
   approveButton: {
     flex: 1,
     paddingVertical: 12,
     borderRadius: 10,
-    backgroundColor: '#10B981',
-    alignItems: 'center',
+    backgroundColor: "#10B981",
+    alignItems: "center",
   },
   approveText: {
-    color: '#fff',
-    fontWeight: '700',
+    color: "#fff",
+    fontWeight: "700",
     fontSize: 13,
   },
   loadVoteButton: {
     paddingVertical: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   loadVoteText: {
-    color: '#F59E0B',
-    fontWeight: '600',
+    color: "#F59E0B",
+    fontWeight: "600",
     fontSize: 13,
   },
   voteDisabled: {
     fontSize: 12,
-    color: '#8A8A8E',
-    fontStyle: 'italic',
+    color: "#8A8A8E",
+    fontStyle: "italic",
+  },
+  voteProgress: {
+    backgroundColor: "#FEF3C7",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 12,
+    gap: 12,
+  },
+  voteProgressRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  voteProgressLabel: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#92400E",
+  },
+  voteProgressValue: {
+    flexShrink: 1,
+    textAlign: "right",
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#57534E",
+  },
+  voteProgressHint: {
+    fontSize: 12,
+    color: "#78716C",
+    lineHeight: 17,
+  },
+  progressBackground: {
+    height: 8,
+    borderRadius: 999,
+    backgroundColor: "#FDE68A",
+    marginTop: 8,
+    overflow: "hidden",
+  },
+  participationProgressFill: {
+    height: "100%",
+    borderRadius: 999,
+    backgroundColor: "#F59E0B",
+  },
+  approvalProgressFill: {
+    height: "100%",
+    borderRadius: 999,
+    backgroundColor: "#10B981",
   },
   votedText: {
     fontSize: 13,
-    color: '#555',
-    fontWeight: '500',
+    color: "#555",
+    fontWeight: "500",
+    marginTop: 2,
   },
   selectAllButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     marginBottom: 10,
   },
   selectAllText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#78716C',
+    fontWeight: "600",
+    color: "#78716C",
   },
   evidenceCard: {
-    backgroundColor: '#FEF3C7',
+    backgroundColor: "#FEF3C7",
     borderRadius: 10,
     padding: 12,
     marginBottom: 12,
     borderWidth: 1.5,
-    borderColor: 'transparent',
+    borderColor: "transparent",
   },
   evidenceCardSelected: {
-    borderColor: '#F59E0B',
-    backgroundColor: '#FEF9C3',
+    borderColor: "#F59E0B",
+    backgroundColor: "#FEF9C3",
   },
   evidenceCardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     marginBottom: 6,
   },
   evidenceAuthor: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#92400E',
+    fontWeight: "600",
+    color: "#92400E",
   },
   selectionCount: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#92400E',
+    fontWeight: "600",
+    color: "#92400E",
     marginBottom: 10,
-    textAlign: 'center',
+    textAlign: "center",
   },
   evidenceDescription: {
     fontSize: 13,
-    color: '#1C1C1E',
+    color: "#1C1C1E",
     lineHeight: 18,
     marginBottom: 8,
   },
@@ -501,32 +694,32 @@ const styles = StyleSheet.create({
   },
   fullscreenBackdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.9)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.9)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   fullscreenClose: {
-    position: 'absolute',
+    position: "absolute",
     top: 56,
     right: 16,
     zIndex: 10,
   },
   fullscreenImage: {
-    width: '100%',
-    height: '80%',
+    width: "100%",
+    height: "80%",
   },
   resolvedSuccessContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 20,
-    backgroundColor: '#ECFDF5',
+    backgroundColor: "#ECFDF5",
     borderRadius: 10,
     marginTop: 12,
   },
   resolvedSuccessText: {
     fontSize: 16,
-    fontWeight: '700',
-    color: '#10B981',
+    fontWeight: "700",
+    color: "#10B981",
     marginTop: 8,
   },
 });

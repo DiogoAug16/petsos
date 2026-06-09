@@ -10,8 +10,23 @@ export function VolunteerButton({
   onSubmitEvidence,
   styles,
 }) {
-  if (isOwner) return null;
   if (complaint?.status !== 'aberto' && complaint?.status !== 'em_andamento') return null;
+
+  if (isOwner) {
+    if (complaint?.status !== 'em_andamento') return null;
+
+    return (
+      <View style={styles.statusUpdateContainer}>
+        <Pressable
+          style={[styles.volunteerButton, { backgroundColor: '#FF6B35' }]}
+          onPress={onSubmitEvidence}
+        >
+          <Ionicons name="camera-outline" size={18} color="#fff" />
+          <Text style={styles.volunteerButtonText}>Enviar Evidência</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.statusUpdateContainer}>

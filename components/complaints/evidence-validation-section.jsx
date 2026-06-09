@@ -43,6 +43,15 @@ const isResolvedByCommunity = (
   );
 };
 
+const isClosedByCommunity = (complaint, responseData) => {
+  return (
+    responseData?.closed === true ||
+    responseData?.closedBy === "community" ||
+    ((complaint?.status === "fechado" || complaint?.status === "closed") &&
+      complaint?.closedBy === "community")
+  );
+};
+
 const isRejectedByCommunity = (complaint, responseData) => {
   return (
     responseData?.rejected === true ||
@@ -73,6 +82,7 @@ export function EvidenceValidationSection({
   const [fullscreenPhoto, setFullscreenPhoto] = useState(null);
   const [communityResolved, setCommunityResolved] = useState(false);
   const [communityRejected, setCommunityRejected] = useState(false);
+  const [communityClosed, setCommunityClosed] = useState(false);
 
   const evidenceList = Array.isArray(evidencesProp) ? evidencesProp : [];
   const pendingEvidences = evidenceList.filter(
@@ -95,6 +105,7 @@ export function EvidenceValidationSection({
     if (!DISPLAY_STATUSES.includes(complaint?.status)) {
       setCommunityResolved(false);
       setCommunityRejected(false);
+      setCommunityClosed(false);
       setVoteStatus(null);
       return;
     }
@@ -195,6 +206,7 @@ export function EvidenceValidationSection({
         allowResolvedFlag: true,
         allowStatusFlag: true,
       });
+      const closedByCommunity = isClosedByCommunity(complaint, data);
       const rejectedByCommunity = isRejectedByCommunity(complaint, data);
       const evidenceProposalRejected = data?.evidenceSelectionRejected === true;
 
@@ -205,6 +217,14 @@ export function EvidenceValidationSection({
           text2: "Denúncia resolvida pela comunidade.",
         });
         setCommunityResolved(true);
+        onStatusChanged?.();
+      } else if (closedByCommunity) {
+        Toast.show({
+          type: "success",
+          text1: "Denúncia fechada",
+          text2: "Denúncia fechada pela comunidade.",
+        });
+        setCommunityClosed(true);
         onStatusChanged?.();
       } else if (evidenceProposalRejected) {
         Toast.show({
@@ -393,6 +413,24 @@ export function EvidenceValidationSection({
         <View style={styles.resolvedSuccessContainer}>
           <Ionicons name="checkmark" size={32} color="#10B981" />
           <Text style={styles.resolvedSuccessText}>Denúncia concluída!</Text>
+        </View>
+      </View>
+    );
+  }
+
+  if (communityClosed || isClosedByCommunity(complaint)) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Ionicons name="close-circle" size={18} color="#78716C" />
+          <Text style={styles.headerText}>Fechado pela Comunidade</Text>
+        </View>
+        <Text style={styles.description}>
+          Esta denúncia foi fechada através da votação comunitária.
+        </Text>
+        <View style={styles.closedContainer}>
+          <Ionicons name="lock-closed" size={32} color="#78716C" />
+          <Text style={styles.closedText}>Denúncia fechada</Text>
         </View>
       </View>
     );
@@ -868,6 +906,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700",
     color: "#10B981",
+    marginTop: 8,
+  },
+  closedContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 20,
+    backgroundColor: "#F5F5F4",
+    borderRadius: 10,
+    marginTop: 12,
+  },
+  closedText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#78716C",
     marginTop: 8,
   },
   rejectedContainer: {

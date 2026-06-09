@@ -178,10 +178,10 @@ export async function getNearbyComplaints(lat, lng, radiusKm = 5) {
   return apiFetch(`/complaints/nearest?lat=${lat}&lng=${lng}&radiusKm=${radiusKm}`);
 }
 
-export async function requestComplaintValidation(id, { reasonType, reasonText }) {
+export async function requestComplaintValidation(id, { reasonType, reasonText, evidenceIds }) {
   return apiFetch(`/complaints/${id}/request-validation`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ reasonType, reasonText }),
+    body: JSON.stringify({ reasonType, reasonText, evidenceIds }),
   });
 }

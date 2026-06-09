@@ -17,12 +17,13 @@ import { validateEvidence } from "@/services/complaint-evidence.service";
 import { getVoteStatus, voteOnComplaint } from "@/services/complaint-votes.service";
 
 const VALIDATION_STATUSES = ["awaiting_validation", "aguardando_validacao"];
-const DISPLAY_STATUSES = [...VALIDATION_STATUSES, "resolved", "resolvido"];
+const DISPLAY_STATUSES = [...VALIDATION_STATUSES, "resolved", "resolvido", "fechado", "closed"];
 
 const REQUEST_REASON_LABELS = {
   already_resolved: "Denúncia já resolvida",
   false_report: "Denúncia falsa",
   needs_community_review: "Precisa de revisão da comunidade",
+  evidence_selection: "Selecionar evidências para resolução",
   owner_inactive: "Autor não respondeu em 7 dias",
 };
 
@@ -36,8 +37,18 @@ const isResolvedByCommunity = (
     (allowStatusFlag &&
       (responseData?.status === "resolved" || responseData?.status === "resolvido")) ||
     responseData?.resolvedBy === "community" ||
+    responseData?.resolvedBy === "community_evidence_vote" ||
     ((complaint?.status === "resolved" || complaint?.status === "resolvido") &&
-      complaint?.resolvedBy === "community")
+      (complaint?.resolvedBy === "community" || complaint?.resolvedBy === "community_evidence_vote"))
+  );
+};
+
+const isRejectedByCommunity = (complaint, responseData) => {
+  return (
+    responseData?.rejected === true ||
+    responseData?.closedBy === "community" ||
+    ((complaint?.status === "fechado" || complaint?.status === "closed") &&
+      complaint?.closedBy === "community")
   );
 };
 
@@ -62,6 +73,7 @@ export function EvidenceValidationSection({
   const [voteLoading, setVoteLoading] = useState(false);
   const [fullscreenPhoto, setFullscreenPhoto] = useState(null);
   const [communityResolved, setCommunityResolved] = useState(false);
+  const [communityRejected, setCommunityRejected] = useState(false);
 
   const evidenceList = Array.isArray(evidencesProp) ? evidencesProp : [];
   const pendingEvidences = evidenceList.filter(
@@ -79,9 +91,11 @@ export function EvidenceValidationSection({
     }
   }, [complaint?.id]);
 
+
   useEffect(() => {
     if (!DISPLAY_STATUSES.includes(complaint?.status)) {
       setCommunityResolved(false);
+      setCommunityRejected(false);
       setVoteStatus(null);
       return;
     }
@@ -182,19 +196,38 @@ export function EvidenceValidationSection({
         allowResolvedFlag: true,
         allowStatusFlag: true,
       });
-
-      Toast.show({
-        type: "success",
-        text1: resolvedByCommunity ? "Denúncia resolvida" : "Voto registrado",
-        text2: resolvedByCommunity
-          ? "Denúncia resolvida pela comunidade."
-          : "Seu voto foi contabilizado.",
-      });
+      const rejectedByCommunity = isRejectedByCommunity(complaint, data);
+      const evidenceProposalRejected = data?.evidenceSelectionRejected === true;
 
       if (resolvedByCommunity) {
+        Toast.show({
+          type: "success",
+          text1: "Denúncia resolvida",
+          text2: "Denúncia resolvida pela comunidade.",
+        });
         setCommunityResolved(true);
         onStatusChanged?.();
+      } else if (evidenceProposalRejected) {
+        Toast.show({
+          type: "info",
+          text1: "Proposta rejeitada",
+          text2: "A proposta de evidências foi rejeitada. Uma nova votação pode ser aberta.",
+        });
+        onStatusChanged?.();
+      } else if (rejectedByCommunity) {
+        Toast.show({
+          type: "info",
+          text1: "Denúncia rejeitada",
+          text2: "A comunidade rejeitou esta denúncia.",
+        });
+        setCommunityRejected(true);
+        onStatusChanged?.();
       } else {
+        Toast.show({
+          type: "success",
+          text1: "Voto registrado",
+          text2: "Seu voto foi contabilizado.",
+        });
         await loadVoteStatus();
       }
     } catch (err) {
@@ -348,10 +381,6 @@ export function EvidenceValidationSection({
     );
   }
 
-  if (!isFollowing && !isVolunteer) return null;
-
-  if (!complaint?.validationRequestedAt) return null;
-
   if (communityResolved || isResolvedByCommunity(complaint)) {
     return (
       <View style={styles.container}>
@@ -370,13 +399,55 @@ export function EvidenceValidationSection({
     );
   }
 
+  if (communityRejected || isRejectedByCommunity(complaint)) {
+    const expiresAt = voteStatus?.rejectionInfo?.rejectionExpiresAt
+      || complaint?.rejectionExpiresAt;
+    const expiresDate = expiresAt ? new Date(expiresAt) : null;
+    const now = new Date();
+    const hoursRemaining = expiresDate
+      ? Math.max(0, Math.ceil((expiresDate.getTime() - now.getTime()) / (1000 * 60 * 60)))
+      : null;
+
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Ionicons name="close-circle" size={18} color="#E24B4A" />
+          <Text style={styles.headerText}>Rejeitado pela Comunidade</Text>
+        </View>
+        <Text style={styles.description}>
+          Esta denúncia foi rejeitada através da votação comunitária.
+        </Text>
+        <View style={styles.rejectedContainer}>
+          <Ionicons name="close" size={32} color="#E24B4A" />
+          <Text style={styles.rejectedText}>Denúncia rejeitada</Text>
+        </View>
+        {hoursRemaining !== null && hoursRemaining > 0 && (
+          <Text style={styles.rejectionExpiryText}>
+            Esta votação será removida em {hoursRemaining}h.
+          </Text>
+        )}
+        {hoursRemaining === 0 && (
+          <Text style={styles.rejectionExpiryText}>
+            Esta votação será removida em breve.
+          </Text>
+        )}
+      </View>
+    );
+  }
+
+  if (!isFollowing && !isVolunteer) return null;
+
+  if (!complaint?.validationRequestedAt) return null;
+
   const totalVotes =
     typeof voteStatus?.votes === "number"
       ? voteStatus.votes
       : (voteStatus?.votes?.total ?? 0);
   const quorumRequired = voteStatus?.quorumRequired ?? 0;
   const approvalRate = voteStatus?.approvalRate ?? 0;
+  const rejectionRate = voteStatus?.rejectionRate ?? 0;
   const approvalRateRequired = voteStatus?.approvalRateRequired ?? 0.7;
+  const rejectionRateRequired = voteStatus?.rejectionRateRequired ?? 0.7;
   const missingQuorumVotes = Math.max(quorumRequired - totalVotes, 0);
   const quorumReached = voteStatus?.quorumReached ?? totalVotes >= quorumRequired;
   const approvalRateReached = voteStatus?.approvalRateReached ?? approvalRate >= approvalRateRequired;
@@ -456,6 +527,29 @@ export function EvidenceValidationSection({
                   />
                 </View>
               </View>
+              <View>
+                <View style={styles.voteProgressRow}>
+                  <Text style={styles.voteProgressLabel}>Rejeição</Text>
+                  <Text style={styles.voteProgressValue}>
+                    {formatPercent(rejectionRate)} / {formatPercent(rejectionRateRequired)}
+                  </Text>
+                </View>
+                <View style={styles.progressBackground}>
+                  <View
+                    style={[
+                      styles.rejectionProgressFill,
+                      {
+                        width: `${Math.min(
+                          rejectionRateRequired === 0
+                            ? 0
+                            : rejectionRate / rejectionRateRequired,
+                          1,
+                        ) * 100}%`,
+                      },
+                    ]}
+                  />
+                </View>
+              </View>
               {!quorumReached ? (
                 <Text style={styles.voteProgressHint}>
                   Ainda faltam {missingQuorumVotes} voto
@@ -493,6 +587,56 @@ export function EvidenceValidationSection({
               >
                 <Text style={styles.approveText}>Resolvido</Text>
               </Pressable>
+            </View>
+          )}
+
+          {voteStatus?.reasonType === "evidence_selection" &&
+            voteStatus?.proposedEvidenceIds?.length > 0 && (
+            <View style={styles.evidenceSelectionSection}>
+              <View style={styles.evidenceSelectionHeader}>
+                <Ionicons name="documents-outline" size={16} color="#92400E" />
+                <Text style={styles.evidenceSelectionTitle}>
+                  Evidências propostas para resolução
+                </Text>
+              </View>
+              <Text style={styles.evidenceSelectionDescription}>
+                Um voluntário propôs estas evidências como resolução. Os botões acima
+                aprovam ou rejeitam esta proposta.
+              </Text>
+
+              {pendingEvidences
+                .filter((e) => voteStatus.proposedEvidenceIds.includes(e.id))
+                .map((evidence) => (
+                  <View key={evidence.id} style={styles.evidenceCard}>
+                    <View style={styles.evidenceCardHeader}>
+                      <Ionicons name="document-text-outline" size={18} color="#F59E0B" />
+                      <Text style={styles.evidenceAuthor}>
+                        @{evidence.username || "anônimo"}
+                      </Text>
+                    </View>
+                    <Text style={styles.evidenceDescription}>{evidence.description}</Text>
+                    {evidence.photos?.length > 0 && (
+                      <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        style={styles.evidencePhotos}
+                      >
+                        {evidence.photos.map((photo, i) => (
+                          <Pressable
+                            key={`${evidence.id}-prop-${i}`}
+                            onPress={() => setFullscreenPhoto(resolveUri(photo))}
+                          >
+                            <Image
+                              source={{ uri: resolveUri(photo) }}
+                              style={styles.evidencePhoto}
+                              contentFit="cover"
+                            />
+                          </Pressable>
+                        ))}
+                      </ScrollView>
+                    )}
+                  </View>
+                ))}
             </View>
           )}
         </>
@@ -630,6 +774,11 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: "#10B981",
   },
+  rejectionProgressFill: {
+    height: "100%",
+    borderRadius: 999,
+    backgroundColor: "#E24B4A",
+  },
   votedText: {
     fontSize: 13,
     color: "#555",
@@ -721,5 +870,49 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#10B981",
     marginTop: 8,
+  },
+  rejectedContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 20,
+    backgroundColor: "#FEF2F2",
+    borderRadius: 10,
+    marginTop: 12,
+  },
+  rejectedText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#E24B4A",
+    marginTop: 8,
+  },
+  rejectionExpiryText: {
+    fontSize: 12,
+    color: "#78716C",
+    textAlign: "center",
+    marginTop: 10,
+    fontStyle: "italic",
+  },
+  evidenceSelectionSection: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 0.5,
+    borderTopColor: "#F59E0B",
+  },
+  evidenceSelectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 6,
+  },
+  evidenceSelectionTitle: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#92400E",
+  },
+  evidenceSelectionDescription: {
+    fontSize: 12,
+    color: "#78716C",
+    lineHeight: 17,
+    marginBottom: 12,
   },
 });

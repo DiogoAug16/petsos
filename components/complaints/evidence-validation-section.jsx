@@ -46,9 +46,8 @@ const isResolvedByCommunity = (
 const isRejectedByCommunity = (complaint, responseData) => {
   return (
     responseData?.rejected === true ||
-    responseData?.closedBy === "community" ||
-    ((complaint?.status === "fechado" || complaint?.status === "closed") &&
-      complaint?.closedBy === "community")
+    responseData?.rejectedBy === "community" ||
+    complaint?.rejectedBy === "community"
   );
 };
 

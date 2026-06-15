@@ -2,8 +2,8 @@ export const detailCommentsStyles = (colorScheme) => {
   const isDark = colorScheme === 'dark';
   const text = isDark ? '#fff' : '#1C1C1E';
   const muted = '#8A8A8E';
-  const border = isDark ? '#3A3A3A' : '#E8E4DF';
-  const soft = isDark ? '#2A2A2A' : '#F7F4F0';
+  const border = isDark ? '#2F3749' : '#F0F0F0';
+  const soft = isDark ? '#2F3749' : '#E8F4F8';
 
   return {
     commentsSection: {
@@ -35,7 +35,7 @@ export const detailCommentsStyles = (colorScheme) => {
       paddingHorizontal: 12,
       paddingTop: 10,
       paddingBottom: 12,
-      backgroundColor: isDark ? '#111113' : '#FFFFFF',
+      backgroundColor: isDark ? '#1A1F2E' : '#FFFFFF',
       borderTopWidth: 1,
       borderTopColor: border,
       elevation: 8,
@@ -132,7 +132,7 @@ export const detailCommentsStyles = (colorScheme) => {
       gap: 6,
     },
     commentBubble: {
-      backgroundColor: isDark ? '#252528' : '#F7F4F0',
+      backgroundColor: isDark ? '#2F3749' : '#E8F4F8',
       borderRadius: 14,
       padding: 10,
     },

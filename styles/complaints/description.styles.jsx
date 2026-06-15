@@ -15,7 +15,7 @@ export const complaintDescriptionStyles = StyleSheet.create({
     borderRadius: 12,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#E8E4DF',
-    backgroundColor: '#fff',
+    borderColor: '#F0F0F0',
+    backgroundColor: '#FFFFFF',
   },
 });

@@ -93,7 +93,7 @@ export default function PhotoSection({ photos, setPhotos, maxPhotos = 5 }) {
   return (
     <View style={formStyles.card}>
       <View style={styles.photosHeader}>
-        <Text style={formStyles.label}>FOTOS DE EVIDÊNCIA</Text>
+        <Text style={formStyles.label}>FOTOS DO PROBLEMA</Text>
         <Text style={styles.counter}>
           {photos.length}/{maxPhotos}
         </Text>

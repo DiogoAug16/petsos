@@ -96,5 +96,44 @@ export const badgeStyles = (colorScheme) => {
       fontWeight: '500',
       color: SUCCESS_TEXT,
     },
+
+    statusEmAndamento: {
+      backgroundColor: 'rgba(59,130,246,0.1)',
+      paddingHorizontal: 10,
+      paddingVertical: 3,
+      borderRadius: 20,
+    },
+
+    statusEmAndamentoText: {
+      fontSize: 10,
+      fontWeight: '500',
+      color: '#1D4ED8',
+    },
+
+    statusAguardandoValidacao: {
+      backgroundColor: 'rgba(245,158,11,0.1)',
+      paddingHorizontal: 10,
+      paddingVertical: 3,
+      borderRadius: 20,
+    },
+
+    statusAguardandoValidacaoText: {
+      fontSize: 10,
+      fontWeight: '500',
+      color: '#92400E',
+    },
+
+    statusFechado: {
+      backgroundColor: 'rgba(107,114,128,0.1)',
+      paddingHorizontal: 10,
+      paddingVertical: 3,
+      borderRadius: 20,
+    },
+
+    statusFechadoText: {
+      fontSize: 10,
+      fontWeight: '500',
+      color: '#374151',
+    },
   });
 };

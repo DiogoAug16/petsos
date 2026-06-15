@@ -8,7 +8,12 @@ export const styles = StyleSheet.create({
     padding: 14,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#F0F0F0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 6,
   },
 
   unreadCard: {
@@ -20,7 +25,7 @@ export const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#E0EDF2',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,

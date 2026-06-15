@@ -28,7 +28,7 @@ export default function RegisterScreen() {
 
   const animatedStyle = useEntranceAnimation();
   const themedStyles = createRegisterStyles(colors);
-  const isDark = colors.background === '#000';
+  const isDark = colors.background !== '#E8F4F8';
 
   return (
     <KeyboardAvoidingView

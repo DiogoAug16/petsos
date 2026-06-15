@@ -9,9 +9,9 @@ export const filterChipsStyles = (colorScheme) => {
     scrollWrapper: {
       flexGrow: 0,
       flexShrink: 0,
-      backgroundColor: isDark ? '#1C1C1E' : '#fff',
+      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
       borderBottomWidth: 0.5,
-      borderBottomColor: isDark ? '#3A3A3A' : '#E8E4DF',
+      borderBottomColor: isDark ? '#2F3749' : '#F0F0F0',
     },
 
     chipsContainer: {
@@ -26,9 +26,9 @@ export const filterChipsStyles = (colorScheme) => {
         paddingHorizontal: 14,
         paddingVertical: 8,
         borderRadius: 20,
-        backgroundColor: isDark ? '#3A3A3C' : '#F7F4F0',
+        backgroundColor: isDark ? '#2F3749' : '#E8F4F8',
         borderWidth: 1,
-        borderColor: isDark ? '#636366' : '#E8E4DF',
+        borderColor: isDark ? '#3D4A5E' : '#F0F0F0',
         justifyContent: 'center',
         alignItems: 'center',
         alignSelf: 'center',

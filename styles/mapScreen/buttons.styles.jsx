@@ -27,7 +27,7 @@ export const buttonsStyles = (colorScheme) => {
       bottom: 225,
       width: 52,
       height: 52,
-      backgroundColor: isDark ? '#1C1C1E' : '#fff',
+      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
       borderRadius: 16,
       alignItems: 'center',
       justifyContent: 'center',

@@ -1,28 +1,38 @@
 export const detailCardsStyles = (colorScheme) => {
   const isDark = colorScheme === 'dark';
-  
+
   return {
     detailScreen: {
       flex: 1,
-      backgroundColor: isDark ? '#000' : '#F7F4F0',
+      backgroundColor: isDark ? '#1A1F2E' : '#E8F4F8',
     },
     detailContent: {
       padding: 14,
       gap: 12,
     },
     detailCard: {
-      backgroundColor: isDark ? '#1C1C1E' : '#fff',
+      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
       borderRadius: 14,
       padding: 14,
-      borderWidth: 0.5,
-      borderColor: isDark ? '#3A3A3A' : '#E8E4DF',
+      borderWidth: 1,
+      borderColor: isDark ? '#2F3749' : '#F0F0F0',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: isDark ? 0.3 : 0.06,
+      shadowRadius: 12,
+      elevation: 6,
     },
     detailMainCard: {
-      backgroundColor: isDark ? '#1C1C1E' : '#fff',
+      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
       borderRadius: 14,
       padding: 14,
-      borderWidth: 0.5,
-      borderColor: isDark ? '#3A3A3A' : '#E8E4DF',
+      borderWidth: 1,
+      borderColor: isDark ? '#2F3749' : '#F0F0F0',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: isDark ? 0.3 : 0.06,
+      shadowRadius: 12,
+      elevation: 6,
       gap: 10,
     },
     detailMainTitle: {
@@ -45,7 +55,7 @@ export const detailCardsStyles = (colorScheme) => {
     },
     detailMainDivider: {
       height: 0.5,
-      backgroundColor: isDark ? '#3A3A3A' : '#E8E4DF',
+      backgroundColor: isDark ? '#2F3749' : '#F0F0F0',
     },
     detailMainSectionLabel: {
       fontSize: 10,
@@ -94,7 +104,7 @@ export const detailCardsStyles = (colorScheme) => {
     },
     detailMapContainer: {
       height: 100,
-      backgroundColor: isDark ? '#2A2A2A' : '#C8D8C0',
+      backgroundColor: isDark ? '#2F3749' : '#F0F0F0',
       borderRadius: 10,
       overflow: 'hidden',
       marginBottom: 8,

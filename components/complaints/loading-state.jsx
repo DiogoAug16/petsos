@@ -8,7 +8,7 @@ export function LoadingState({ message = 'Carregando denúncias...' }) {
 
   return (
     <View style={styles.centered}>
-      <ActivityIndicator size="large" color="#FF6B35" />
+      <ActivityIndicator size="large" color="#FF9F1C" />
       <Text style={styles.loadingText}>{message}</Text>
     </View>
   );

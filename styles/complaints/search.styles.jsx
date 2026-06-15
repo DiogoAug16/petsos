@@ -7,11 +7,11 @@ export const searchStyles = (colorScheme) => {
     searchContainer: {
       paddingHorizontal: 16,
       paddingVertical: 10,
-      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
+      backgroundColor: isDark ? '#FFFCF7' : '#FFFFFF',
     },
 
     searchBar: {
-      backgroundColor: isDark ? '#2F3749' : '#E8F4F8',
+      backgroundColor: isDark ? '#F0D8BF' : '#FFF6EC',
       borderRadius: 12,
       paddingHorizontal: 12,
       paddingVertical: 8,
@@ -19,19 +19,19 @@ export const searchStyles = (colorScheme) => {
       alignItems: 'center',
       gap: 8,
       borderWidth: 0.5,
-      borderColor: isDark ? '#2F3749' : '#F0F0F0',
+      borderColor: isDark ? '#F0D8BF' : '#F0D8BF',
     },
 
     searchInput: {
       flex: 1,
       fontSize: 14,
-      color: isDark ? '#fff' : '#1C1C1E',
+      color: isDark ? '#fff' : '#272A3A',
     },
 
     filterBtn: {
       width: 30,
       height: 30,
-      backgroundColor: '#FF6B35',
+      backgroundColor: '#FF9F1C',
       borderRadius: 8,
       alignItems: 'center',
       justifyContent: 'center',

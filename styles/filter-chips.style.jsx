@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-const ORANGE = '#FF6B35';
+const ORANGE = '#FF9F1C';
 
 export const filterChipsStyles = (colorScheme) => {
   const isDark = colorScheme === 'dark';
@@ -9,9 +9,9 @@ export const filterChipsStyles = (colorScheme) => {
     scrollWrapper: {
       flexGrow: 0,
       flexShrink: 0,
-      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
+      backgroundColor: isDark ? '#FFFCF7' : '#FFFFFF',
       borderBottomWidth: 0.5,
-      borderBottomColor: isDark ? '#2F3749' : '#F0F0F0',
+      borderBottomColor: isDark ? '#F0D8BF' : '#F0D8BF',
     },
 
     chipsContainer: {
@@ -26,9 +26,9 @@ export const filterChipsStyles = (colorScheme) => {
         paddingHorizontal: 14,
         paddingVertical: 8,
         borderRadius: 20,
-        backgroundColor: isDark ? '#2F3749' : '#E8F4F8',
+        backgroundColor: isDark ? '#F0D8BF' : '#FFF6EC',
         borderWidth: 1,
-        borderColor: isDark ? '#3D4A5E' : '#F0F0F0',
+        borderColor: isDark ? '#E7C7A8' : '#F0D8BF',
         justifyContent: 'center',
         alignItems: 'center',
         alignSelf: 'center',
@@ -43,7 +43,7 @@ export const filterChipsStyles = (colorScheme) => {
     chipText: {
         fontSize: 12,
         fontWeight: '600',
-        color: isDark ? '#FFFFFF' : '#1C1C1E',
+        color: isDark ? '#FFFFFF' : '#272A3A',
         includeFontPadding: false,
         height: 16,         
         lineHeight: 16,

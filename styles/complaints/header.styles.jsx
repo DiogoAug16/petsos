@@ -8,12 +8,12 @@ export const headerStyles = (colorScheme) => {
       paddingTop: 60,
       paddingBottom: 16,
       paddingHorizontal: 20,
-      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
+      backgroundColor: isDark ? '#FFFCF7' : '#FFFFFF',
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'flex-start',
       borderBottomWidth: 0.5,
-      borderBottomColor: isDark ? '#2F3749' : '#F0F0F0',
+      borderBottomColor: isDark ? '#F0D8BF' : '#F0D8BF',
     },
 
     headerTitle: {
@@ -23,7 +23,7 @@ export const headerStyles = (colorScheme) => {
 
     headerSubtitle: {
       fontSize: 13,
-      color: '#8A8A8E',
+      color: '#8D7D78',
       marginTop: 2,
     },
   });

@@ -29,7 +29,7 @@ export default function LoginScreen() {
 
   const animatedStyle = useEntranceAnimation();
   const themedStyles = createLoginStyles(colors);
-  const isDark = colors.background !== '#E8F4F8';
+  const isDark = colors.background !== '#FFF6EC';
 
   return (
     <KeyboardAvoidingView

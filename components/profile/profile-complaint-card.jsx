@@ -44,7 +44,7 @@ export function ProfileComplaintCard({ complaint, styles }) {
           <View style={styles.statusPill}>
             <Text style={styles.statusText}>{cleanStatusLabel(status.label)}</Text>
           </View>
-          <Ionicons name="location-outline" size={13} color="#8A8A8E" />
+          <Ionicons name="location-outline" size={13} color="#8D7D78" />
           <Text style={styles.cardAddress} numberOfLines={1}>
             {address || 'Localização'}
           </Text>

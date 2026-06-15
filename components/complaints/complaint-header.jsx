@@ -16,7 +16,7 @@ export function ComplaintsHeader({ count }) {
     <View style={styles.header}>
       <View>
         <Text style={styles.headerTitle}>
-          <Text style={{ color: isDark ? '#fff' : '#1C1C1E' }}>PET</Text>
+          <Text style={{ color: isDark ? '#fff' : '#272A3A' }}>PET</Text>
           <Text style={{ color: '#FF3B30' }}>SOS</Text>
         </Text>
         <Text style={styles.headerSubtitle}>

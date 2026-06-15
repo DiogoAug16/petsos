@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   modalTitle: {
-    color: "#1C1C1E",
+    color: "#272A3A",
     fontSize: 18,
     fontWeight: "800",
     marginBottom: 6,
@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
   },
   evidenceCardDescription: {
     fontSize: 13,
-    color: "#1C1C1E",
+    color: "#272A3A",
     lineHeight: 18,
     marginBottom: 6,
   },

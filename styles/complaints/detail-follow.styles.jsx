@@ -1,10 +1,10 @@
 export const detailFollowStyles = (colorScheme) => {
   const isDark = colorScheme === 'dark';
-  const card = isDark ? '#242B3D' : '#FFFFFF';
-  const text = isDark ? '#fff' : '#1C1C1E';
-  const muted = '#8A8A8E';
-  const border = isDark ? '#2F3749' : '#F0F0F0';
-  const soft = isDark ? '#2F3749' : '#E8F4F8';
+  const card = isDark ? '#FFFCF7' : '#FFFFFF';
+  const text = '#272A3A';
+  const muted = '#8D7D78';
+  const border = isDark ? '#F0D8BF' : '#F0D8BF';
+  const soft = isDark ? '#F0D8BF' : '#FFF6EC';
 
   return {
     detailFollowSummary: {
@@ -33,7 +33,7 @@ export const detailFollowStyles = (colorScheme) => {
       borderRadius: 999,
       backgroundColor: '#fff',
       borderWidth: 1,
-      borderColor: isDark ? '#fff' : '#1C1C1E',
+      borderColor: isDark ? '#fff' : '#272A3A',
       alignItems: 'center',
       justifyContent: 'center',
     },

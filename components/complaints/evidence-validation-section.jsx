@@ -761,7 +761,7 @@ const styles = StyleSheet.create({
   },
   voteDisabled: {
     fontSize: 12,
-    color: "#8A8A8E",
+    color: "#8D7D78",
     fontStyle: "italic",
   },
   voteProgress: {
@@ -865,7 +865,7 @@ const styles = StyleSheet.create({
   },
   evidenceDescription: {
     fontSize: 13,
-    color: "#1C1C1E",
+    color: "#272A3A",
     lineHeight: 18,
     marginBottom: 8,
   },

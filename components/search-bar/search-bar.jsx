@@ -27,17 +27,17 @@ export function SearchBar({
   return (
     <View style={style.searchContainer}>
       <View style={style.searchBar}>
-        <Ionicons name="search-outline" size={18} color="#8A8A8E" />
+        <Ionicons name="search-outline" size={18} color="#8D7D78" />
         <TextInput
           style={style.searchInput}
           placeholder="Buscar denúncias..."
-          placeholderTextColor="#8A8A8E"
+          placeholderTextColor="#8D7D78"
           value={value}
           onChangeText={onChangeText}
         />
         {value.length > 0 && (
           <TouchableOpacity onPress={() => onChangeText('')}>
-            <Ionicons name="close-circle" size={18} color="#8A8A8E" />
+            <Ionicons name="close-circle" size={18} color="#8D7D78" />
           </TouchableOpacity>
         )}
         {showFilterBtn && (

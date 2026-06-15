@@ -4,7 +4,6 @@ import { FlatList, RefreshControl, Text, View } from 'react-native';
 
 import { ErrorState } from '@/components/complaints/error-state';
 import { LoadingState } from '@/components/complaints/loading-state';
-import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { ProfileComplaintCard } from '@/components/profile/profile-complaint-card';
 import { ProfileHeader } from '@/components/profile/profile-header';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -75,7 +74,6 @@ export function PublicProfileScreen({
             styles={styles}
             isCurrentUser={isCurrentUser}
             showBack={showBack}
-            rightComponent={<NotificationBell />}
           />
         }
         ListEmptyComponent={
@@ -87,8 +85,8 @@ export function PublicProfileScreen({
           <RefreshControl
             refreshing={refreshing}
             onRefresh={refresh}
-            tintColor="#FF6B35"
-            colors={['#FF6B35']}
+            tintColor="#FF9F1C"
+            colors={['#FF9F1C']}
           />
         }
       />

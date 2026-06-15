@@ -32,7 +32,7 @@ export function DetailMainCard({
         <Text style={styles.detailMainTitle}>{complaint.title}</Text>
 
         <View style={styles.detailMainMetaRow}>
-          <Ionicons name="location-outline" size={16} color="#8A8A8E" />
+          <Ionicons name="location-outline" size={16} color="#8D7D78" />
           <Text style={styles.detailMainMetaText} numberOfLines={2}>
             {address || 'Localização'}
           </Text>
@@ -97,7 +97,7 @@ export function DetailMainCard({
                 style={styles.followersModalCloseButton}
                 onPress={() => setFollowersModalVisible(false)}
               >
-                <Ionicons name="close" size={18} color="#8A8A8E" />
+                <Ionicons name="close" size={18} color="#8D7D78" />
               </Pressable>
             </View>
 

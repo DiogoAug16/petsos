@@ -1,17 +1,17 @@
 import { StyleSheet } from 'react-native';
 
-const ORANGE = '#FF6B35';
+const ORANGE = '#FF9F1C';
 
 export const cardStyles = (colorScheme) => {
   const isDark = colorScheme === 'dark';
 
   return StyleSheet.create({
     card: {
-      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
+      backgroundColor: isDark ? '#FFFCF7' : '#FFFFFF',
       borderRadius: 16,
       padding: 14,
       borderWidth: 1,
-      borderColor: isDark ? '#2F3749' : '#F0F0F0',
+      borderColor: isDark ? '#F0D8BF' : '#F0D8BF',
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 6 },
       shadowOpacity: isDark ? 0.3 : 0.06,
@@ -50,20 +50,20 @@ export const cardStyles = (colorScheme) => {
     cardTitle: {
       fontSize: 13,
       fontWeight: '500',
-      color: isDark ? '#fff' : '#1C1C1E',
+      color: isDark ? '#fff' : '#272A3A',
       marginBottom: 3,
       lineHeight: 18,
     },
 
     cardAddress: {
       fontSize: 11,
-      color: '#8A8A8E',
+      color: '#8D7D78',
       marginTop: 3,
     },
 
     cardDivider: {
       height: 0.5,
-      backgroundColor: isDark ? '#2F3749' : '#F0F0F0',
+      backgroundColor: isDark ? '#F0D8BF' : '#F0D8BF',
       marginTop: 10,
       marginBottom: 10,
     },
@@ -76,7 +76,7 @@ export const cardStyles = (colorScheme) => {
 
     cardDate: {
       fontSize: 11,
-      color: '#8A8A8E',
+      color: '#8D7D78',
     },
   });
 };

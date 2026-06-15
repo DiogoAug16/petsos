@@ -4,7 +4,6 @@ import { EmptyState } from '@/components/complaints/empty-state';
 import { ErrorState } from '@/components/complaints/error-state';
 import { FilterChips } from '@/components/filter-chips/filter-chips';
 import { LoadingState } from '@/components/complaints/loading-state';
-import { NewComplaintButton } from '@/components/complaints/new-complaint-button';
 import { SearchBar } from '@/components/search-bar/search-bar';
 import { useComplaints } from '@/context/ComplaintsContext';
 import { useComplaintsListControls } from '@/hooks/useComplaintsListControls';
@@ -67,13 +66,12 @@ export default function ComplaintsScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={refresh}
-              tintColor="#FF6B35"
-              colors={['#FF6B35']}
+              tintColor="#FF9F1C"
+              colors={['#FF9F1C']}
             />
           }
         />
       )}
-      <NewComplaintButton />
     </View>
   );
 }

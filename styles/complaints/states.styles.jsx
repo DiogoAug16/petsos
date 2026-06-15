@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-const ORANGE = '#FF6B35';
+const ORANGE = '#FF9F1C';
 
 export const statesStyles = (colorScheme) => {
   const isDark = colorScheme === 'dark';
@@ -23,7 +23,7 @@ export const statesStyles = (colorScheme) => {
 
     loadingText: {
       fontSize: 13,
-      color: '#8A8A8E',
+      color: '#8D7D78',
     },
 
     errorIcon: {
@@ -33,12 +33,12 @@ export const statesStyles = (colorScheme) => {
     errorTitle: {
       fontSize: 16,
       fontWeight: '600',
-      color: isDark ? '#fff' : '#1C1C1E',
+      color: isDark ? '#fff' : '#272A3A',
     },
 
     errorMessage: {
       fontSize: 13,
-      color: '#8A8A8E',
+      color: '#8D7D78',
       textAlign: 'center',
     },
 
@@ -62,12 +62,12 @@ export const statesStyles = (colorScheme) => {
     emptyTitle: {
       fontSize: 16,
       fontWeight: '600',
-      color: isDark ? '#fff' : '#1C1C1E',
+      color: isDark ? '#fff' : '#272A3A',
     },
 
     emptySubtitle: {
       fontSize: 13,
-      color: '#8A8A8E',
+      color: '#8D7D78',
       textAlign: 'center',
     },
   });

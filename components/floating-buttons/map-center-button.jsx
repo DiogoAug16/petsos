@@ -12,7 +12,7 @@ export function CenterButton({ style, onPress }) {
 
   return (
     <TouchableOpacity style={style} onPress={handlePress}>
-      <Ionicons name="locate-outline" size={22} color="#FF6B35" />
+      <Ionicons name="locate-outline" size={22} color="#FF9F1C" />
     </TouchableOpacity>
   );
 }

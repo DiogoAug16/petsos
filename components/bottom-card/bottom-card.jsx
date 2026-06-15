@@ -11,23 +11,26 @@ export function BottomCard({ style, complaint, animation }) {
       {...panResponder.panHandlers}
     >
       <View style={style.bottomHandle} />
-      <Text style={style.bottomTitle}>DENÚNCIA PRÓXIMA</Text>
 
-      <View style={style.miniCard}>
-        {complaint ? (
-          <View style={style.innerBorder}>
-            <ComplaintNearbyCard style={style} complaint={complaint} />
-          </View>
-        ) : (
-          <View
-            style={[
-              style.innerBorder,
-              { minHeight: 62, alignItems: 'center', justifyContent: 'center' },
-            ]}
-          >
-            <Text style={style.miniCardSub}>Não há denúncias próximas</Text>
-          </View>
-        )}
+      <View style={style.bottomContent}>
+        <Text style={style.bottomTitle}>DENÚNCIA PRÓXIMA</Text>
+
+        <View style={style.miniCard}>
+          {complaint ? (
+            <View style={style.innerBorder}>
+              <ComplaintNearbyCard style={style} complaint={complaint} />
+            </View>
+          ) : (
+            <View
+              style={[
+                style.innerBorder,
+                { minHeight: 62, alignItems: 'center', justifyContent: 'center' },
+              ]}
+            >
+              <Text style={style.miniCardSub}>Não há denúncias próximas</Text>
+            </View>
+          )}
+        </View>
       </View>
     </Animated.View>
   );

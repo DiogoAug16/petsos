@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-const ORANGE = '#FF6B35';
+const ORANGE = '#FF9F1C';
 const ORANGE_BG = 'rgba(255,107,53,0.1)';
 const DANGER_BG = 'rgba(230,57,70,0.1)';
 const DANGER_TEXT = '#A32D2D';

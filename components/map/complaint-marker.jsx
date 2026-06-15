@@ -37,7 +37,7 @@ export const ComplaintMarker = ({ complaint, onPress }) => {
           styles.container,
           {
             borderColor: themeColor,
-            backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
+            backgroundColor: isDark ? '#FFFCF7' : '#FFFFFF',
             shadowOpacity: isDark ? 0.4 : 0.2,
           },
         ]}
@@ -47,7 +47,7 @@ export const ComplaintMarker = ({ complaint, onPress }) => {
           size={16}
           color={themeColor}
         />
-        <Text style={[styles.label, { color: isDark ? '#F2F2F7' : '#333333' }]} numberOfLines={1}>
+        <Text style={[styles.label, { color: isDark ? '#F2F2F7' : '#4A4050' }]} numberOfLines={1}>
           {complaint.title}
         </Text>
         <View style={[styles.arrow, { borderTopColor: themeColor }]} />

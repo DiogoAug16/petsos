@@ -1,12 +1,12 @@
 import { StyleSheet } from 'react-native';
 
 export const createLoginStyles = (colors) => {
-  const isDark = colors.background !== '#E8F4F8';
+  const isDark = colors.background !== '#FFF6EC';
 
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: isDark ? '#1A1F2E' : '#E8F4F8',
+      backgroundColor: isDark ? '#FFF6EC' : '#FFF6EC',
     },
     scrollContent: {
       flexGrow: 1,
@@ -47,7 +47,7 @@ export const createLoginStyles = (colors) => {
       lineHeight: 20,
     },
     formCard: {
-      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
+      backgroundColor: isDark ? '#FFFCF7' : '#FFFFFF',
       borderRadius: 20,
       padding: 24,
       gap: 16,
@@ -57,7 +57,7 @@ export const createLoginStyles = (colors) => {
       shadowRadius: 12,
       elevation: 6,
       borderWidth: 1,
-      borderColor: isDark ? '#2F3749' : '#F0F0F0',
+      borderColor: isDark ? '#F0D8BF' : '#F0D8BF',
       overflow: 'visible',
     },
     titleContainer: {
@@ -146,7 +146,7 @@ export const createLoginStyles = (colors) => {
     dividerLine: {
       flex: 1,
       height: 1,
-      backgroundColor: isDark ? '#2F3749' : '#E0E0E0',
+      backgroundColor: isDark ? '#F0D8BF' : '#E0E0E0',
     },
     dividerText: {
       fontSize: 14,
@@ -163,11 +163,11 @@ export const createLoginStyles = (colors) => {
       alignItems: 'center',
       justifyContent: 'center',
       gap: 8,
-      backgroundColor: isDark ? '#1A1F2E' : '#2C3E50',
+      backgroundColor: isDark ? '#FFF6EC' : '#2B2D42',
       borderRadius: 12,
       paddingVertical: 14,
       borderWidth: 1,
-      borderColor: isDark ? '#2F3749' : '#34495E',
+      borderColor: isDark ? '#F0D8BF' : '#3A3850',
     },
     socialButtonText: {
       color: '#FFFFFF',

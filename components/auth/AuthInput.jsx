@@ -53,7 +53,7 @@ export default function AuthInput({
           style={[
             styles.input,
             {
-              backgroundColor: isDark ? '#1A1F2E' : '#F7F9FB',
+              backgroundColor: isDark ? '#FFF6EC' : '#F7F9FB',
               color: colors.text,
             },
             showToggle && styles.passwordInput,

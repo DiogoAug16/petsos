@@ -1,23 +1,37 @@
-import { Tabs } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Tabs, useRouter } from 'expo-router';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { AnimatedTabIcon } from '@/components/bottom-card/animated-tab-icon';
+import { useRequireAuth } from '@/context/AuthPromptContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { useHaptics } from '@/hooks/useHaptics';
 import { useUnreadCount } from '@/hooks/useUnreadCount';
 import Colors from '@/styles/theme/Colors';
 
 function ProfileTabIcon({ color, focused }) {
+  return (
+    <AnimatedTabIcon
+      name="person-outline"
+      nameActive="person"
+      color={color}
+      focused={focused}
+    />
+  );
+}
+
+function NotificationsTabIcon({ color, focused }) {
   const { unreadCount } = useUnreadCount();
 
   return (
     <View>
       <AnimatedTabIcon
-        name="person-outline"
-        nameActive="person"
+        name="notifications-outline"
+        nameActive="notifications"
         color={color}
         focused={focused}
       />
-      {!focused && unreadCount > 0 && (
+      {unreadCount > 0 && (
         <View style={tabBadgeStyles.badge}>
           <Text style={tabBadgeStyles.text}>
             {unreadCount > 99 ? '99+' : unreadCount}
@@ -25,6 +39,53 @@ function ProfileTabIcon({ color, focused }) {
         </View>
       )}
     </View>
+  );
+}
+
+function CreateComplaintTabButton() {
+  const router = useRouter();
+  const requireAuth = useRequireAuth();
+  const { triggerHaptics } = useHaptics();
+
+  const handlePress = () => {
+    requireAuth(
+      () => {
+        triggerHaptics('normal');
+        router.push('/complaint/create');
+      },
+      {
+        title: 'Entre para criar uma denúncia',
+        message: 'Faça login ou crie uma conta para registrar uma denúncia.',
+      }
+    );
+  };
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel="Criar denúncia"
+      style={tabActionStyles.createTab}
+      onPress={handlePress}
+    >
+      <View style={tabActionStyles.createIcon}>
+        <Ionicons name="add" size={34} color="#FFFFFF" />
+      </View>
+    </Pressable>
+  );
+}
+
+function NotificationsTabButton({ children, style }) {
+  const router = useRouter();
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel="Abrir notificações"
+      style={style}
+      onPress={() => router.push('/notifications')}
+    >
+      {children}
+    </Pressable>
   );
 }
 
@@ -48,6 +109,29 @@ const tabBadgeStyles = StyleSheet.create({
   },
 });
 
+const tabActionStyles = StyleSheet.create({
+  createTab: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 2,
+  },
+  createIcon: {
+    width: 52,
+    height: 52,
+    marginTop: -22,
+    borderRadius: 18,
+    backgroundColor: '#FF9F1C',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+});
+
 export default function TabLayout() {
   const colorScheme = useColorScheme() ?? 'light';
 
@@ -58,6 +142,7 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors[colorScheme].tint,
         headerShown: false,
         lazy: true,
+        tabBarShowLabel: false,
       }}
     >
       <Tabs.Screen
@@ -86,6 +171,28 @@ export default function TabLayout() {
               focused={focused}
             />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="create"
+        listeners={{
+          tabPress: (event) => {
+            event.preventDefault();
+          },
+        }}
+        options={{
+          title: 'Criar',
+          tabBarButton: () => <CreateComplaintTabButton />,
+        }}
+      />
+      <Tabs.Screen
+        name="notifications-tab"
+        options={{
+          title: 'Notificações',
+          tabBarIcon: ({ color, focused }) => (
+            <NotificationsTabIcon color={color} focused={focused} />
+          ),
+          tabBarButton: (props) => <NotificationsTabButton {...props} />,
         }}
       />
       <Tabs.Screen

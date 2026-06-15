@@ -1,12 +1,12 @@
 import { StyleSheet } from 'react-native';
 
 export const createRegisterStyles = (colors) => {
-  const isDark = colors.background !== '#E8F4F8';
+  const isDark = colors.background !== '#FFF6EC';
 
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: isDark ? '#1A1F2E' : '#E8F4F8',
+      backgroundColor: isDark ? '#FFF6EC' : '#FFF6EC',
     },
     scrollContent: {
       flexGrow: 1,
@@ -47,7 +47,7 @@ export const createRegisterStyles = (colors) => {
       lineHeight: 20,
     },
     formCard: {
-      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
+      backgroundColor: isDark ? '#FFFCF7' : '#FFFFFF',
       borderRadius: 20,
       padding: 20,
       gap: 16,
@@ -57,7 +57,7 @@ export const createRegisterStyles = (colors) => {
       shadowRadius: 12,
       elevation: 6,
       borderWidth: 1,
-      borderColor: isDark ? '#2F3749' : '#F0F0F0',
+      borderColor: isDark ? '#F0D8BF' : '#F0D8BF',
       overflow: 'visible',
     },
     submitButton: {

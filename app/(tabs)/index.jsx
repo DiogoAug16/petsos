@@ -1,5 +1,4 @@
 import { BottomCard } from '@/components/bottom-card/bottom-card';
-import { FabButton } from '@/components/floating-buttons/create-complaint-button';
 import { CenterButton } from '@/components/floating-buttons/map-center-button';
 import { AutocompleteSuggestions } from '@/components/map/autocomplete-suggestions';
 import { ComplaintMarkersLayer } from '@/components/map/complaint-markers-layer';
@@ -156,10 +155,6 @@ export default function MapScreen() {
 
       <Animated.View style={{ transform: [{ translateY: buttonsTranslateY }] }}>
         <CenterButton style={styles.centerBtn} onPress={centerOnUser} />
-
-        <FabButton
-          style={styles.fab}
-        />
       </Animated.View>
 
       <BottomCard

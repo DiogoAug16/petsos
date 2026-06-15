@@ -127,7 +127,7 @@ export function EvidenceSection({ evidences, styles: parentStyles }) {
 
 const localStyles = StyleSheet.create({
   card: {
-    backgroundColor: '#E8F4F8',
+    backgroundColor: '#FFF6EC',
     borderRadius: 12,
     padding: 14,
     marginBottom: 10,
@@ -162,11 +162,11 @@ const localStyles = StyleSheet.create({
   },
   date: {
     fontSize: 11,
-    color: '#8A8A8E',
+    color: '#8D7D78',
   },
   description: {
     fontSize: 14,
-    color: '#1C1C1E',
+    color: '#272A3A',
     lineHeight: 20,
     marginBottom: 10,
   },

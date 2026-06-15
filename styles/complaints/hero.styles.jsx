@@ -4,7 +4,7 @@ export const heroStyles = (colorScheme) => {
   return {
     detailHero: {
       height: 220,
-      backgroundColor: isDark ? '#242B3D' : '#B8E0ED',
+      backgroundColor: isDark ? '#FFFCF7' : '#DCC8FF',
       position: 'relative',
       overflow: 'hidden',
     },

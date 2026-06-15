@@ -65,8 +65,8 @@ export default function NotificationsScreen() {
               hitSlop={12}
               style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 4, paddingRight: 8 }}
             >
-              <Ionicons name="chevron-back" size={20} color="#FF6B35" />
-              <Text style={{ color: '#FF6B35', fontSize: 16, fontWeight: '700' }}>Voltar</Text>
+              <Ionicons name="chevron-back" size={20} color="#FF9F1C" />
+              <Text style={{ color: '#FF9F1C', fontSize: 16, fontWeight: '700' }}>Voltar</Text>
             </Pressable>
           ),
         }}

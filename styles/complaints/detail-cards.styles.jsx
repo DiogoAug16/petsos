@@ -4,18 +4,18 @@ export const detailCardsStyles = (colorScheme) => {
   return {
     detailScreen: {
       flex: 1,
-      backgroundColor: isDark ? '#1A1F2E' : '#E8F4F8',
+      backgroundColor: isDark ? '#FFF6EC' : '#FFF6EC',
     },
     detailContent: {
       padding: 14,
       gap: 12,
     },
     detailCard: {
-      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
+      backgroundColor: isDark ? '#FFFCF7' : '#FFFFFF',
       borderRadius: 14,
       padding: 14,
       borderWidth: 1,
-      borderColor: isDark ? '#2F3749' : '#F0F0F0',
+      borderColor: isDark ? '#F0D8BF' : '#F0D8BF',
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 6 },
       shadowOpacity: isDark ? 0.3 : 0.06,
@@ -23,11 +23,11 @@ export const detailCardsStyles = (colorScheme) => {
       elevation: 6,
     },
     detailMainCard: {
-      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
+      backgroundColor: isDark ? '#FFFCF7' : '#FFFFFF',
       borderRadius: 14,
       padding: 14,
       borderWidth: 1,
-      borderColor: isDark ? '#2F3749' : '#F0F0F0',
+      borderColor: isDark ? '#F0D8BF' : '#F0D8BF',
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 6 },
       shadowOpacity: isDark ? 0.3 : 0.06,
@@ -38,7 +38,7 @@ export const detailCardsStyles = (colorScheme) => {
     detailMainTitle: {
       fontSize: 19,
       fontWeight: '800',
-      color: isDark ? '#fff' : '#1C1C1E',
+      color: isDark ? '#fff' : '#272A3A',
       lineHeight: 25,
     },
     detailMainMetaRow: {
@@ -49,25 +49,25 @@ export const detailCardsStyles = (colorScheme) => {
     detailMainMetaText: {
       flex: 1,
       fontSize: 13,
-      color: '#8A8A8E',
+      color: '#8D7D78',
       lineHeight: 18,
       fontWeight: '600',
     },
     detailMainDivider: {
       height: 0.5,
-      backgroundColor: isDark ? '#2F3749' : '#F0F0F0',
+      backgroundColor: isDark ? '#F0D8BF' : '#F0D8BF',
     },
     detailMainSectionLabel: {
       fontSize: 10,
       fontWeight: '700',
-      color: '#8A8A8E',
+      color: '#8D7D78',
       letterSpacing: 0.8,
       textTransform: 'uppercase',
       marginBottom: -4,
     },
     detailMainDescription: {
       fontSize: 14,
-      color: isDark ? '#EBEBF5' : '#1C1C1E',
+      color: isDark ? '#EBEBF5' : '#272A3A',
       lineHeight: 21,
     },
     detailMainFooter: {
@@ -90,21 +90,21 @@ export const detailCardsStyles = (colorScheme) => {
       justifyContent: 'center',
     },
     detailMainFollowersText: {
-      color: '#8A8A8E',
+      color: '#8D7D78',
       fontSize: 12,
       fontWeight: '800',
     },
     detailSectionLabel: {
       fontSize: 10,
       fontWeight: '600',
-      color: '#8A8A8E',
+      color: '#8D7D78',
       letterSpacing: 0.8,
       textTransform: 'uppercase',
       marginBottom: 10,
     },
     detailMapContainer: {
       height: 100,
-      backgroundColor: isDark ? '#2F3749' : '#F0F0F0',
+      backgroundColor: isDark ? '#F0D8BF' : '#F0D8BF',
       borderRadius: 10,
       overflow: 'hidden',
       marginBottom: 8,
@@ -118,16 +118,16 @@ export const detailCardsStyles = (colorScheme) => {
     },
     detailMapAddress: {
       fontSize: 12,
-      color: '#8A8A8E',
+      color: '#8D7D78',
     },
     detailRegistrarName: {
       fontSize: 14,
       fontWeight: '600',
-      color: isDark ? '#fff' : '#1C1C1E',
+      color: isDark ? '#fff' : '#272A3A',
     },
     detailRegistrarDate: {
       fontSize: 12,
-      color: '#8A8A8E',
+      color: '#8D7D78',
       marginTop: 2,
     },
   };

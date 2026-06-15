@@ -109,7 +109,7 @@ export function ProfileHeader({
           />
           <View style={styles.profileMenu}>
             <Pressable style={styles.profileMenuItem} onPress={handleEdit}>
-              <Ionicons name="create-outline" size={18} color="#fff" />
+              <Ionicons name="create-outline" size={18} color="#272A3A" />
               <Text style={styles.profileMenuText}>Editar</Text>
             </Pressable>
             <Pressable style={styles.profileMenuItem} onPress={handleLogout}>

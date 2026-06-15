@@ -1,7 +1,7 @@
 export const toastStyles = {
   container: {
     width: '90%',
-    backgroundColor: '#242B3D',
+    backgroundColor: '#FFFCF7',
     borderRadius: 16,
     padding: 16,
     flexDirection: 'row',

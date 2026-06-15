@@ -1,4 +1,4 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -11,27 +11,15 @@ import { AuthProvider } from '@/context/AuthContext';
 import { AuthPromptProvider } from '@/context/AuthPromptContext';
 import { ComplaintsProvider } from '@/context/ComplaintsContext';
 import { UnreadCountProvider } from '@/context/UnreadCountContext';
-import { useColorScheme } from '@/hooks/useColorScheme';
 
-const LightTheme = {
+const AppTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    background: '#E8F4F8',
+    background: '#FFF6EC',
     card: '#FFFFFF',
-    border: '#F0F0F0',
-    primary: '#FF6B35',
-  },
-};
-
-const CustomDarkTheme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    background: '#1A1F2E',
-    card: '#242B3D',
-    border: '#2F3749',
-    primary: '#FF6B35',
+    border: '#F0D8BF',
+    primary: '#FF9F1C',
   },
 };
 
@@ -66,10 +54,8 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? CustomDarkTheme : LightTheme}>
+    <ThemeProvider value={AppTheme}>
       <AuthProvider>
         <UnreadCountProvider>
           <AuthPromptProvider>

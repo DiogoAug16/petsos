@@ -13,7 +13,7 @@ export const searchStyles = (colorScheme) => {
     },
 
     searchBar: {
-      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
+      backgroundColor: isDark ? '#FFFCF7' : '#FFFFFF',
       borderRadius: 16,
       paddingHorizontal: 14,
       paddingVertical: 10,
@@ -30,20 +30,20 @@ export const searchStyles = (colorScheme) => {
     searchInput: {
       flex: 1,
       fontSize: 14,
-      color: isDark ? '#fff' : '#1C1C1E',
+      color: isDark ? '#fff' : '#272A3A',
     },
 
     filterBtn: {
       width: 34,
       height: 34,
-      backgroundColor: '#FF6B35',
+      backgroundColor: '#FF9F1C',
       borderRadius: 10,
       alignItems: 'center',
       justifyContent: 'center',
     },
 
     filterBtnActive: {
-      backgroundColor: isDark ? '#FF8A5E' : '#E85A24',
+      backgroundColor: isDark ? '#FFB457' : '#E88212',
     },
 
     filterPanel: {
@@ -53,7 +53,7 @@ export const searchStyles = (colorScheme) => {
       right: 16,
       zIndex: 12,
       borderRadius: 14,
-      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
+      backgroundColor: isDark ? '#FFFCF7' : '#FFFFFF',
       paddingHorizontal: 14,
       paddingVertical: 12,
       shadowColor: '#000',
@@ -67,13 +67,13 @@ export const searchStyles = (colorScheme) => {
     filterTitle: {
       fontSize: 14,
       fontWeight: '700',
-      color: isDark ? '#F2F2F7' : '#1C1C1E',
+      color: isDark ? '#F2F2F7' : '#272A3A',
     },
 
     filterLabel: {
       fontSize: 12,
       fontWeight: '600',
-      color: isDark ? '#8A8A8E' : '#666666',
+      color: isDark ? '#8D7D78' : '#6F6772',
     },
 
     filterStatusList: {
@@ -87,19 +87,19 @@ export const searchStyles = (colorScheme) => {
       paddingVertical: 8,
       borderRadius: 16,
       borderWidth: 1,
-      borderColor: isDark ? '#2F3749' : '#F0F0F0',
-      backgroundColor: isDark ? '#2F3749' : '#E8F4F8',
+      borderColor: isDark ? '#F0D8BF' : '#F0D8BF',
+      backgroundColor: isDark ? '#F0D8BF' : '#FFF6EC',
     },
 
     filterStatusOptionActive: {
-      borderColor: '#FF6B35',
-      backgroundColor: '#FF6B35',
+      borderColor: '#FF9F1C',
+      backgroundColor: '#FF9F1C',
     },
 
     filterStatusOptionText: {
       fontSize: 12,
       fontWeight: '600',
-      color: isDark ? '#F2F2F7' : '#1C1C1E',
+      color: isDark ? '#F2F2F7' : '#272A3A',
     },
 
     filterStatusOptionTextActive: {
@@ -118,20 +118,20 @@ export const searchStyles = (colorScheme) => {
       paddingHorizontal: 12,
       paddingVertical: 8,
       borderRadius: 10,
-      backgroundColor: isDark ? '#2F3749' : '#E0EDF2',
+      backgroundColor: isDark ? '#F0D8BF' : '#FFE8C8',
     },
 
     filterClearButtonText: {
       fontSize: 12,
       fontWeight: '600',
-      color: isDark ? '#F2F2F7' : '#333333',
+      color: isDark ? '#F2F2F7' : '#4A4050',
     },
 
     filterApplyButton: {
       paddingHorizontal: 12,
       paddingVertical: 8,
       borderRadius: 10,
-      backgroundColor: '#FF6B35',
+      backgroundColor: '#FF9F1C',
     },
 
     filterApplyButtonText: {
@@ -147,7 +147,7 @@ export const searchStyles = (colorScheme) => {
       right: 16,
       zIndex: 11,
       borderRadius: 14,
-      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
+      backgroundColor: isDark ? '#FFFCF7' : '#FFFFFF',
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.12,
@@ -160,7 +160,7 @@ export const searchStyles = (colorScheme) => {
       paddingHorizontal: 14,
       paddingVertical: 10,
       borderBottomWidth: 1,
-      borderBottomColor: isDark ? '#2F3749' : '#E0EDF2',
+      borderBottomColor: isDark ? '#F0D8BF' : '#FFE8C8',
       gap: 2,
     },
 
@@ -171,12 +171,12 @@ export const searchStyles = (colorScheme) => {
     autocompleteTitle: {
       fontSize: 14,
       fontWeight: '600',
-      color: isDark ? '#F2F2F7' : '#1C1C1E',
+      color: isDark ? '#F2F2F7' : '#272A3A',
     },
 
     autocompleteSubtitle: {
       fontSize: 12,
-      color: isDark ? '#8A8A8E' : '#666666',
+      color: isDark ? '#8D7D78' : '#6F6772',
     },
 
     noResultsBadge: {
@@ -186,11 +186,11 @@ export const searchStyles = (colorScheme) => {
       right: 16,
       zIndex: 11,
       borderRadius: 12,
-      backgroundColor: isDark ? '#2F3749' : '#FFFFFF',
+      backgroundColor: isDark ? '#F0D8BF' : '#FFFFFF',
       paddingHorizontal: 12,
       paddingVertical: 10,
       borderWidth: 1,
-      borderColor: isDark ? '#2F3749' : '#F0F0F0',
+      borderColor: isDark ? '#F0D8BF' : '#F0D8BF',
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 3 },
       shadowOpacity: 0.1,
@@ -201,7 +201,7 @@ export const searchStyles = (colorScheme) => {
     noResultsText: {
       fontSize: 12,
       fontWeight: '600',
-      color: isDark ? '#F2F2F7' : '#333333',
+      color: isDark ? '#F2F2F7' : '#4A4050',
       textAlign: 'center',
     },
   });

@@ -2,12 +2,12 @@ import { StyleSheet } from 'react-native';
 
 export const profileStyles = (colorScheme) => {
   const isDark = colorScheme === 'dark';
-  const background = isDark ? '#1A1F2E' : '#E8F4F8';
-  const surface = isDark ? '#242B3D' : '#FFFFFF';
-  const surfaceSoft = isDark ? '#2F3749' : '#E0EDF2';
-  const text = isDark ? '#FFFFFF' : '#1C1C1E';
-  const muted = '#8A8A8E';
-  const border = isDark ? '#2F3749' : '#F0F0F0';
+  const background = isDark ? '#FFF6EC' : '#FFF6EC';
+  const surface = isDark ? '#FFFCF7' : '#FFFFFF';
+  const surfaceSoft = isDark ? '#F0D8BF' : '#FFE8C8';
+  const text = isDark ? '#FFFFFF' : '#272A3A';
+  const muted = '#8D7D78';
+  const border = isDark ? '#F0D8BF' : '#F0D8BF';
 
   return StyleSheet.create({
     screen: {
@@ -19,7 +19,7 @@ export const profileStyles = (colorScheme) => {
     },
     hero: {
       height: 230,
-      backgroundColor: isDark ? '#1A1F2E' : '#2C3E50',
+      backgroundColor: isDark ? '#FFF6EC' : '#2B2D42',
       borderBottomLeftRadius: 22,
       borderBottomRightRadius: 22,
       overflow: 'hidden',
@@ -219,7 +219,7 @@ export const profileStyles = (colorScheme) => {
       backgroundColor: 'rgba(255, 107, 53, 0.16)',
     },
     statusText: {
-      color: '#FF6B35',
+      color: '#FF9F1C',
       fontSize: 11,
       fontWeight: '900',
     },
@@ -254,7 +254,7 @@ export const profileStyles = (colorScheme) => {
       borderRadius: 999,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: '#FF6B35',
+      backgroundColor: '#FF9F1C',
     },
     authRequiredButtonText: {
       color: '#fff',
@@ -278,9 +278,9 @@ export const profileStyles = (colorScheme) => {
       right: 14,
       width: 164,
       borderRadius: 14,
-      backgroundColor: isDark ? '#242B3D' : '#2C3E50',
+      backgroundColor: '#FFFFFF',
       borderWidth: 0.5,
-      borderColor: isDark ? '#2F3749' : '#34495E',
+      borderColor: '#F0D8BF',
       overflow: 'hidden',
       elevation: 8,
       shadowColor: '#000',
@@ -296,7 +296,7 @@ export const profileStyles = (colorScheme) => {
       gap: 10,
     },
     profileMenuText: {
-      color: '#fff',
+      color: '#272A3A',
       fontSize: 14,
       fontWeight: '700',
     },

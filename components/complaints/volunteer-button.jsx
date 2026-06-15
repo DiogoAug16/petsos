@@ -18,7 +18,7 @@ export function VolunteerButton({
     return (
       <View style={styles.statusUpdateContainer}>
         <Pressable
-          style={[styles.volunteerButton, { backgroundColor: '#FF6B35' }]}
+          style={[styles.volunteerButton, { backgroundColor: '#FF9F1C' }]}
           onPress={onSubmitEvidence}
         >
           <Ionicons name="camera-outline" size={18} color="#fff" />
@@ -56,7 +56,7 @@ export function VolunteerButton({
 
       {isVolunteer && complaint?.status === 'em_andamento' && (
         <Pressable
-          style={[styles.volunteerButton, { marginTop: 8, backgroundColor: '#FF6B35' }]}
+          style={[styles.volunteerButton, { marginTop: 8, backgroundColor: '#FF9F1C' }]}
           onPress={onSubmitEvidence}
         >
           <Ionicons name="camera-outline" size={18} color="#fff" />

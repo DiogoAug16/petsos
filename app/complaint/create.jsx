@@ -23,9 +23,9 @@ import { ANIMAL_TYPES, COMPLAINT_TYPES } from '../../constants/complaints.consta
 import { validateComplaintForm } from '../../utils/complaintForm';
 
 const COLORS = {
-  background: '#E8F4F8',
-  border: '#F0F0F0',
-  orange: '#FF6B35',
+  background: '#FFF6EC',
+  border: '#F0D8BF',
+  orange: '#FF9F1C',
 };
 
 // Estado inicial do formulário
@@ -511,12 +511,12 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   authRequiredTitle: {
-    color: '#1C1C1E',
+    color: '#272A3A',
     fontSize: 24,
     fontWeight: '900',
   },
   authRequiredText: {
-    color: '#8A8A8E',
+    color: '#8D7D78',
     fontSize: 15,
     lineHeight: 21,
     textAlign: 'center',

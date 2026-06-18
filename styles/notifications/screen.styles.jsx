@@ -6,9 +6,50 @@ export const styles = StyleSheet.create({
     backgroundColor: '#FFF6EC',
   },
 
+  header: {
+    paddingTop: 62,
+    paddingHorizontal: 18,
+    paddingBottom: 12,
+  },
+
+  headerTop: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+
+  headerText: {
+    flex: 1,
+  },
+
+  title: {
+    fontSize: 28,
+    fontWeight: '900',
+    color: '#272A3A',
+  },
+
+  subtitle: {
+    marginTop: 4,
+    fontSize: 14,
+    lineHeight: 20,
+    color: '#8D7D78',
+  },
+
+  clearButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    borderWidth: 0.5,
+    borderColor: '#F0D8BF',
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   listContent: {
     padding: 16,
-    paddingBottom: 32,
+    paddingBottom: 96,
   },
 
   center: {

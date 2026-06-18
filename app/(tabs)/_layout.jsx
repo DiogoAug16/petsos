@@ -1,12 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs, useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 import { AnimatedTabIcon } from '@/components/bottom-card/animated-tab-icon';
 import { useRequireAuth } from '@/context/AuthPromptContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { useHapticPress } from '@/hooks/useHapticPress';
 import { useHaptics } from '@/hooks/useHaptics';
+import { usePressAnimation } from '@/hooks/usePressAnimation';
 import { useUnreadCount } from '@/hooks/useUnreadCount';
 import Colors from '@/styles/theme/Colors';
 
@@ -47,6 +48,9 @@ function CreateComplaintTabButton() {
   const router = useRouter();
   const requireAuth = useRequireAuth();
   const { triggerHaptics } = useHaptics();
+  const { animatedStyle, onPressIn, onPressOut } = usePressAnimation({
+    toScale: 0.88,
+  });
 
   const handlePress = () => {
     triggerHaptics('normal');
@@ -67,28 +71,14 @@ function CreateComplaintTabButton() {
       accessibilityLabel="Criar denúncia"
       style={tabActionStyles.createTab}
       onPress={handlePress}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}
     >
-      <View style={tabActionStyles.createBlobStage}>
+      <Animated.View style={[tabActionStyles.createBlobStage, animatedStyle]}>
         <View style={tabActionStyles.createIcon}>
           <Ionicons name="paw" size={31} color="#FFFFFF" />
         </View>
-      </View>
-    </Pressable>
-  );
-}
-
-function NotificationsTabButton({ children, style }) {
-  const router = useRouter();
-  const handlePress = useHapticPress(() => router.push('/notifications'));
-
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel="Abrir notificações"
-      style={style}
-      onPress={handlePress}
-    >
-      {children}
+      </Animated.View>
     </Pressable>
   );
 }
@@ -205,12 +195,16 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="notifications-tab"
+        listeners={{
+          tabPress: () => {
+            triggerHaptics('soft');
+          },
+        }}
         options={{
           title: 'Notificações',
           tabBarIcon: ({ color, focused }) => (
             <NotificationsTabIcon color={color} focused={focused} />
           ),
-          tabBarButton: (props) => <NotificationsTabButton {...props} />,
         }}
       />
       <Tabs.Screen

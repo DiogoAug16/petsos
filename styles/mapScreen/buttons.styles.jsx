@@ -24,7 +24,7 @@ export const buttonsStyles = (colorScheme) => {
     centerBtn: {
       position: 'absolute',
       right: 16,
-      bottom: 225,
+      bottom: 170,
       width: 52,
       height: 52,
       backgroundColor: isDark ? '#FFFCF7' : '#FFFFFF',

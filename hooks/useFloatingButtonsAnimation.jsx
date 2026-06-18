@@ -18,7 +18,7 @@ export function useFloatingButtonsAnimation() {
 
   const animateTo = (hidden) => {
     Animated.spring(translateY, {
-      toValue: hidden ? 120 : 0,
+      toValue: hidden ? 130 : 0,
       ...(hidden ? WOBBLY_CONFIG : RETURN_CONFIG),
     }).start();
   };

@@ -17,6 +17,7 @@ import PhotoSection from '../../components/complaints/PhotoSection';
 
 import { useAuth } from '@/context/AuthContext';
 import { useAuthPrompt } from '@/context/AuthPromptContext';
+import { useHapticPress } from '@/hooks/useHapticPress';
 import { useLocation } from '../../hooks/useLocation';
 import { createComplaint, getComplaintById, updateComplaint } from '../../services/complaints.service';
 import { ANIMAL_TYPES, COMPLAINT_TYPES } from '../../constants/complaints.constants';
@@ -123,6 +124,13 @@ export default function CreateComplaintScreen() {
   const [isLoadingEdit, setIsLoadingEdit] = useState(false);
 
   const isEdit = edit === 'true' && complaintId;
+  const handleAuthRequiredPress = useHapticPress(() =>
+    openAuthPrompt({
+      title: 'Entre para criar uma denúncia',
+      message:
+        'Faça login ou crie uma conta para registrar uma denúncia.',
+    })
+  );
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -307,6 +315,8 @@ export default function CreateComplaintScreen() {
       setIsSubmitting(false);
     }
   };
+  const handleHapticGoBack = useHapticPress(handleGoBack);
+  const handleHapticSubmit = useHapticPress(handleSubmit, 'normal');
 
   if (authLoading) {
     return (
@@ -330,13 +340,7 @@ export default function CreateComplaintScreen() {
           </Text>
           <Pressable
             style={styles.authRequiredButton}
-            onPress={() =>
-              openAuthPrompt({
-                title: 'Entre para criar uma denúncia',
-                message:
-                  'Faça login ou crie uma conta para registrar uma denúncia.',
-              })
-            }
+            onPress={handleAuthRequiredPress}
           >
             <Text style={styles.authRequiredButtonText}>Entrar ou criar conta</Text>
           </Pressable>
@@ -354,7 +358,7 @@ export default function CreateComplaintScreen() {
           headerBackVisible: false,
           headerLeft: () => (
             <Pressable
-              onPress={handleGoBack}
+              onPress={handleHapticGoBack}
               hitSlop={12}
               style={styles.headerBackContainer}
             >
@@ -432,7 +436,7 @@ export default function CreateComplaintScreen() {
               styles.submitButton,
               isSubmitting && styles.submitButtonDisabled,
             ]}
-            onPress={handleSubmit}
+            onPress={handleHapticSubmit}
             disabled={isSubmitting || isLoadingEdit}
           >
             <Text style={styles.submitButtonText}>

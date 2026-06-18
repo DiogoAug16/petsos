@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { AnimatedTabIcon } from '@/components/bottom-card/animated-tab-icon';
 import { useRequireAuth } from '@/context/AuthPromptContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { useHapticPress } from '@/hooks/useHapticPress';
 import { useHaptics } from '@/hooks/useHaptics';
 import { useUnreadCount } from '@/hooks/useUnreadCount';
 import Colors from '@/styles/theme/Colors';
@@ -48,9 +49,9 @@ function CreateComplaintTabButton() {
   const { triggerHaptics } = useHaptics();
 
   const handlePress = () => {
+    triggerHaptics('normal');
     requireAuth(
       () => {
-        triggerHaptics('normal');
         router.push('/complaint/create');
       },
       {
@@ -67,8 +68,10 @@ function CreateComplaintTabButton() {
       style={tabActionStyles.createTab}
       onPress={handlePress}
     >
-      <View style={tabActionStyles.createIcon}>
-        <Ionicons name="add" size={34} color="#FFFFFF" />
+      <View style={tabActionStyles.createBlobStage}>
+        <View style={tabActionStyles.createIcon}>
+          <Ionicons name="paw" size={31} color="#FFFFFF" />
+        </View>
       </View>
     </Pressable>
   );
@@ -76,13 +79,14 @@ function CreateComplaintTabButton() {
 
 function NotificationsTabButton({ children, style }) {
   const router = useRouter();
+  const handlePress = useHapticPress(() => router.push('/notifications'));
 
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel="Abrir notificações"
       style={style}
-      onPress={() => router.push('/notifications')}
+      onPress={handlePress}
     >
       {children}
     </Pressable>
@@ -116,24 +120,28 @@ const tabActionStyles = StyleSheet.create({
     justifyContent: 'center',
     paddingTop: 2,
   },
-  createIcon: {
-    width: 52,
-    height: 52,
-    marginTop: -22,
-    borderRadius: 18,
-    backgroundColor: '#FF9F1C',
+  createBlobStage: {
+    width: 68,
+    height: 68,
+    marginTop: -26,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 8,
+  },
+  createIcon: {
+    width: 58,
+    height: 58,
+    borderRadius: 22,
+    borderWidth: 4,
+    borderColor: '#FFFFFF',
+    backgroundColor: '#FF8C42',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
 export default function TabLayout() {
   const colorScheme = useColorScheme() ?? 'light';
+  const { triggerHaptics } = useHaptics();
 
   return (
     <Tabs
@@ -147,6 +155,11 @@ export default function TabLayout() {
     >
       <Tabs.Screen
         name="complaints"
+        listeners={{
+          tabPress: () => {
+            triggerHaptics('soft');
+          },
+        }}
         options={{
           title: 'Denúncias',
           tabBarIcon: ({ color, focused }) => (
@@ -161,6 +174,11 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="index"
+        listeners={{
+          tabPress: () => {
+            triggerHaptics('soft');
+          },
+        }}
         options={{
           title: 'Mapa',
           tabBarIcon: ({ color, focused }) => (
@@ -197,6 +215,11 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="profile"
+        listeners={{
+          tabPress: () => {
+            triggerHaptics('soft');
+          },
+        }}
         options={{
           title: 'Perfil',
           tabBarIcon: ({ color, focused }) => (

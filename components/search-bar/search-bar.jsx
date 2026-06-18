@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useHapticPress } from '@/hooks/useHapticPress';
 import { useSortOrderButtonAnimation } from '@/hooks/useSortOrderButtonAnimation';
 import { sortButtonStyles } from '@/styles/search-bar-sort-button.styles';
 import { Animated, TextInput, TouchableOpacity, View } from 'react-native';
@@ -14,6 +15,8 @@ export function SearchBar({
   sortOrder = 'desc',
   onSortPress,
 }) {
+  const handleClearPress = useHapticPress(() => onChangeText(''));
+  const handleFilterPress = useHapticPress(onFilterPress);
   const {
     effectiveSortOrder,
     sortIcon,
@@ -23,6 +26,7 @@ export function SearchBar({
     sortLabelOpacity,
     handleSortPress,
   } = useSortOrderButtonAnimation(sortOrder, onSortPress);
+  const handleHapticSortPress = useHapticPress(handleSortPress);
 
   return (
     <View style={style.searchContainer}>
@@ -36,14 +40,14 @@ export function SearchBar({
           onChangeText={onChangeText}
         />
         {value.length > 0 && (
-          <TouchableOpacity onPress={() => onChangeText('')}>
+          <TouchableOpacity onPress={handleClearPress}>
             <Ionicons name="close-circle" size={18} color="#8D7D78" />
           </TouchableOpacity>
         )}
         {showFilterBtn && (
           <TouchableOpacity
             style={[style.filterBtn, filterActive ? style.filterBtnActive : null]}
-            onPress={onFilterPress}
+            onPress={handleFilterPress}
           >
             <Ionicons name="options-outline" size={18} color="#fff" />
           </TouchableOpacity>
@@ -52,7 +56,7 @@ export function SearchBar({
           <Animated.View style={[sortButtonStyles.sortBtnWrapper, { width: sortWidth }]}>
             <TouchableOpacity
               style={[style.filterBtn, sortButtonStyles.sortBtn]}
-              onPress={handleSortPress}
+              onPress={handleHapticSortPress}
               accessibilityRole="button"
               accessibilityLabel={`Ordenar por data ${effectiveSortOrder === 'asc' ? 'crescente' : 'decrescente'}`}
             >

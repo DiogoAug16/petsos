@@ -1,3 +1,4 @@
+import { useHapticPress } from '@/hooks/useHapticPress';
 import { FORM_COLORS, formStyles } from '@/styles/form/form.styles';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
@@ -10,13 +11,14 @@ export default function ComplaintLocation({
   onChangeManualLocation,
 }) {
   const currentMapLocation = manualLocation || location;
+  const handleChangeLocationMode = useHapticPress(onChangeLocationMode);
 
   const renderLocationOption = (mode, icon, titleText, subtitle) => {
     const selected = locationMode === mode;
 
     return (
       <Pressable
-        onPress={() => onChangeLocationMode(mode)}
+        onPress={() => handleChangeLocationMode(mode)}
         style={[
           styles.locationOption,
           selected && styles.locationOptionSelected,

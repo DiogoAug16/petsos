@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AuthInput from './AuthInput';
 import { useStaggeredAnimation } from '@/hooks/useStaggeredAnimation';
 import { useButtonPulse } from '@/hooks/useButtonPulse';
+import { useHapticPress } from '@/hooks/useHapticPress';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -32,6 +33,8 @@ function RegisterForm({
   const buttonStyle = useStaggeredAnimation(5);
   const linkStyle = useStaggeredAnimation(6);
   const pulseStyle = useButtonPulse(isSubmitting);
+  const handleSubmitPress = useHapticPress(handleSubmit, 'normal');
+  const handleLoginPress = useHapticPress(() => router.replace('/(auth)/login'));
 
   return (
     <View style={styles.formCard}>
@@ -129,7 +132,7 @@ function RegisterForm({
           (!isFormValid || isSubmitting) && styles.submitButtonDisabled,
           pulseStyle,
         ]}
-        onPress={handleSubmit}
+        onPress={handleSubmitPress}
         disabled={!isFormValid || isSubmitting}
       >
         <Text style={styles.submitButtonText}>
@@ -141,7 +144,7 @@ function RegisterForm({
 
       <Animated.View style={[styles.linkContainer, linkStyle]}>
         <Text style={styles.linkText}>Já faz parte? </Text>
-        <Pressable onPress={() => router.replace('/(auth)/login')}>
+        <Pressable onPress={handleLoginPress}>
           <Text style={[styles.link, { color: colors.primary }]}>Entre aqui</Text>
         </Pressable>
       </Animated.View>

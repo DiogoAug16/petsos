@@ -1,4 +1,5 @@
 import Colors from '@/styles/theme/Colors';
+import { useHapticPress } from '@/hooks/useHapticPress';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
@@ -12,6 +13,7 @@ export default function Button({
 }) {
   const theme = useColorScheme() || 'light';
   const colors = Colors[theme];
+  const handlePress = useHapticPress(onPress);
 
   const backgroundColor = disabled
     ? '#ccc'
@@ -22,7 +24,7 @@ export default function Button({
   return (
     <TouchableOpacity
       style={[styles.button, { backgroundColor }, style]}
-      onPress={onPress}
+      onPress={handlePress}
       activeOpacity={0.7}
       disabled={disabled}
     >

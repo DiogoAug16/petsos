@@ -1,4 +1,5 @@
 import { FILTER_CHIPS } from '@/constants/complaints.constants';
+import { useHapticPress } from '@/hooks/useHapticPress';
 import { Text, TouchableOpacity, View } from 'react-native';
 
 export function ComplaintsFilter({
@@ -9,6 +10,10 @@ export function ComplaintsFilter({
   onApply = () => {},
   onClear = () => {},
 }) {
+  const handleApply = useHapticPress(onApply);
+  const handleClear = useHapticPress(onClear);
+  const handleSelectType = useHapticPress(onSelectType);
+
   if (!visible) return null;
 
   return (
@@ -27,7 +32,7 @@ export function ComplaintsFilter({
                 style.filterStatusOption,
                 isActive ? style.filterStatusOptionActive : null,
               ]}
-              onPress={() => onSelectType(option.value)}
+              onPress={() => handleSelectType(option.value)}
             >
               <Text
                 style={[
@@ -43,10 +48,10 @@ export function ComplaintsFilter({
       </View>
 
       <View style={style.filterActions}>
-        <TouchableOpacity style={style.filterClearButton} onPress={onClear}>
+        <TouchableOpacity style={style.filterClearButton} onPress={handleClear}>
           <Text style={style.filterClearButtonText}>Limpar</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={style.filterApplyButton} onPress={onApply}>
+        <TouchableOpacity style={style.filterApplyButton} onPress={handleApply}>
           <Text style={style.filterApplyButtonText}>Aplicar filtros</Text>
         </TouchableOpacity>
       </View>

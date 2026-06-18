@@ -1,3 +1,4 @@
+import { useHapticPress } from '@/hooks/useHapticPress';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 export function AuthPromptBottomSheet({
@@ -8,6 +9,10 @@ export function AuthPromptBottomSheet({
   onLogin,
   onRegister,
 }) {
+  const handleClose = useHapticPress(onClose);
+  const handleLogin = useHapticPress(onLogin);
+  const handleRegister = useHapticPress(onRegister);
+
   return (
     <Modal
       transparent
@@ -16,7 +21,7 @@ export function AuthPromptBottomSheet({
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
-        <Pressable style={styles.backdrop} onPress={onClose} />
+        <Pressable style={styles.backdrop} onPress={handleClose} />
 
         <View style={styles.sheet}>
           <View style={styles.handle} />
@@ -25,16 +30,16 @@ export function AuthPromptBottomSheet({
           <Text style={styles.message}>{message}</Text>
 
           <View style={styles.actions}>
-            <Pressable style={styles.primaryButton} onPress={onRegister}>
+            <Pressable style={styles.primaryButton} onPress={handleRegister}>
               <Text style={styles.primaryText}>Criar conta</Text>
             </Pressable>
 
-            <Pressable style={styles.secondaryButton} onPress={onLogin}>
+            <Pressable style={styles.secondaryButton} onPress={handleLogin}>
               <Text style={styles.secondaryText}>Entrar</Text>
             </Pressable>
           </View>
 
-          <Pressable style={styles.cancelButton} onPress={onClose}>
+          <Pressable style={styles.cancelButton} onPress={handleClose}>
             <Text style={styles.cancelText}>Agora não</Text>
           </Pressable>
         </View>

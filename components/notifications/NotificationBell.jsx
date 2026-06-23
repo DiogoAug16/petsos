@@ -11,7 +11,7 @@ export function NotificationBell() {
   return (
     <Pressable
       style={styles.container}
-      onPress={() => router.push('/notifications')}
+      onPress={() => router.push('/(tabs)/notifications-tab')}
     >
       <Ionicons name="notifications-outline" size={24} color="#FFFFFF" />
 

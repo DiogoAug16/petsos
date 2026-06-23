@@ -18,11 +18,13 @@ export function VolunteerButton({
     return (
       <View style={styles.statusUpdateContainer}>
         <Pressable
-          style={[styles.volunteerButton, { backgroundColor: '#FF6B35' }]}
+          style={[styles.volunteerButton, styles.evidenceButton]}
           onPress={onSubmitEvidence}
+          accessibilityRole="button"
+          accessibilityLabel="Enviar evidência"
         >
           <Ionicons name="camera-outline" size={18} color="#fff" />
-          <Text style={styles.volunteerButtonText}>Enviar Evidência</Text>
+          <Text style={styles.volunteerButtonText}>Enviar evidência</Text>
         </Pressable>
       </View>
     );
@@ -38,6 +40,8 @@ export function VolunteerButton({
         ]}
         onPress={onToggleVolunteer}
         disabled={volunteerLoading}
+        accessibilityRole="button"
+        accessibilityLabel={isVolunteer ? 'Cancelar voluntariado' : 'Voluntariar-se'}
       >
         <Ionicons
           name={isVolunteer ? 'hand-left' : 'hand-left-outline'}
@@ -56,11 +60,13 @@ export function VolunteerButton({
 
       {isVolunteer && complaint?.status === 'em_andamento' && (
         <Pressable
-          style={[styles.volunteerButton, { marginTop: 8, backgroundColor: '#FF6B35' }]}
+          style={[styles.volunteerButton, styles.evidenceButton]}
           onPress={onSubmitEvidence}
+          accessibilityRole="button"
+          accessibilityLabel="Enviar evidência"
         >
           <Ionicons name="camera-outline" size={18} color="#fff" />
-          <Text style={styles.volunteerButtonText}>Enviar Evidência</Text>
+          <Text style={styles.volunteerButtonText}>Enviar evidência</Text>
         </Pressable>
       )}
     </View>

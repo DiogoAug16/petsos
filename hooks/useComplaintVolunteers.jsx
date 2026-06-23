@@ -63,7 +63,8 @@ export function useComplaintVolunteers(complaintId, { onStatusChanged } = {}) {
       setInitialError(null);
 
       if (!isAuthenticated) {
-        await loadVolunteers();
+        setVolunteers([]);
+        setTotalVolunteers(0);
         setIsVolunteer(false);
         setInitialReady(true);
         return true;

@@ -6,7 +6,8 @@ import { router } from 'expo-router';
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export async function apiFetch(endpoint, options = {}) {
-  const headers = { ...options.headers };
+  const { skipAuthRedirect = false, ...fetchOptions } = options;
+  const headers = { ...fetchOptions.headers };
 
   if (auth.currentUser) {
     try {
@@ -18,11 +19,15 @@ export async function apiFetch(endpoint, options = {}) {
   }
 
   const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
+    ...fetchOptions,
     headers,
   });
 
   if (response.status === 401) {
+    if (skipAuthRedirect) {
+      throw new Error('Não autorizado.');
+    }
+
     try {
       await logoutAuth();
     } finally {

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import ComplaintPhotos from './complaint-photos';
 import { getPhotoPath } from '@/utils/photo.utils';
+import { Ionicons } from '@expo/vector-icons';
 
 export function DetailPhotosCard({ photos, styles }) {
   const validPhotos = useMemo(
@@ -25,7 +26,17 @@ export function DetailPhotosCard({ photos, styles }) {
 
   return (
     <View style={styles.detailCard}>
-      <Text style={styles.detailSectionLabel}>Imagens</Text>
+      <View style={styles.detailSectionHeader}>
+        <View style={styles.detailSectionIcon}>
+          <Ionicons name="images-outline" size={16} color="#FF8C42" />
+        </View>
+        <View>
+          <Text style={styles.detailSectionLabel}>Imagens</Text>
+          <Text style={styles.detailSectionHint}>
+            {visiblePhotos.length} registro{visiblePhotos.length > 1 ? 's' : ''} visual
+          </Text>
+        </View>
+      </View>
       <ComplaintPhotos
         photos={visiblePhotos}
         onPhotoError={(photo) => {

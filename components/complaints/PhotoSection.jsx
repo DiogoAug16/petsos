@@ -1,4 +1,5 @@
 import { useUploadUrl } from '@/hooks/useUploadUrl';
+import { useHapticPress } from '@/hooks/useHapticPress';
 import { FORM_COLORS, formStyles } from '@/styles/form/form.styles';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
@@ -89,6 +90,9 @@ export default function PhotoSection({ photos, setPhotos, maxPhotos = 5 }) {
   const removePhoto = (uriToRemove) => {
     setPhotos((prev) => prev.filter((uri) => uri !== uriToRemove));
   };
+  const handlePickFromGallery = useHapticPress(pickFromGallery);
+  const handleTakePhoto = useHapticPress(takePhoto);
+  const handleRemovePhoto = useHapticPress(removePhoto);
 
   return (
     <View style={formStyles.card}>
@@ -100,11 +104,11 @@ export default function PhotoSection({ photos, setPhotos, maxPhotos = 5 }) {
       </View>
 
       <View style={styles.photoActions}>
-        <Pressable style={styles.secondaryButton} onPress={pickFromGallery}>
+        <Pressable style={styles.secondaryButton} onPress={handlePickFromGallery}>
           <Text style={styles.secondaryButtonText}>Galeria</Text>
         </Pressable>
 
-        <Pressable style={styles.secondaryButton} onPress={takePhoto}>
+        <Pressable style={styles.secondaryButton} onPress={handleTakePhoto}>
           <Text style={styles.secondaryButtonText}>Câmera</Text>
         </Pressable>
       </View>
@@ -112,7 +116,7 @@ export default function PhotoSection({ photos, setPhotos, maxPhotos = 5 }) {
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={styles.photosRow}>
           {photos.length < maxPhotos && (
-            <Pressable style={styles.addPhotoBox} onPress={pickFromGallery}>
+            <Pressable style={styles.addPhotoBox} onPress={handlePickFromGallery}>
               <Text style={styles.addPhotoPlus}>+</Text>
               <Text style={styles.addPhotoText}>Adicionar</Text>
             </Pressable>
@@ -129,7 +133,7 @@ export default function PhotoSection({ photos, setPhotos, maxPhotos = 5 }) {
               />
               <Pressable
                 style={styles.removePhotoButton}
-                onPress={() => removePhoto(uri)}
+                onPress={() => handleRemovePhoto(uri)}
               >
                 <Text style={styles.removePhotoButtonText}>×</Text>
               </Pressable>

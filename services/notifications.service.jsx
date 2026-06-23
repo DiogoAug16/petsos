@@ -15,6 +15,13 @@ export const markNotificationAsRead = (notificationId) => {
     method: 'PATCH',
   });
 };
+
+export const clearNotifications = () => {
+  return apiFetch('/notifications', {
+    method: 'DELETE',
+  });
+};
+
 export const getUnreadCount = () => {
   return apiFetch('/notifications/unread-count');
 };

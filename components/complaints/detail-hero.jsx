@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Modal, Pressable, Text, useWindowDimensions, View } from 'react-native';
 import { useEffect, useRef, useState } from 'react';
 import { useUploadUrl } from '@/hooks/useUploadUrl';
@@ -48,22 +49,42 @@ export function DetailHero({
   return (
     <View style={styles.detailHero}>
       {shouldShowCover ? (
-        <Image
-          source={{ uri: coverPhotoUri }}
-          style={styles.detailHeroImage}
-          contentFit="cover"
-          cachePolicy="memory-disk"
-          transition={120}
-          onError={() => setCoverFailed(true)}
-        />
+        <>
+          <Image
+            source={{ uri: coverPhotoUri }}
+            style={styles.detailHeroImage}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+            transition={120}
+            onError={() => setCoverFailed(true)}
+          />
+          <LinearGradient
+            colors={['rgba(255,246,236,0)', 'rgba(255,246,236,0.64)', '#FFF6EC']}
+            locations={[0, 0.62, 1]}
+            style={styles.detailHeroFade}
+            pointerEvents="none"
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          />
+        </>
       ) : (
         <View style={[styles.detailHeroContent, { backgroundColor: type.photoColor }]}>
+          <View style={styles.detailHeroBlobPrimary} />
+          <View style={styles.detailHeroBlobSecondary} />
+          <View style={styles.detailHeroPawPrint}>
+            <Ionicons name="paw" size={28} color="#FF8C42" />
+          </View>
           <Text style={styles.detailHeroEmoji}>{emoji}</Text>
         </View>
       )}
 
       <View style={styles.detailHeroHeader}>
-        <Pressable style={styles.detailIconButton} onPress={onBack}>
+        <Pressable
+          style={styles.detailIconButton}
+          onPress={onBack}
+          accessibilityRole="button"
+          accessibilityLabel="Voltar"
+        >
           <Ionicons name="arrow-back" size={20} color={theme.text} />
         </Pressable>
         
@@ -73,6 +94,8 @@ export function DetailHero({
             collapsable={false}
             style={styles.detailIconButton}
             onPress={openMenu}
+            accessibilityRole="button"
+            accessibilityLabel="Abrir opções da denúncia"
           >
             <Ionicons name="ellipsis-vertical" size={20} color={theme.text} />
           </Pressable>

@@ -1,10 +1,10 @@
 import { BottomCard } from '@/components/bottom-card/bottom-card';
-import { FabButton } from '@/components/floating-buttons/create-complaint-button';
 import { CenterButton } from '@/components/floating-buttons/map-center-button';
 import { AutocompleteSuggestions } from '@/components/map/autocomplete-suggestions';
 import { ComplaintMarkersLayer } from '@/components/map/complaint-markers-layer';
 import { ComplaintsFilter } from '@/components/map/complaints-filter';
 import { HighlightedCircle } from '@/components/map/highlighted-circle';
+import { MapComplaintPreview } from '@/components/map/map-complaint-preview';
 import { NoResultsBadge } from '@/components/map/no-results-badge';
 import { SearchBar } from '@/components/search-bar/search-bar';
 import { useComplaints } from '@/context/ComplaintsContext';
@@ -17,19 +17,26 @@ import { useMapSearchAutocomplete } from '@/hooks/useMapSearchAutocomplete';
 import { useMapTypeFilter } from '@/hooks/useMapTypeFilter';
 import { useNearbyComplaints } from '@/hooks/useNearbyComplaints';
 import { useVisibleMapComplaints } from '@/hooks/useVisibleMapComplaints';
+import { getDrivingRoute } from '@/services/routes.service';
 import { mapScreenStyles } from '@/styles/mapScreen';
 import { useFocusEffect } from '@react-navigation/native';
-import { useRouter } from 'expo-router';
-import { useCallback, useRef, useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, View } from 'react-native';
-import MapView from 'react-native-maps';
+import MapView, { Polyline } from 'react-native-maps';
 
 export default function MapScreen() {
   const router = useRouter();
+  const { focusLat, focusLng } = useLocalSearchParams();
   const { location } = useLocation();
   const colorScheme = useColorScheme();
   const mapRef = useRef(null);
+  const routeRequestRef = useRef(0);
   const [region, setRegion] = useState(null);
+  const [mapReady, setMapReady] = useState(false);
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const [routeComplaintId, setRouteComplaintId] = useState(null);
+  const [routeCoordinates, setRouteCoordinates] = useState([]);
   const { data: allComplaints = [], refetchSilent } = useComplaints();
 
   const { translateY: buttonsTranslateY, animateTo } =
@@ -38,12 +45,35 @@ export default function MapScreen() {
   const animation = useBottomCardAnimation(160, animateTo);
 
   const { nearbyComplaints, refetchNearby } = useNearbyComplaints(location, 5);
+  const focusRegion = useMemo(() => {
+    const latitude = Number(Array.isArray(focusLat) ? focusLat[0] : focusLat);
+    const longitude = Number(Array.isArray(focusLng) ? focusLng[0] : focusLng);
+
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+    return {
+      latitude,
+      longitude,
+      latitudeDelta: 0.005,
+      longitudeDelta: 0.005,
+    };
+  }, [focusLat, focusLng]);
+
+  const focusCoordinate = focusRegion
+    ? { latitude: focusRegion.latitude, longitude: focusRegion.longitude }
+    : null;
+
+  const focusMapOnComplaint = useCallback(() => {
+    if (!focusRegion || !mapReady) return;
+    mapRef.current?.animateToRegion(focusRegion, 600);
+  }, [focusRegion, mapReady]);
 
   useFocusEffect(
     useCallback(() => {
       refetchNearby();
       refetchSilent();
-    }, [refetchNearby, refetchSilent])
+      const timer = setTimeout(focusMapOnComplaint, 80);
+      return () => clearTimeout(timer);
+    }, [focusMapOnComplaint, refetchNearby, refetchSilent])
   );
 
   const styles = mapScreenStyles(colorScheme);
@@ -51,6 +81,86 @@ export default function MapScreen() {
   const centerOnUser = () => {
     mapRef.current?.animateToRegion(location, 500);
   };
+
+  const selectedCoordinate = useMemo(() => {
+    const latitude = Number(selectedComplaint?.location?.latitude);
+    const longitude = Number(selectedComplaint?.location?.longitude);
+
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+    return { latitude, longitude };
+  }, [selectedComplaint]);
+
+  const selectMapComplaint = useCallback((complaint) => {
+    routeRequestRef.current += 1;
+    setSelectedComplaint(complaint);
+
+    const latitude = Number(complaint?.location?.latitude);
+    const longitude = Number(complaint?.location?.longitude);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
+
+    mapRef.current?.animateToRegion({
+      latitude,
+      longitude,
+      latitudeDelta: 0.005,
+      longitudeDelta: 0.005,
+    }, 450);
+  }, []);
+
+  const clearSelectedComplaint = useCallback(() => {
+    routeRequestRef.current += 1;
+    setSelectedComplaint((current) =>
+      current ? { ...current, __previewHidden: true } : null
+    );
+  }, []);
+
+  const showSelectedRoute = useCallback(async () => {
+    if (!selectedComplaint || !selectedCoordinate) return;
+
+    const selectedComplaintId = selectedComplaint.id ?? selectedComplaint._id;
+    if (!selectedComplaintId) return;
+
+    if (routeComplaintId && routeComplaintId === selectedComplaintId) {
+      routeRequestRef.current += 1;
+      setRouteComplaintId(null);
+      setRouteCoordinates([]);
+      return;
+    }
+
+    const requestId = routeRequestRef.current + 1;
+    routeRequestRef.current = requestId;
+    const start = { latitude: location.latitude, longitude: location.longitude };
+    let nextRoute = [start, selectedCoordinate];
+
+    try {
+      const route = await getDrivingRoute(start, selectedCoordinate);
+      if (route?.length > 1) {
+        nextRoute = route;
+      }
+    } catch (error) {
+      console.warn('OpenRouteService route failed', error?.message);
+    }
+
+    if (requestId !== routeRequestRef.current) return;
+
+    setRouteComplaintId(selectedComplaintId);
+    setRouteCoordinates(nextRoute);
+    mapRef.current?.fitToCoordinates(
+      nextRoute,
+      {
+        edgePadding: { top: 120, right: 64, bottom: 260, left: 64 },
+        animated: true,
+      },
+    );
+  }, [location, routeComplaintId, selectedComplaint, selectedCoordinate]);
+
+  const openSelectedComplaintDetails = useCallback(() => {
+    const complaintId = selectedComplaint?.id ?? selectedComplaint?._id;
+    if (complaintId) router.push(`/complaint/${complaintId}`);
+  }, [router, selectedComplaint]);
+
+  useEffect(() => {
+    focusMapOnComplaint();
+  }, [focusMapOnComplaint]);
 
   const { shouldShowComplaintMarkers, validComplaints } = useVisibleMapComplaints(
     allComplaints,
@@ -92,9 +202,9 @@ export default function MapScreen() {
     handleApplyFilter,
     handleClearFilter,
   } = useMapHandlers({
-    router,
     hideSuggestions,
     closeFilter,
+    selectComplaint: selectMapComplaint,
     toggleFilter,
     applyTypeFilter,
     clearTypeFilter,
@@ -110,13 +220,24 @@ export default function MapScreen() {
         initialRegion={location}
         showsUserLocation
         showsMyLocationButton={false}
+        onMapReady={() => setMapReady(true)}
         onRegionChangeComplete={setRegion}
         onPress={handleMapPress}
       >
-        <HighlightedCircle coordinate={highlightedCoordinate} />
+        <HighlightedCircle
+          coordinate={selectedCoordinate ?? focusCoordinate ?? highlightedCoordinate}
+        />
+
+        {routeCoordinates.length > 1 && (
+          <Polyline
+            coordinates={routeCoordinates}
+            strokeColor="#FF9F1C"
+            strokeWidth={5}
+          />
+        )}
 
         <ComplaintMarkersLayer
-          key={appliedType ?? 'all'}
+          key={`${mapReady ? 'ready' : 'loading'}-${appliedType ?? 'all'}-${filteredComplaints.length}`}
           complaints={filteredComplaints}
           shouldRender={shouldShowComplaintMarkers}
           onMarkerPress={handleComplaintMarkerPress}
@@ -154,12 +275,19 @@ export default function MapScreen() {
         />
       )}
 
+      {selectedComplaint && !selectedComplaint.__previewHidden && !isFilterOpen && (
+        <MapComplaintPreview
+          complaint={selectedComplaint}
+          styles={styles}
+          onClose={clearSelectedComplaint}
+          onDetails={openSelectedComplaintDetails}
+          onRoute={showSelectedRoute}
+          routeActive={routeComplaintId === (selectedComplaint.id ?? selectedComplaint._id)}
+        />
+      )}
+
       <Animated.View style={{ transform: [{ translateY: buttonsTranslateY }] }}>
         <CenterButton style={styles.centerBtn} onPress={centerOnUser} />
-
-        <FabButton
-          style={styles.fab}
-        />
       </Animated.View>
 
       <BottomCard

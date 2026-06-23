@@ -44,7 +44,7 @@ function CommentBody({ comment, isReply, onLike, onReply, styles }) {
             <Ionicons
               name={comment.likedByMe ? 'heart' : 'heart-outline'}
               size={16}
-              color={comment.likedByMe ? '#E24B4A' : '#8A8A8E'}
+              color={comment.likedByMe ? '#E24B4A' : '#8D7D78'}
             />
             <Text style={styles.commentActionText}>{comment.likes || 0}</Text>
           </Pressable>

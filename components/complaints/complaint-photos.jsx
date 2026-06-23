@@ -116,9 +116,9 @@ function PhotoViewerModal({ visible, photos, initialIndex, onClose }) {
 
 const styles = StyleSheet.create({
   photo: {
-    width: 200,
-    height: 150,
-    borderRadius: 12,
+    width: 214,
+    height: 156,
+    borderRadius: 20,
     marginRight: 10,
   },
   modalContainer: {

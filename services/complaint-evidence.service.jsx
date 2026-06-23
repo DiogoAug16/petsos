@@ -8,7 +8,9 @@ export const submitEvidence = (complaintId, formData) => {
 };
 
 export const getEvidences = (complaintId) => {
-  return apiFetch(`/complaints/${complaintId}/evidences`);
+  return apiFetch(`/complaints/${complaintId}/evidences`, {
+    skipAuthRedirect: true,
+  });
 };
 
 export const validateEvidence = (complaintId, { approved, evidenceIds }) => {

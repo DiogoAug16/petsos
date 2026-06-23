@@ -24,7 +24,7 @@ const getInitial = (username) => {
 
 const getAvatarColor = (username) => {
   const normalizedUsername = normalizeUsername(username);
-  if (!normalizedUsername) return '#8A8A8E';
+  if (!normalizedUsername) return '#8D7D78';
 
   const value = normalizedUsername
     .split('')

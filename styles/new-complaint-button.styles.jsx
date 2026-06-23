@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-const ORANGE = '#FF6B35';
+const ORANGE = '#FF9F1C';
 
 export const newComplaintButtonStyles = (colorScheme) => {
   const isDark = colorScheme === 'dark';
@@ -11,9 +11,9 @@ export const newComplaintButtonStyles = (colorScheme) => {
       bottom: 0,
       left: 0,
       right: 0,
-      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
+      backgroundColor: isDark ? '#FFFCF7' : '#FFFFFF',
       borderTopWidth: 0.5,
-      borderTopColor: isDark ? '#2F3749' : '#F0F0F0',
+      borderTopColor: isDark ? '#F0D8BF' : '#F0D8BF',
       paddingTop: 8,
       paddingBottom: 8,
       paddingHorizontal: 16,

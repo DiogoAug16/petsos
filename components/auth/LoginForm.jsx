@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AuthInput from './AuthInput';
 import { useStaggeredAnimation } from '@/hooks/useStaggeredAnimation';
 import { useButtonPulse } from '@/hooks/useButtonPulse';
+import { useHapticPress } from '@/hooks/useHapticPress';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -32,6 +33,9 @@ function LoginForm({
   const buttonStyle = useStaggeredAnimation(4);
   const linkStyle = useStaggeredAnimation(5);
   const pulseStyle = useButtonPulse(isSubmitting);
+  const handleRememberPress = useHapticPress(() => setRememberMe(!rememberMe));
+  const handleSubmitPress = useHapticPress(handleSubmit, 'normal');
+  const handleRegisterPress = useHapticPress(() => router.replace('/(auth)/register'));
 
   return (
     <View style={styles.formCard}>
@@ -80,7 +84,7 @@ function LoginForm({
       <Animated.View style={[styles.optionsRow, optionsStyle]}>
         <Pressable
           style={styles.rememberContainer}
-          onPress={() => setRememberMe(!rememberMe)}
+          onPress={handleRememberPress}
         >
           <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
             {rememberMe && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
@@ -101,7 +105,7 @@ function LoginForm({
             (!isFormValid || isSubmitting) && styles.submitButtonDisabled,
             pulseStyle,
           ]}
-          onPress={handleSubmit}
+          onPress={handleSubmitPress}
           disabled={!isFormValid || isSubmitting}
         >
           <Text style={styles.submitButtonText}>
@@ -115,7 +119,7 @@ function LoginForm({
 
       <Animated.View style={[styles.linkContainer, linkStyle]}>
         <Text style={styles.linkText}>Ainda não tem conta? </Text>
-        <Pressable onPress={() => router.replace('/(auth)/register')}>
+        <Pressable onPress={handleRegisterPress}>
           <Text style={[styles.link, { color: colors.primary }]}>Crie sua conta</Text>
         </Pressable>
       </Animated.View>

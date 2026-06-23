@@ -27,7 +27,7 @@ export function CommentComposer({
         value={text}
         onChangeText={setText}
         placeholder={placeholder}
-        placeholderTextColor="#8A8A8E"
+        placeholderTextColor="#8D7D78"
         multiline
         onFocus={onFocus}
         onBlur={onBlur}

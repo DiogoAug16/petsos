@@ -1,7 +1,8 @@
 import { useRouter } from 'expo-router';
 import { memo } from 'react';
 import { Image } from 'expo-image';
-import { Pressable, Text, View, useColorScheme } from 'react-native';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Pressable, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import { useAddress } from '@/hooks/useAddress';
@@ -52,7 +53,7 @@ function ComplaintNearbyCardComponent({ complaint }) {
             alignItems: 'center',
             padding: 12,
             borderRadius: 20,
-            backgroundColor: colorScheme === 'dark' ? '#242B3D' : '#FFFFFF',
+            backgroundColor: colorScheme === 'dark' ? '#FFFCF7' : '#FFFFFF',
           },
           animatedStyle,
         ]}

@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { Animated, PanResponder } from 'react-native';
 
-const HANDLE_HEIGHT = 24;
+const HANDLE_HEIGHT = 36;
 const SPRING_CONFIG = {
   useNativeDriver: true,
   tension: 80,

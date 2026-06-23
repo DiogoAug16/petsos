@@ -1,26 +1,26 @@
-export const detailCommentsStyles = (colorScheme) => {
-  const isDark = colorScheme === 'dark';
-  const text = isDark ? '#fff' : '#1C1C1E';
-  const muted = '#8A8A8E';
-  const border = isDark ? '#2F3749' : '#F0F0F0';
-  const soft = isDark ? '#2F3749' : '#E8F4F8';
+export const detailCommentsStyles = () => {
+  const text = '#272A3A';
+  const muted = '#8D7D78';
+  const border = '#F0D8BF';
+  const soft = '#FFF6EC';
 
   return {
     commentsSection: {
-      paddingHorizontal: 14,
-      paddingTop: 4,
-      paddingBottom: 20,
-      gap: 12,
+      paddingHorizontal: 16,
+      paddingTop: 8,
+      paddingBottom: 22,
+      gap: 14,
     },
     commentsHeader: {
       flexDirection: 'row',
       alignItems: 'baseline',
       gap: 6,
+      paddingHorizontal: 2,
     },
     commentsTitle: {
       color: text,
-      fontSize: 18,
-      fontWeight: '800',
+      fontSize: 20,
+      fontWeight: '900',
     },
     commentsCount: {
       color: muted,
@@ -35,7 +35,7 @@ export const detailCommentsStyles = (colorScheme) => {
       paddingHorizontal: 12,
       paddingTop: 10,
       paddingBottom: 12,
-      backgroundColor: isDark ? '#1A1F2E' : '#FFFFFF',
+      backgroundColor: '#FFFFFF',
       borderTopWidth: 1,
       borderTopColor: border,
       elevation: 8,
@@ -46,9 +46,9 @@ export const detailCommentsStyles = (colorScheme) => {
     },
     commentComposer: {
       minHeight: 46,
-      backgroundColor: soft,
-      borderRadius: 14,
-      borderWidth: 0.5,
+      backgroundColor: '#FFF6EC',
+      borderRadius: 20,
+      borderWidth: 1,
       borderColor: border,
       flexDirection: 'row',
       alignItems: 'flex-end',
@@ -64,12 +64,12 @@ export const detailCommentsStyles = (colorScheme) => {
       paddingHorizontal: 4,
     },
     commentSendButton: {
-      width: 34,
-      height: 34,
-      borderRadius: 17,
+      width: 44,
+      height: 44,
+      borderRadius: 16,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: '#FF6B35',
+      backgroundColor: '#FF9F1C',
     },
     commentSendButtonDisabled: {
       opacity: 0.45,
@@ -78,15 +78,23 @@ export const detailCommentsStyles = (colorScheme) => {
       color: muted,
       fontSize: 13,
       lineHeight: 19,
-      paddingVertical: 4,
+      padding: 16,
+      backgroundColor: '#FFFFFF',
+      borderWidth: 1,
+      borderColor: border,
+      borderRadius: 22,
     },
     commentComposerAnchor: {
       height: 1,
       width: '100%',
     },
     commentsBlockedBox: {
-      gap: 8,
-      paddingVertical: 6,
+      gap: 10,
+      padding: 16,
+      backgroundColor: '#FFFFFF',
+      borderRadius: 24,
+      borderWidth: 1,
+      borderColor: border,
     },
     commentsBlockedTitle: {
       color: text,
@@ -100,10 +108,10 @@ export const detailCommentsStyles = (colorScheme) => {
     },
     commentsBlockedButton: {
       alignSelf: 'flex-start',
-      minHeight: 36,
-      paddingHorizontal: 14,
+      minHeight: 44,
+      paddingHorizontal: 16,
       borderRadius: 999,
-      backgroundColor: '#FF6B35',
+      backgroundColor: '#FF8C42',
       alignItems: 'center',
       justifyContent: 'center',
       marginTop: 2,
@@ -132,9 +140,15 @@ export const detailCommentsStyles = (colorScheme) => {
       gap: 6,
     },
     commentBubble: {
-      backgroundColor: isDark ? '#2F3749' : '#E8F4F8',
-      borderRadius: 14,
-      padding: 10,
+      backgroundColor: '#FFFFFF',
+      borderRadius: 20,
+      padding: 12,
+      borderWidth: 1,
+      borderColor: '#F0D8BF',
+      shadowColor: '#7A3F12',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.04,
+      shadowRadius: 10,
     },
     commentHeader: {
       flexDirection: 'row',
@@ -158,7 +172,7 @@ export const detailCommentsStyles = (colorScheme) => {
       lineHeight: 20,
     },
     commentMentionText: {
-      color: '#FF6B35',
+      color: '#FF9F1C',
       fontWeight: '800',
     },
     commentActions: {
@@ -204,13 +218,13 @@ export const detailCommentsStyles = (colorScheme) => {
       justifyContent: 'center',
     },
     moreRepliesText: {
-      color: '#FF6B35',
+      color: '#FF9F1C',
       fontSize: 12,
       fontWeight: '800',
     },
     moreCommentsButton: {
-      minHeight: 42,
-      borderRadius: 12,
+      minHeight: 46,
+      borderRadius: 18,
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: soft,
@@ -218,7 +232,7 @@ export const detailCommentsStyles = (colorScheme) => {
       borderColor: border,
     },
     moreCommentsText: {
-      color: '#FF6B35',
+      color: '#FF9F1C',
       fontSize: 13,
       fontWeight: '800',
     },

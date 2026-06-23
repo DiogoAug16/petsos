@@ -1,4 +1,5 @@
 import { ANIMAL_TYPES, COMPLAINT_TYPES } from '@/constants/complaints.constants';
+import { useHapticPress } from '@/hooks/useHapticPress';
 import { FORM_COLORS, formStyles } from '@/styles/form/form.styles';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -10,6 +11,9 @@ export default function ComplaintTypeAnimal({
   onChangeAnimal,
   //onChangeAnimalOther,
 }) {
+  const handleChangeType = useHapticPress(onChangeType);
+  const handleChangeAnimal = useHapticPress(onChangeAnimal);
+
   const renderChip = (item, selectedValue, onSelect, activeColor) => {
     const isActive = item.value === selectedValue;
 
@@ -40,7 +44,7 @@ export default function ComplaintTypeAnimal({
         </Text>
         <View style={styles.chipsContainer}>
           {COMPLAINT_TYPES.map((item) =>
-            renderChip(item, type, onChangeType, FORM_COLORS.orange)
+            renderChip(item, type, handleChangeType, FORM_COLORS.orange)
           )}
         </View>
       </View>
@@ -52,7 +56,7 @@ export default function ComplaintTypeAnimal({
 
         <View style={styles.chipsContainer}>
           {ANIMAL_TYPES.map((item) =>
-            renderChip(item, animal, onChangeAnimal, FORM_COLORS.green)
+            renderChip(item, animal, handleChangeAnimal, FORM_COLORS.green)
           )}
         </View>
 

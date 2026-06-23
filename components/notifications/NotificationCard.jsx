@@ -1,6 +1,9 @@
 import { styles } from '@/styles/notifications/card.styles';
+import { useHaptics } from '@/hooks/useHaptics';
+import { usePressAnimation } from '@/hooks/usePressAnimation';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, Text, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 function formatRelativeTime(createdAt) {
   if (!createdAt) return '';
@@ -32,46 +35,78 @@ function formatRelativeTime(createdAt) {
 
 export function NotificationCard({ notification, onPress }) {
   const isUnread = notification.read === false;
+  const { animatedStyle, onPressIn, onPressOut } = usePressAnimation();
+  const { triggerHaptics } = useHaptics();
+  const handlePressIn = () => {
+    onPressIn();
+    triggerHaptics('soft');
+  };
+  const getIcon = () => {
+    switch (notification.type) {
+      case 'new_comment':
+      case 'comment_group':
+      case 'comment_reply':
+        return 'chatbubble-ellipses-outline';
+      case 'status_change':
+      case 'complaint_resolved':
+      case 'complaint_resolved_community':
+      case 'complaint_closed_community':
+      case 'complaint_rejected_community':
+        return 'checkmark-circle-outline';
+      case 'validation_request':
+        return 'shield-checkmark-outline';
+      default:
+        return isUnread ? 'notifications' : 'notifications-outline';
+    }
+  };
 
   return (
     <Pressable
-      style={[
-        styles.card,
-        isUnread && styles.unreadCard,
-      ]}
+      onPressIn={handlePressIn}
+      onPressOut={onPressOut}
       onPress={() => onPress(notification)}
+      accessibilityRole="button"
+      accessibilityLabel={`Abrir notificação: ${notification.message}`}
     >
-      <View style={styles.iconBox}>
-        <Ionicons
-          name={isUnread ? 'notifications' : 'notifications-outline'}
-          size={22}
-          color={isUnread ? '#F59E0B' : '#6B7280'}
-        />
-      </View>
-
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.message}>
-            {notification.message}
-          </Text>
-
-          {isUnread && <View style={styles.unreadDot} />}
+      <Animated.View
+        style={[
+          styles.card,
+          isUnread && styles.unreadCard,
+          animatedStyle,
+        ]}
+      >
+        <View style={styles.iconBox}>
+          <Ionicons
+            name={getIcon()}
+            size={21}
+            color={isUnread ? '#FF8C42' : '#8D7D78'}
+          />
         </View>
 
-        <View style={styles.footer}>
-          <Text style={styles.time}>
-            {formatRelativeTime(notification.createdAt)}
-          </Text>
+        <View style={styles.content}>
+          <View style={styles.header}>
+            <Text style={styles.message}>
+              {notification.message}
+            </Text>
 
-          {notification.count > 1 && (
-            <View style={styles.countBadge}>
-              <Text style={styles.countText}>
-                {notification.count}
-              </Text>
-            </View>
-          )}
+            {isUnread && <View style={styles.unreadDot} />}
+          </View>
+
+          <View style={styles.footer}>
+            <Text style={styles.time}>
+              {formatRelativeTime(notification.createdAt)}
+            </Text>
+
+            {notification.count > 1 && (
+              <View style={styles.countBadge}>
+                <Text style={styles.countText}>
+                  {notification.count}
+                </Text>
+              </View>
+            )}
+          </View>
         </View>
-      </View>
+      </Animated.View>
     </Pressable>
   );
 }

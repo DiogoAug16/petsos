@@ -3,6 +3,7 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 
@@ -55,25 +56,27 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <ThemeProvider value={AppTheme}>
-      <AuthProvider>
-        <UnreadCountProvider>
-          <AuthPromptProvider>
-            <ComplaintsProvider>
-              <Stack screenOptions={{ detachInactiveScreens: true, animation: 'none' }}>
-                <Stack.Screen name="index" options={{ headerShown: false }} />
-                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="complaint/[id]" options={{ headerShown: false }} />
-                <Stack.Screen name="complaint/create" />
-                <Stack.Screen name="users/[username]" options={{ headerShown: false }} />
-                <Stack.Screen name="notifications/index" options={{ headerShown: false }} />
-              </Stack>
-              <Toast config={toastConfig} topOffset={60} />
-            </ComplaintsProvider>
-          </AuthPromptProvider>
-        </UnreadCountProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider value={AppTheme}>
+        <AuthProvider>
+          <UnreadCountProvider>
+            <AuthPromptProvider>
+              <ComplaintsProvider>
+                <Stack screenOptions={{ detachInactiveScreens: true, animation: 'none' }}>
+                  <Stack.Screen name="index" options={{ headerShown: false }} />
+                  <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                  <Stack.Screen name="complaint/[id]" options={{ headerShown: false }} />
+                  <Stack.Screen name="complaint/create" />
+                  <Stack.Screen name="users/[username]" options={{ headerShown: false }} />
+                  <Stack.Screen name="notifications/index" options={{ headerShown: false }} />
+                </Stack>
+                <Toast config={toastConfig} topOffset={60} />
+              </ComplaintsProvider>
+            </AuthPromptProvider>
+          </UnreadCountProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

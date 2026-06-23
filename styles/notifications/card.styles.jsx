@@ -4,27 +4,27 @@ export const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
-    borderRadius: 14,
+    borderRadius: 22,
     padding: 14,
     marginBottom: 12,
-    borderWidth: 1,
+    borderWidth: 0.75,
     borderColor: '#F0D8BF',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
   },
 
   unreadCard: {
-    backgroundColor: '#FFF7ED',
-    borderColor: '#FDBA74',
+    backgroundColor: '#FFF9F2',
+    borderColor: '#FFB77A',
   },
 
   iconBox: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 44,
+    height: 44,
+    borderRadius: 16,
     backgroundColor: '#FFE8C8',
     alignItems: 'center',
     justifyContent: 'center',
@@ -43,17 +43,20 @@ export const styles = StyleSheet.create({
   message: {
     flex: 1,
     fontSize: 14,
-    color: '#111827',
-    fontWeight: '500',
+    lineHeight: 20,
+    color: '#272A3A',
+    fontWeight: '700',
   },
 
   unreadDot: {
-    width: 9,
-    height: 9,
+    width: 10,
+    height: 10,
     borderRadius: 5,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#FF8C42',
     marginLeft: 8,
     marginTop: 4,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
   },
 
   footer: {
@@ -65,14 +68,15 @@ export const styles = StyleSheet.create({
 
   time: {
     fontSize: 12,
-    color: '#6B7280',
+    color: '#8D7D78',
+    fontWeight: '700',
   },
 
   countBadge: {
     minWidth: 24,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: '#F59E0B',
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#FF8C42',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 8,

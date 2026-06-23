@@ -1,24 +1,60 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
 import { Text, View } from 'react-native';
 import { Marker } from 'react-native-maps';
-import { useColorScheme } from '@/hooks/useColorScheme';
 import { complaintMarkerStyles as styles } from '@/styles/mapScreen/complaint-marker.styles';
 
 export const ComplaintMarker = ({ complaint, onPress }) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-
   const getTheme = (type) => {
     switch (type?.toLowerCase()) {
-      case 'abandono': return '#E74C3C';
-      case 'maus-tratos': return '#E67E22';
-      case 'negligência': return '#1ABC9C';
-      default: return '#E67E22';
+      case 'abandono':
+        return {
+          accent: '#E94B5F',
+          soft: '#FFE2E7',
+        };
+      case 'maus-tratos':
+      case 'maus-tratos fisicos':
+        return {
+          accent: '#FF8C42',
+          soft: '#FFE8C8',
+        };
+      case 'negligência':
+      case 'negligencia':
+        return {
+          accent: '#1A936F',
+          soft: '#DDF7EC',
+        };
+      case 'perdido':
+        return {
+          accent: '#7C5CFF',
+          soft: '#E9E0FF',
+        };
+      default:
+        return {
+          accent: '#FF9F1C',
+          soft: '#FFE8C8',
+        };
     }
   };
 
-  const themeColor = getTheme(complaint.type);
+  const getAnimalIcon = (animal) => {
+    switch (animal?.toLowerCase()) {
+      case 'gato':
+      case 'cat':
+        return '🐱';
+      case 'passaro':
+      case 'pássaro':
+      case 'bird':
+        return '🐦';
+      case 'cachorro':
+      case 'dog':
+        return '🐶';
+      default:
+        return '🐾';
+    }
+  };
+
+  const theme = getTheme(complaint.type);
+  const animalIcon = getAnimalIcon(complaint.animal);
 
   return (
     <Marker
@@ -26,31 +62,26 @@ export const ComplaintMarker = ({ complaint, onPress }) => {
         latitude: Number(complaint.location?.latitude || 0),
         longitude: Number(complaint.location?.longitude || 0),
       }}
-      title={complaint.title}
-      description={complaint.type}
-      onPress={onPress}
+      onPress={(event) => {
+        event.stopPropagation?.();
+        onPress?.();
+      }}
       anchor={{ x: 0.5, y: 1 }}
-      tracksViewChanges={false}
+      tracksViewChanges
     >
-      <View
-        style={[
-          styles.container,
-          {
-            borderColor: themeColor,
-            backgroundColor: isDark ? '#FFFCF7' : '#FFFFFF',
-            shadowOpacity: isDark ? 0.4 : 0.2,
-          },
-        ]}
-      >
-        <MaterialCommunityIcons
-          name={complaint.animal === 'Gato' ? 'cat' : 'dog'}
-          size={16}
-          color={themeColor}
-        />
-        <Text style={[styles.label, { color: isDark ? '#F2F2F7' : '#4A4050' }]} numberOfLines={1}>
-          {complaint.title}
-        </Text>
-        <View style={[styles.arrow, { borderTopColor: themeColor }]} />
+      <View style={styles.markerShell}>
+        <View style={[styles.halo, { backgroundColor: theme.soft }]} />
+        <View style={[styles.pin, { borderColor: theme.accent }]}>
+          <View style={[styles.face, { backgroundColor: theme.soft }]}>
+            <Text style={styles.markerEmoji}>{animalIcon}</Text>
+          </View>
+          <View style={styles.cheeks}>
+            <View style={styles.cheek} />
+            <View style={styles.cheek} />
+          </View>
+          <View style={[styles.statusDot, { backgroundColor: theme.accent }]} />
+        </View>
+        <View style={[styles.pointer, { backgroundColor: '#FFFFFF', borderColor: theme.accent }]} />
       </View>
     </Marker>
   );

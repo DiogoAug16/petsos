@@ -1,5 +1,5 @@
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Animated, KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 
 import { CommentComposer } from "@/components/complaints/comment-composer";
@@ -9,7 +9,6 @@ import { DetailHero } from "@/components/complaints/detail-hero";
 import { DetailInfoBar } from "@/components/complaints/detail-info-bar";
 import { DetailMainCard } from "@/components/complaints/detail-main-card";
 import { DetailMapCard } from "@/components/complaints/detail-map-card";
-import { DetailMapModal } from "@/components/complaints/detail-map-modal";
 import { DetailPhotosCard } from "@/components/complaints/detail-photos-card";
 import { ErrorState } from "@/components/complaints/error-state";
 import { EvidenceSection } from "@/components/complaints/evidence-section";
@@ -41,7 +40,6 @@ export default function ComplaintDetailScreen() {
   const colorScheme = useColorScheme();
   const styles = complaintsStyles(colorScheme);
   const theme = Colors[colorScheme ?? "light"];
-  const mapRef = useRef();
   const {
     isVisible: isCommentComposerVisible,
     animatedStyle: commentComposerAnimatedStyle,
@@ -67,12 +65,10 @@ export default function ComplaintDetailScreen() {
     complaint,
     loading,
     error,
-    showMapModal,
     fetchComplaintDetails,
     handleEdit,
     handleOpenMap,
     handleDelete,
-    handleCloseMapModal,
   } = detail;
 
   const {
@@ -189,39 +185,34 @@ export default function ComplaintDetailScreen() {
             onDelete={handleDelete}
           />
 
-          {!isOwner && (
-            <DetailFollowSummary
-              followers={followers}
-              totalFollowers={totalFollowers}
-              followersLoading={followersLoading}
-              followLoading={followLoading}
-              isFollowing={isFollowing}
-              isOwner={isOwner}
-              onToggleFollow={toggleFollow}
-              styles={styles}
-            />
+          {(!isOwner || complaint?.status === "em_andamento") && (
+            <View style={styles.detailActionDock}>
+              {!isOwner && (
+                <DetailFollowSummary
+                  followers={followers}
+                  totalFollowers={totalFollowers}
+                  followersLoading={followersLoading}
+                  followLoading={followLoading}
+                  isFollowing={isFollowing}
+                  isOwner={isOwner}
+                  onToggleFollow={toggleFollow}
+                  styles={styles}
+                />
+              )}
+
+              <VolunteerButton
+                complaint={complaint}
+                isOwner={isOwner}
+                isVolunteer={isVolunteer}
+                volunteerLoading={volunteerLoading}
+                onToggleVolunteer={toggleVolunteer}
+                onSubmitEvidence={() => setEvidenceModalVisible(true)}
+                styles={styles}
+              />
+            </View>
           )}
 
-          <DetailInfoBar
-            complaint={complaint}
-            status={status}
-            type={type}
-            emoji={emoji}
-            styles={styles}
-            colorScheme={colorScheme}
-          />
-
-          <VolunteerButton
-            complaint={complaint}
-            isOwner={isOwner}
-            isVolunteer={isVolunteer}
-            volunteerLoading={volunteerLoading}
-            onToggleVolunteer={toggleVolunteer}
-            onSubmitEvidence={() => setEvidenceModalVisible(true)}
-            styles={styles}
-          />
-
-          <View style={styles.detailContent}>
+          <View style={styles.detailLeadStack}>
             <DetailMainCard
               complaint={complaint}
               address={address}
@@ -232,12 +223,23 @@ export default function ComplaintDetailScreen() {
               styles={styles}
             />
 
+            <DetailInfoBar
+              complaint={complaint}
+              status={status}
+              type={type}
+              emoji={emoji}
+              styles={styles}
+            />
+          </View>
+
+          <View style={styles.detailContent}>
             <DetailPhotosCard photos={complaint.photos} styles={styles} />
 
             <DetailMapCard
+              complaint={complaint}
               location={complaint.location}
               address={address}
-              onOpenMap={() => handleOpenMap(mapRef)}
+              onOpenMap={handleOpenMap}
               styles={styles}
             />
 
@@ -344,15 +346,6 @@ export default function ComplaintDetailScreen() {
         onCancel={closeUnvolunteerModal}
         onConfirm={confirmUnvolunteer}
         styles={styles}
-      />
-
-      <DetailMapModal
-        visible={showMapModal}
-        location={complaint.location}
-        mapRef={mapRef}
-        onClose={handleCloseMapModal}
-        styles={styles}
-        theme={theme}
       />
 
       <EvidenceSubmitModal

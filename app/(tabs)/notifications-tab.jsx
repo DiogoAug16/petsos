@@ -1,14 +1,20 @@
+import { LoadingState } from '@/components/complaints/loading-state';
 import { NotificationCard } from '@/components/notifications/NotificationCard';
+import { useAuth } from '@/context/AuthContext';
+import { useAuthPrompt } from '@/context/AuthPromptContext';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { useHapticPress } from '@/hooks/useHapticPress';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useUnreadCount } from '@/hooks/useUnreadCount';
-import { useHapticPress } from '@/hooks/useHapticPress';
 import {
   clearNotifications,
   markNotificationAsRead,
 } from '@/services/notifications.service';
 import { styles } from '@/styles/notifications/screen.styles';
+import { profileStyles } from '@/styles/profile.styles';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useCallback } from 'react';
 import {
@@ -20,7 +26,52 @@ import {
   View,
 } from 'react-native';
 
-export default function NotificationsScreen() {
+const NOTIFICATIONS_BACKGROUND = require('@/assets/images/pets/notificacoes_bg.webp');
+
+function GuestNotificationsScreen() {
+  const colorScheme = useColorScheme();
+  const guestStyles = profileStyles(colorScheme);
+  const { openAuthPrompt } = useAuthPrompt();
+
+  const openPrompt = useCallback(() => {
+    openAuthPrompt({
+      title: 'Entre para ver notificações',
+      message:
+        'Faça login ou crie uma conta para receber alertas sobre denúncias que você acompanha.',
+    });
+  }, [openAuthPrompt]);
+
+  useFocusEffect(
+    useCallback(() => {
+      openPrompt();
+    }, [openPrompt]),
+  );
+
+  return (
+    <View style={guestStyles.authRequiredScreen}>
+      <Image
+        source={NOTIFICATIONS_BACKGROUND}
+        style={guestStyles.backgroundImage}
+        contentFit="cover"
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+      />
+      <View style={guestStyles.authRequiredCard}>
+        <Text style={guestStyles.authRequiredTitle}>Notificações</Text>
+        <Text style={guestStyles.authRequiredText}>
+          Entre ou crie sua conta para receber notificações.
+        </Text>
+        <Pressable style={guestStyles.authRequiredButton} onPress={openPrompt}>
+          <Text style={guestStyles.authRequiredButtonText}>
+            Entrar ou criar conta
+          </Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
+function NotificationsContent() {
   const router = useRouter();
   const { reloadUnreadCount } = useUnreadCount();
   const {
@@ -77,6 +128,13 @@ export default function NotificationsScreen() {
 
   return (
     <View style={styles.container}>
+      <Image
+        source={NOTIFICATIONS_BACKGROUND}
+        style={styles.backgroundImage}
+        contentFit="cover"
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+      />
       <View style={styles.header}>
         <View style={styles.headerTop}>
           <View style={styles.headerText}>
@@ -140,4 +198,18 @@ export default function NotificationsScreen() {
       )}
     </View>
   );
+}
+
+export default function NotificationsScreen() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <LoadingState message="Carregando…" />;
+  }
+
+  if (!isAuthenticated) {
+    return <GuestNotificationsScreen />;
+  }
+
+  return <NotificationsContent />;
 }

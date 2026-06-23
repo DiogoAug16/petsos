@@ -10,9 +10,11 @@ import { useComplaintsListControls } from '@/hooks/useComplaintsListControls';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { complaintsStyles } from '@/styles/complaints';
 import { useFocusEffect } from '@react-navigation/native';
+import { Image } from 'expo-image';
 import { useCallback } from 'react';
 import { FlatList, RefreshControl, View } from 'react-native';
 
+const COMPLAINTS_BACKGROUND = require('@/assets/images/pets/denuncias_bg.webp');
 const keyExtractor = (item) => String(item.id);
 const renderItem = ({ item }) => <ComplaintCard complaint={item} />;
 
@@ -41,16 +43,25 @@ export default function ComplaintsScreen() {
 
   return (
     <View style={styles.container}>
-      <ComplaintsHeader count={visibleComplaints.length} />
-      <SearchBar
-        style={styles}
-        value={search}
-        onChangeText={setSearch}
-        showSortBtn
-        sortOrder={sortOrder}
-        onSortPress={toggleSortOrder}
+      <Image
+        source={COMPLAINTS_BACKGROUND}
+        style={styles.complaintsBackgroundImage}
+        contentFit="cover"
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
       />
-      <FilterChips activeChip={activeChip} onChipPress={setActiveChip} />
+      <View style={styles.topPanel}>
+        <ComplaintsHeader count={visibleComplaints.length} />
+        <SearchBar
+          style={styles}
+          value={search}
+          onChangeText={setSearch}
+          showSortBtn
+          sortOrder={sortOrder}
+          onSortPress={toggleSortOrder}
+        />
+        <FilterChips activeChip={activeChip} onChipPress={setActiveChip} />
+      </View>
       {visibleComplaints.length === 0 ? (
         <View style={styles.centered}>
           <EmptyState />

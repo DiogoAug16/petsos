@@ -2,9 +2,7 @@ import { StyleSheet } from 'react-native';
 
 const ORANGE = '#FF9F1C';
 
-export const statesStyles = (colorScheme) => {
-  const isDark = colorScheme === 'dark';
-
+export const statesStyles = () => {
   return StyleSheet.create({
     centered: {
       flex: 1,
@@ -19,6 +17,12 @@ export const statesStyles = (colorScheme) => {
       justifyContent: 'center',
       gap: 12,
       padding: 32,
+      marginHorizontal: 16,
+      marginTop: 24,
+      backgroundColor: '#FFFFFF',
+      borderRadius: 24,
+      borderWidth: 1,
+      borderColor: '#F0D8BF',
     },
 
     loadingText: {
@@ -31,9 +35,9 @@ export const statesStyles = (colorScheme) => {
     },
 
     errorTitle: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: isDark ? '#fff' : '#272A3A',
+      fontSize: 18,
+      fontWeight: '800',
+      color: '#272A3A',
     },
 
     errorMessage: {
@@ -46,7 +50,10 @@ export const statesStyles = (colorScheme) => {
       paddingHorizontal: 24,
       paddingVertical: 10,
       backgroundColor: ORANGE,
-      borderRadius: 12,
+      borderRadius: 16,
+      minHeight: 44,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
 
     retryButtonText: {
@@ -60,9 +67,9 @@ export const statesStyles = (colorScheme) => {
     },
 
     emptyTitle: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: isDark ? '#fff' : '#272A3A',
+      fontSize: 18,
+      fontWeight: '800',
+      color: '#272A3A',
     },
 
     emptySubtitle: {

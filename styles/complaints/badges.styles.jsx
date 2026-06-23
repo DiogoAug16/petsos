@@ -1,66 +1,80 @@
 import { StyleSheet } from 'react-native';
 
 const ORANGE = '#FF9F1C';
-const ORANGE_BG = 'rgba(255,107,53,0.1)';
-const DANGER_BG = 'rgba(230,57,70,0.1)';
-const DANGER_TEXT = '#A32D2D';
-const SUCCESS_BG = 'rgba(26,147,111,0.1)';
-const SUCCESS_TEXT = '#085041';
-const abandono_bg = 'rgb(117, 177, 228, 0.1)'
-const abanadono_text = '#518abb'
-const animal_perdido_bg = 'rgb(241, 221, 72, 0.1)'
-const animal_perdido_text = '#8a7c0e'
-const maus_tratos_bg = 'rgba(230,57,70,0.1)';
-const maus_tratos_text = '#A32D2D';
-const negligencia_bg = 'rgba(237, 102, 114, 0.1)';
-const negligencia_text = '#aa4a4a';
+const ORANGE_BG = '#FFE8C8';
+const DANGER_BG = '#FFE2E7';
+const DANGER_TEXT = '#B83649';
+const SUCCESS_BG = '#DDF7EC';
+const SUCCESS_TEXT = '#1A936F';
+const ABANDONO_BG = '#FFE2E7';
+const ABANDONO_TEXT = '#B83649';
+const ANIMAL_PERDIDO_BG = '#E9E0FF';
+const ANIMAL_PERDIDO_TEXT = '#7C5CFF';
+const MAUS_TRATOS_BG = '#FFE8C8';
+const MAUS_TRATOS_TEXT = '#A84F16';
+const NEGLIGENCIA_BG = '#DDF7EC';
+const NEGLIGENCIA_TEXT = '#1A936F';
 
+const statusPill = {
+  paddingHorizontal: 10,
+  paddingVertical: 4,
+  borderRadius: 999,
+  borderWidth: 0.5,
+  borderColor: 'rgba(255,255,255,0.75)',
+};
 
-export const badgeStyles = (colorScheme) => {
+const statusText = {
+  fontSize: 10,
+  fontWeight: '800',
+};
+
+export const badgeStyles = () => {
   return StyleSheet.create({
     badgeBase: {
       alignSelf: 'flex-start',
-      paddingHorizontal: 8,
-      paddingVertical: 3,
-      borderRadius: 20,
-      marginBottom: 5,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 999,
+      marginBottom: 6,
+      borderWidth: 0.5,
+      borderColor: 'rgba(255,255,255,0.75)',
     },
 
     badgeTextBase: {
       fontSize: 10,
-      fontWeight: '500',
+      fontWeight: '800',
     },
 
     badgeAbandono: {
-      backgroundColor: abandono_bg,
+      backgroundColor: ABANDONO_BG,
     },
 
     badgeAbandonoText: {
-      color: abanadono_text,
+      color: ABANDONO_TEXT,
     },
 
     badgeNegligencia: {
-      backgroundColor: negligencia_bg,
+      backgroundColor: NEGLIGENCIA_BG,
     },
 
     badgeNegligenciaText: {
-      color: negligencia_text,
+      color: NEGLIGENCIA_TEXT,
     },
 
     badgeMausTratos: {
-      backgroundColor: maus_tratos_bg,
+      backgroundColor: MAUS_TRATOS_BG,
     },
 
     badgeMausTratosText: {
-      color: maus_tratos_text,
+      color: MAUS_TRATOS_TEXT,
     },
 
     badgeAnimalPerdido: {
-      backgroundColor: animal_perdido_bg,
+      backgroundColor: ANIMAL_PERDIDO_BG,
     },
 
     badgeAnimalPerdidoText: {
-      color: animal_perdido_text,
+      color: ANIMAL_PERDIDO_TEXT,
     },
 
     badgeOutro: {
@@ -73,67 +87,52 @@ export const badgeStyles = (colorScheme) => {
 
     statusAberto: {
       backgroundColor: DANGER_BG,
-      paddingHorizontal: 10,
-      paddingVertical: 3,
-      borderRadius: 20,
+      ...statusPill,
     },
 
     statusAbertoText: {
-      fontSize: 10,
-      fontWeight: '500',
+      ...statusText,
       color: DANGER_TEXT,
     },
 
     statusResolvido: {
       backgroundColor: SUCCESS_BG,
-      paddingHorizontal: 10,
-      paddingVertical: 3,
-      borderRadius: 20,
+      ...statusPill,
     },
 
     statusResolvidoText: {
-      fontSize: 10,
-      fontWeight: '500',
+      ...statusText,
       color: SUCCESS_TEXT,
     },
 
     statusEmAndamento: {
-      backgroundColor: 'rgba(59,130,246,0.1)',
-      paddingHorizontal: 10,
-      paddingVertical: 3,
-      borderRadius: 20,
+      backgroundColor: '#E7F0FF',
+      ...statusPill,
     },
 
     statusEmAndamentoText: {
-      fontSize: 10,
-      fontWeight: '500',
-      color: '#1D4ED8',
+      ...statusText,
+      color: '#2F64C8',
     },
 
     statusAguardandoValidacao: {
-      backgroundColor: 'rgba(245,158,11,0.1)',
-      paddingHorizontal: 10,
-      paddingVertical: 3,
-      borderRadius: 20,
+      backgroundColor: '#FFF1D6',
+      ...statusPill,
     },
 
     statusAguardandoValidacaoText: {
-      fontSize: 10,
-      fontWeight: '500',
-      color: '#92400E',
+      ...statusText,
+      color: '#A84F16',
     },
 
     statusFechado: {
-      backgroundColor: 'rgba(107,114,128,0.1)',
-      paddingHorizontal: 10,
-      paddingVertical: 3,
-      borderRadius: 20,
+      backgroundColor: '#ECE7E2',
+      ...statusPill,
     },
 
     statusFechadoText: {
-      fontSize: 10,
-      fontWeight: '500',
-      color: '#374151',
+      ...statusText,
+      color: '#6F625B',
     },
   });
 };

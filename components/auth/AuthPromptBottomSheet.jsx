@@ -1,5 +1,18 @@
 import { useHapticPress } from '@/hooks/useHapticPress';
+import { useEffect } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
+
+const DISMISS_TRANSLATION = 90;
+const DISMISS_VELOCITY = 650;
+const DISMISS_OFFSET = 380;
 
 export function AuthPromptBottomSheet({
   visible,
@@ -9,40 +22,75 @@ export function AuthPromptBottomSheet({
   onLogin,
   onRegister,
 }) {
+  const translateY = useSharedValue(0);
   const handleClose = useHapticPress(onClose);
   const handleLogin = useHapticPress(onLogin);
   const handleRegister = useHapticPress(onRegister);
+
+  useEffect(() => {
+    if (visible) {
+      translateY.value = 0;
+    }
+  }, [translateY, visible]);
+
+  const sheetStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }));
+
+  const panGesture = Gesture.Pan()
+    .onUpdate((event) => {
+      translateY.value = Math.max(0, event.translationY);
+    })
+    .onEnd((event) => {
+      const shouldDismiss =
+        event.translationY > DISMISS_TRANSLATION ||
+        event.velocityY > DISMISS_VELOCITY;
+
+      if (shouldDismiss) {
+        translateY.value = withTiming(DISMISS_OFFSET, { duration: 180 }, () => {
+          runOnJS(onClose)();
+        });
+        return;
+      }
+
+      translateY.value = withSpring(0, {
+        damping: 18,
+        stiffness: 220,
+      });
+    });
 
   return (
     <Modal
       transparent
       visible={visible}
-      animationType="slide"
+      animationType="fade"
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
         <Pressable style={styles.backdrop} onPress={handleClose} />
 
-        <View style={styles.sheet}>
-          <View style={styles.handle} />
+        <GestureDetector gesture={panGesture}>
+          <Animated.View style={[styles.sheet, sheetStyle]}>
+            <View style={styles.handle} />
 
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.message}>{message}</Text>
+            <Text style={styles.title}>{title}</Text>
+            <Text style={styles.message}>{message}</Text>
 
-          <View style={styles.actions}>
-            <Pressable style={styles.primaryButton} onPress={handleRegister}>
-              <Text style={styles.primaryText}>Criar conta</Text>
+            <View style={styles.actions}>
+              <Pressable style={styles.primaryButton} onPress={handleRegister}>
+                <Text style={styles.primaryText}>Criar conta</Text>
+              </Pressable>
+
+              <Pressable style={styles.secondaryButton} onPress={handleLogin}>
+                <Text style={styles.secondaryText}>Entrar</Text>
+              </Pressable>
+            </View>
+
+            <Pressable style={styles.cancelButton} onPress={handleClose}>
+              <Text style={styles.cancelText}>Agora não</Text>
             </Pressable>
-
-            <Pressable style={styles.secondaryButton} onPress={handleLogin}>
-              <Text style={styles.secondaryText}>Entrar</Text>
-            </Pressable>
-          </View>
-
-          <Pressable style={styles.cancelButton} onPress={handleClose}>
-            <Text style={styles.cancelText}>Agora não</Text>
-          </Pressable>
-        </View>
+          </Animated.View>
+        </GestureDetector>
       </View>
     </Modal>
   );

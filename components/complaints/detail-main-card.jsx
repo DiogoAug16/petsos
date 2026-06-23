@@ -29,6 +29,13 @@ export function DetailMainCard({
   return (
     <>
       <View style={styles.detailMainCard}>
+        <View style={styles.detailMainKickerRow}>
+          <View style={styles.detailMainPawBadge}>
+            <Ionicons name="paw" size={16} color="#FF8C42" />
+          </View>
+          <Text style={styles.detailMainKicker}>Ficha de cuidado</Text>
+        </View>
+
         <Text style={styles.detailMainTitle}>{complaint.title}</Text>
 
         <View style={styles.detailMainMetaRow}>
@@ -96,6 +103,8 @@ export function DetailMainCard({
               <Pressable
                 style={styles.followersModalCloseButton}
                 onPress={() => setFollowersModalVisible(false)}
+                accessibilityRole="button"
+                accessibilityLabel="Fechar lista de acompanhantes"
               >
                 <Ionicons name="close" size={18} color="#8D7D78" />
               </Pressable>

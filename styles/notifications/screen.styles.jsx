@@ -6,10 +6,20 @@ export const styles = StyleSheet.create({
     backgroundColor: '#FFF6EC',
   },
 
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
+  },
+
   header: {
-    paddingTop: 62,
-    paddingHorizontal: 18,
-    paddingBottom: 12,
+    marginTop: 52,
+    marginHorizontal: 16,
+    marginBottom: 4,
+    padding: 16,
+    borderRadius: 24,
+    borderWidth: 0.75,
+    borderColor: '#F0D8BF',
+    backgroundColor: '#FFE8C8',
+    overflow: 'hidden',
   },
 
   headerTop: {
@@ -39,10 +49,10 @@ export const styles = StyleSheet.create({
   clearButton: {
     width: 44,
     height: 44,
-    borderRadius: 14,
+    borderRadius: 16,
     borderWidth: 0.5,
     borderColor: '#F0D8BF',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(255,255,255,0.82)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -61,11 +71,17 @@ export const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 14,
-    color: '#6B7280',
+    color: '#8D7D78',
   },
 
   emptyBox: {
-    marginTop: 120,
+    marginTop: 92,
+    marginHorizontal: 16,
+    borderRadius: 24,
+    borderWidth: 0.75,
+    borderColor: '#F0D8BF',
+    backgroundColor: '#FFFFFF',
+    padding: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -73,14 +89,14 @@ export const styles = StyleSheet.create({
   emptyTitle: {
     marginTop: 12,
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '900',
     color: '#272A3A',
   },
 
   emptyText: {
     marginTop: 4,
     fontSize: 14,
-    color: '#6B7280',
+    color: '#8D7D78',
     textAlign: 'center',
   },
 });

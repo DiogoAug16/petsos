@@ -1,20 +1,20 @@
 import { useCallback } from 'react';
 
 export function useMapHandlers({
-  router,
   hideSuggestions,
   closeFilter,
+  selectComplaint,
   toggleFilter,
   applyTypeFilter,
   clearTypeFilter,
 }) {
   const handleComplaintMarkerPress = useCallback(
-    (complaintRouteId) => {
-      if (complaintRouteId) {
-        router.push(`/complaint/${complaintRouteId}`);
-      }
+    (complaint) => {
+      hideSuggestions();
+      closeFilter();
+      selectComplaint?.(complaint);
     },
-    [router]
+    [closeFilter, hideSuggestions, selectComplaint]
   );
 
   const handleMapPress = useCallback(() => {

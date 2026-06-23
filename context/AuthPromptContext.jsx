@@ -13,17 +13,19 @@ const AuthPromptContext = createContext(null);
 
 export function AuthPromptProvider({ children }) {
   const router = useRouter();
-  const [prompt, setPrompt] = useState(null);
+  const [prompt, setPrompt] = useState(DEFAULT_PROMPT);
+  const [promptVisible, setPromptVisible] = useState(false);
 
   const openAuthPrompt = useCallback((options = {}) => {
     setPrompt({
       ...DEFAULT_PROMPT,
       ...options,
     });
+    setPromptVisible(true);
   }, []);
 
   const closeAuthPrompt = useCallback(() => {
-    setPrompt(null);
+    setPromptVisible(false);
   }, []);
 
   const goToLogin = useCallback(() => {
@@ -48,9 +50,9 @@ export function AuthPromptProvider({ children }) {
     <AuthPromptContext.Provider value={value}>
       {children}
       <AuthPromptBottomSheet
-        visible={Boolean(prompt)}
-        title={prompt?.title ?? DEFAULT_PROMPT.title}
-        message={prompt?.message ?? DEFAULT_PROMPT.message}
+        visible={promptVisible}
+        title={prompt.title}
+        message={prompt.message}
         onClose={closeAuthPrompt}
         onLogin={goToLogin}
         onRegister={goToRegister}

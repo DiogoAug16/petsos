@@ -188,5 +188,60 @@ export const createLoginStyles = (colors) => {
       fontSize: 14,
       fontWeight: '700',
     },
+    socialSlot: {
+      marginTop: 22,
+      marginBottom: 20,
+      gap: 14,
+    },
+    socialDivider: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      paddingHorizontal: 10,
+    },
+    socialDividerLine: {
+      flex: 1,
+      height: 1,
+      backgroundColor: '#F0D8BF',
+    },
+    socialDividerText: {
+      color: colors.tabIconDefault,
+      fontSize: 13,
+      fontWeight: '700',
+    },
+    socialSoonCard: {
+      minHeight: 64,
+      borderRadius: 20,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      backgroundColor: '#FFFFFF',
+      borderWidth: 1,
+      borderColor: '#F0D8BF',
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    socialSoonIcon: {
+      width: 40,
+      height: 40,
+      borderRadius: 14,
+      backgroundColor: '#FFF6EC',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    socialSoonCopy: {
+      flex: 1,
+    },
+    socialSoonTitle: {
+      color: colors.text,
+      fontSize: 14,
+      fontWeight: '800',
+    },
+    socialSoonText: {
+      marginTop: 2,
+      color: colors.tabIconDefault,
+      fontSize: 12,
+      fontWeight: '600',
+    },
   });
 };

@@ -23,6 +23,7 @@ function ComplaintCardComponent({ complaint }) {
   const styles = complaintsStyles(colorScheme);
   const UPLOAD_URL = useUploadUrl();
   const { type, emoji } = useComplaintConfig(complaint);
+  const complaintId = complaint.id ?? complaint._id;
 
   const resolvePhotoUri = (photoPath) => {
     if (!photoPath) return null;
@@ -45,7 +46,9 @@ function ComplaintCardComponent({ complaint }) {
     <Pressable
       onPressIn={handlePressIn}
       onPressOut={onPressOut}
-      onPress={() => router.push(`/complaint/${complaint.id}`)}
+      onPress={() => complaintId && router.push(`/complaint/${complaintId}`)}
+      accessibilityRole="button"
+      accessibilityLabel={`Abrir denúncia ${complaint.title}`}
     >
       <Animated.View style={[styles.card, animatedStyle]}>
         <View style={styles.cardTop}>
@@ -53,7 +56,7 @@ function ComplaintCardComponent({ complaint }) {
             {coverPhotoUri ? (
               <Image
                 source={{ uri: coverPhotoUri }}
-                style={styles.cardPhoto}
+                style={styles.cardPhotoImage}
                 contentFit="cover"
                 cachePolicy="memory-disk"
                 transition={120}

@@ -22,7 +22,7 @@ export function ComplaintMarkersLayer({
       <ComplaintMarker
         key={markerKey}
         complaint={complaint}
-        onPress={() => onMarkerPress(complaintRouteId)}
+        onPress={() => onMarkerPress(complaint, complaintRouteId)}
       />
     );
   });

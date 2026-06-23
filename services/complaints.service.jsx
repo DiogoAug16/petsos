@@ -6,7 +6,7 @@ const MAX_UPLOAD_DIMENSION = 1280;
 const JPEG_UPLOAD_QUALITY = 0.72;
 
 export async function getComplaints(signal) {
-  const result = await apiFetch("/complaints", { signal });
+  const result = await apiFetch("/complaints", { signal, skipAuthRedirect: true });
 
   if (Array.isArray(result)) return result;
 
@@ -86,7 +86,7 @@ const isLocalPhotoUri = (uri) =>
   /^(file:|content:|ph:|assets-library:)/i.test(String(uri || ""));
 
 export async function getComplaintById(id, signal) {
-  return await apiFetch(`/complaints/${id}`, { signal });
+  return await apiFetch(`/complaints/${id}`, { signal, skipAuthRedirect: true });
 }
 
 export async function deleteComplaint(id) {
@@ -175,7 +175,9 @@ export async function updateComplaintStatus(id, status) {
 }
 
 export async function getNearbyComplaints(lat, lng, radiusKm = 5) {
-  return apiFetch(`/complaints/nearest?lat=${lat}&lng=${lng}&radiusKm=${radiusKm}`);
+  return apiFetch(`/complaints/nearest?lat=${lat}&lng=${lng}&radiusKm=${radiusKm}`, {
+    skipAuthRedirect: true,
+  });
 }
 
 export async function requestComplaintValidation(id, { reasonType, reasonText, evidenceIds }) {

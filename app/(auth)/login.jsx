@@ -8,7 +8,7 @@ import PawBackground from '@/components/auth/PawBackground';
 import AuthHero from '@/components/auth/AuthHero';
 import LoginForm from '@/components/auth/LoginForm';
 import CatAndDogPeeking from '@/components/auth/CatAndDogPeeking';
-import LoginBottomSection from '@/components/auth/LoginBottomSection';
+import LoginSocialPlaceholder from '@/components/auth/LoginSocialPlaceholder';
 import { createLoginStyles } from '@/styles/auth';
 
 export default function LoginScreen() {
@@ -70,7 +70,7 @@ export default function LoginScreen() {
             />
           </View>
 
-          <LoginBottomSection colors={colors} isDark={isDark} />
+          <LoginSocialPlaceholder styles={themedStyles} />
         </ScrollView>
       </Animated.View>
     </KeyboardAvoidingView>

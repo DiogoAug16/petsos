@@ -1,13 +1,12 @@
-export const detailMenuStyles = (colorScheme) => {
-  const isDark = colorScheme === 'dark';
-  const card = isDark ? '#FFFCF7' : '#FFFFFF';
-  const text = isDark ? '#fff' : '#272A3A';
-  const border = isDark ? '#F0D8BF' : '#F0D8BF';
+export const detailMenuStyles = () => {
+  const card = '#FFFFFF';
+  const text = '#272A3A';
+  const border = '#F0D8BF';
 
   return {
     detailIconButtonPlaceholder: {
-      width: 36,
-      height: 36,
+      width: 44,
+      height: 44,
     },
     detailMenuBackdrop: {
       flex: 1,
@@ -24,14 +23,14 @@ export const detailMenuStyles = (colorScheme) => {
       position: 'absolute',
       width: 168,
       backgroundColor: card,
-      borderRadius: 14,
-      borderWidth: 0.5,
+      borderRadius: 18,
+      borderWidth: 1,
       borderColor: border,
       overflow: 'hidden',
       elevation: 8,
-      shadowColor: '#000',
+      shadowColor: '#7A3F12',
       shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.16,
+      shadowOpacity: 0.12,
       shadowRadius: 16,
     },
     detailHeroMenuItem: {
@@ -43,12 +42,12 @@ export const detailMenuStyles = (colorScheme) => {
     },
     detailHeroMenuText: {
       fontSize: 14,
-      fontWeight: '600',
+      fontWeight: '800',
       color: text,
     },
     detailHeroMenuDangerText: {
       fontSize: 14,
-      fontWeight: '600',
+      fontWeight: '800',
       color: '#E24B4A',
     },
   };

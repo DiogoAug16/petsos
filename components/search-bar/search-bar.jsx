@@ -34,13 +34,18 @@ export function SearchBar({
         <Ionicons name="search-outline" size={18} color="#8D7D78" />
         <TextInput
           style={style.searchInput}
-          placeholder="Buscar denúncias..."
+          placeholder="Buscar denúncias…"
           placeholderTextColor="#8D7D78"
           value={value}
           onChangeText={onChangeText}
         />
         {value.length > 0 && (
-          <TouchableOpacity onPress={handleClearPress}>
+          <TouchableOpacity
+            onPress={handleClearPress}
+            accessibilityRole="button"
+            accessibilityLabel="Limpar busca"
+            hitSlop={10}
+          >
             <Ionicons name="close-circle" size={18} color="#8D7D78" />
           </TouchableOpacity>
         )}
@@ -48,6 +53,8 @@ export function SearchBar({
           <TouchableOpacity
             style={[style.filterBtn, filterActive ? style.filterBtnActive : null]}
             onPress={handleFilterPress}
+            accessibilityRole="button"
+            accessibilityLabel="Abrir filtros"
           >
             <Ionicons name="options-outline" size={18} color="#fff" />
           </TouchableOpacity>

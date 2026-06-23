@@ -110,7 +110,7 @@ export function EvidenceValidationSection({
       return;
     }
 
-    if (complaint?.validationRequestedAt && !isOwner) {
+    if (complaint?.validationRequestedAt && !isOwner && (isFollowing || isVolunteer)) {
       loadVoteStatus();
     }
   }, [
@@ -118,6 +118,8 @@ export function EvidenceValidationSection({
     complaint?.status,
     complaint?.validationRequestedAt,
     isOwner,
+    isFollowing,
+    isVolunteer,
     loadVoteStatus,
   ]);
 

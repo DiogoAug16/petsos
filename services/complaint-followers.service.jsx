@@ -17,9 +17,13 @@ export const getIsFollowingComplaint = (complaintId) => {
 };
 
 export const getComplaintFollowersCount = (complaintId) => {
-  return apiFetch(`/complaint-followers/${complaintId}/count`);
+  return apiFetch(`/complaint-followers/${complaintId}/count`, {
+    skipAuthRedirect: true,
+  });
 };
 
 export const getComplaintFollowers = (complaintId) => {
-  return apiFetch(`/complaint-followers/${complaintId}`);
+  return apiFetch(`/complaint-followers/${complaintId}`, {
+    skipAuthRedirect: true,
+  });
 };

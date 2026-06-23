@@ -47,7 +47,17 @@ export function EvidenceSection({ evidences, styles: parentStyles }) {
   return (
     <>
       <View style={parentStyles?.detailCard}>
-        <Text style={parentStyles?.detailSectionLabel}>Evidências</Text>
+        <View style={parentStyles?.detailSectionHeader}>
+          <View style={parentStyles?.detailSectionIcon}>
+            <Ionicons name="shield-checkmark-outline" size={16} color="#FF8C42" />
+          </View>
+          <View>
+            <Text style={parentStyles?.detailSectionLabel}>Evidências</Text>
+            <Text style={parentStyles?.detailSectionHint}>
+              Atualizações enviadas por voluntários
+            </Text>
+          </View>
+        </View>
 
         {sortedEvidences.map((evidence) => {
           const isApproved = evidence.status === 'approved';
@@ -127,16 +137,16 @@ export function EvidenceSection({ evidences, styles: parentStyles }) {
 
 const localStyles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFF6EC',
-    borderRadius: 12,
+    backgroundColor: '#FFFCF7',
+    borderRadius: 20,
     padding: 14,
-    marginBottom: 10,
-    borderWidth: 1.5,
-    borderColor: 'transparent',
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#F0D8BF',
   },
   cardApproved: {
-    backgroundColor: '#ECFDF5',
-    borderColor: '#10B981',
+    backgroundColor: '#DDF7EC',
+    borderColor: '#1A936F',
   },
   cardHeader: {
     flexDirection: 'row',
@@ -151,13 +161,13 @@ const localStyles = StyleSheet.create({
   },
   username: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#555',
+    fontWeight: '800',
+    color: '#272A3A',
   },
   approvedBadge: {
     fontSize: 11,
-    fontWeight: '700',
-    color: '#10B981',
+    fontWeight: '900',
+    color: '#1A936F',
     marginBottom: 6,
   },
   date: {
@@ -174,9 +184,9 @@ const localStyles = StyleSheet.create({
     marginTop: 4,
   },
   photo: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
+    width: 104,
+    height: 104,
+    borderRadius: 16,
     marginRight: 8,
   },
   fullscreenBackdrop: {

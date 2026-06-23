@@ -14,7 +14,6 @@ export function useComplaintDetail(id) {
   const [loading, setLoading] = useState(!complaintFromCache);
   const [error, setError] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [showMapModal, setShowMapModal] = useState(false);
 
   useEffect(() => {
     setError(null);
@@ -70,19 +69,17 @@ export function useComplaintDetail(id) {
     router.push(`/complaint/create?edit=true&id=${id}`);
   }, [router, id]);
 
-  const handleOpenMap = useCallback((mapRef) => {
+  const handleOpenMap = useCallback(() => {
     if (!complaint?.location) return;
 
-    setShowMapModal(true);
-    setTimeout(() => {
-      mapRef.current?.animateToRegion({
-        latitude: complaint.location.latitude,
-        longitude: complaint.location.longitude,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
-      }, 500);
-    }, 100);
-  }, [complaint]);
+    router.push({
+      pathname: '/(tabs)',
+      params: {
+        focusLat: String(complaint.location.latitude),
+        focusLng: String(complaint.location.longitude),
+      },
+    });
+  }, [complaint, router]);
 
   const handleDelete = useCallback(async () => {
     if (isDeleting) return;
@@ -112,10 +109,6 @@ export function useComplaintDetail(id) {
     );
   }, [id, isDeleting, router]);
 
-  const handleCloseMapModal = useCallback(() => {
-    setShowMapModal(false);
-  }, []);
-
   const handleStatusUpdated = useCallback((updatedComplaint) => {
     setComplaint((prev) => ({ ...prev, ...updatedComplaint }));
   }, []);
@@ -124,12 +117,10 @@ export function useComplaintDetail(id) {
     complaint,
     loading,
     error,
-    showMapModal,
     fetchComplaintDetails,
     handleEdit,
     handleOpenMap,
     handleDelete,
-    handleCloseMapModal,
     handleStatusUpdated,
   };
 }

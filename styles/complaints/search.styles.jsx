@@ -1,38 +1,43 @@
 import { StyleSheet } from 'react-native';
 
-export const searchStyles = (colorScheme) => {
-  const isDark = colorScheme === 'dark';
-
+export const searchStyles = () => {
   return StyleSheet.create({
     searchContainer: {
       paddingHorizontal: 16,
-      paddingVertical: 10,
-      backgroundColor: isDark ? '#FFFCF7' : '#FFFFFF',
+      paddingTop: 8,
+      paddingBottom: 6,
     },
 
     searchBar: {
-      backgroundColor: isDark ? '#F0D8BF' : '#FFF6EC',
-      borderRadius: 12,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
+      minHeight: 48,
+      backgroundColor: '#FFFFFF',
+      borderRadius: 18,
+      paddingHorizontal: 14,
+      paddingVertical: 6,
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 8,
-      borderWidth: 0.5,
-      borderColor: isDark ? '#F0D8BF' : '#F0D8BF',
+      gap: 10,
+      borderWidth: 1,
+      borderColor: '#F0D8BF',
+      shadowColor: '#7A3F12',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.04,
+      shadowRadius: 10,
+      elevation: 1,
     },
 
     searchInput: {
       flex: 1,
       fontSize: 14,
-      color: isDark ? '#fff' : '#272A3A',
+      color: '#272A3A',
+      minHeight: 36,
     },
 
     filterBtn: {
-      width: 30,
-      height: 30,
+      width: 44,
+      height: 44,
       backgroundColor: '#FF9F1C',
-      borderRadius: 8,
+      borderRadius: 16,
       alignItems: 'center',
       justifyContent: 'center',
     },

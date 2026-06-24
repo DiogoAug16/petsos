@@ -3,12 +3,14 @@ import { Text, View } from 'react-native';
 import { Marker } from 'react-native-maps';
 import { complaintMarkerStyles as styles } from '@/styles/mapScreen/complaint-marker.styles';
 
+const TRACKS_VIEW_CHANGES_MS = 650;
+
 function ComplaintMarkerComponent({ complaint, onPress }) {
   const [tracksViewChanges, setTracksViewChanges] = useState(true);
 
   useEffect(() => {
     setTracksViewChanges(true);
-    const timer = setTimeout(() => setTracksViewChanges(false), 700);
+    const timer = setTimeout(() => setTracksViewChanges(false), TRACKS_VIEW_CHANGES_MS);
     return () => clearTimeout(timer);
   }, [complaint.id, complaint.type, complaint.animal]);
 

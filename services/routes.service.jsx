@@ -11,7 +11,7 @@ export async function getDrivingRoute(start, end) {
   const route = await apiFetch(`/routes/driving?${params}`, {
     skipAuthRedirect: true,
   }).catch(() => null);
-  const coordinates = route?.coordinates;
+  const coordinates = route?.data?.coordinates ?? route?.coordinates;
   if (!Array.isArray(coordinates)) return null;
 
   return coordinates

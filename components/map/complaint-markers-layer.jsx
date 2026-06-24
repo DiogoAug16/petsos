@@ -1,6 +1,6 @@
 import { ComplaintMarker } from '@/components/map/complaint-marker';
 
-const MAX_MARKERS = 120;
+const MAX_MARKERS = 150;
 
 export function ComplaintMarkersLayer({
   complaints = [],

@@ -7,6 +7,11 @@ import { useCallback, useEffect, useState } from 'react';
 
 const EMPTY_SUMMARY = { total: 0, resolved: 0 };
 
+const normalizeSummary = (summary) => ({
+  total: Number(summary?.total ?? 0),
+  resolved: Number(summary?.resolved ?? 0),
+});
+
 export function usePublicProfile(username, { includeFollowedComplaints = true } = {}) {
   const [profile, setProfile] = useState(null);
   const [followedComplaints, setFollowedComplaints] = useState([]);
@@ -14,6 +19,28 @@ export function usePublicProfile(username, { includeFollowedComplaints = true } 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
+
+  const fetchProfilePayload = useCallback(async () => {
+    const [profileResult, summaryResult, followedResult] = await Promise.all([
+      getPublicUserProfile(username),
+      getUserFollowedComplaintsSummary(username),
+      includeFollowedComplaints
+        ? getUserFollowedComplaints(username)
+        : Promise.resolve([]),
+    ]);
+
+    return {
+      profile: profileResult,
+      followedComplaints: followedResult,
+      followedSummary: normalizeSummary(summaryResult),
+    };
+  }, [includeFollowedComplaints, username]);
+
+  const applyProfilePayload = useCallback((payload) => {
+    setProfile(payload.profile);
+    setFollowedComplaints(payload.followedComplaints);
+    setFollowedSummary(payload.followedSummary);
+  }, []);
 
   const loadProfile = useCallback(
     async ({ silent = false } = {}) => {
@@ -34,26 +61,7 @@ export function usePublicProfile(username, { includeFollowedComplaints = true } 
         }
         setError(null);
 
-        const [profileResult, followedResult] = await Promise.all([
-          getPublicUserProfile(username),
-          includeFollowedComplaints
-            ? getUserFollowedComplaints(username)
-            : getUserFollowedComplaintsSummary(username),
-        ]);
-
-        setProfile(profileResult);
-        if (includeFollowedComplaints) {
-          setFollowedComplaints(followedResult);
-          setFollowedSummary({
-            total: followedResult.length,
-            resolved: followedResult.filter((complaint) =>
-              ['resolvido', 'resolved'].includes(complaint?.status)
-            ).length,
-          });
-        } else {
-          setFollowedComplaints([]);
-          setFollowedSummary(followedResult);
-        }
+        applyProfilePayload(await fetchProfilePayload());
       } catch (err) {
         setError(err?.message ?? 'Não foi possível carregar o perfil.');
       } finally {
@@ -61,7 +69,7 @@ export function usePublicProfile(username, { includeFollowedComplaints = true } 
         setRefreshing(false);
       }
     },
-    [includeFollowedComplaints, username],
+    [applyProfilePayload, fetchProfilePayload, username],
   );
 
   const refresh = useCallback(() => {
@@ -71,27 +79,11 @@ export function usePublicProfile(username, { includeFollowedComplaints = true } 
   const softReload = useCallback(async () => {
     if (!username) return;
     try {
-      const [profileResult, followedResult] = await Promise.all([
-        getPublicUserProfile(username),
-        includeFollowedComplaints
-          ? getUserFollowedComplaints(username)
-          : getUserFollowedComplaintsSummary(username),
-      ]);
-      setProfile(profileResult);
-      if (includeFollowedComplaints) {
-        setFollowedComplaints(followedResult);
-        setFollowedSummary({
-          total: followedResult.length,
-          resolved: followedResult.filter((complaint) =>
-            ['resolvido', 'resolved'].includes(complaint?.status)
-          ).length,
-        });
-      } else {
-        setFollowedComplaints([]);
-        setFollowedSummary(followedResult);
-      }
-    } catch {}
-  }, [includeFollowedComplaints, username]);
+      applyProfilePayload(await fetchProfilePayload());
+    } catch (error) {
+      console.warn('Erro ao recarregar perfil público', error?.message);
+    }
+  }, [applyProfilePayload, fetchProfilePayload, username]);
 
   useEffect(() => {
     loadProfile();

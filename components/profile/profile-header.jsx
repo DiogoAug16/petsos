@@ -5,7 +5,7 @@ import { Alert, Modal, Pressable, Text, View } from 'react-native';
 
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { useAuth } from '@/context/AuthContext';
-import { getJoinedYear } from '@/utils/profile.utils';
+import { getJoinedYear } from '@/utils/profile/profile.utils';
 
 export function ProfileHeader({
   profile,

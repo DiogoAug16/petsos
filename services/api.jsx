@@ -1,6 +1,6 @@
 import { auth } from '@/config/firebase';
-import { deleteAuthToken } from '@/services/auth-token.service';
-import { logout as logoutAuth } from '@/services/auth.service';
+import { deleteAuthToken } from '@/services/auth/auth-token.service';
+import { logout as logoutAuth } from '@/services/auth/auth.service';
 import { router } from 'expo-router';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;

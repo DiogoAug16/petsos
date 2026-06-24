@@ -1,4 +1,4 @@
-import { useHapticPress } from '@/hooks/useHapticPress';
+import { useHapticPress } from '@/hooks/ui/useHapticPress';
 import { useEffect } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';

@@ -1,4 +1,4 @@
-import { useHaptics } from '@/hooks/useHaptics.jsx';
+import { useHaptics } from '@/hooks/ui/useHaptics.jsx';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
 

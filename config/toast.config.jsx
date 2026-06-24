@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { toastStyles } from '@/styles/toast.styles';
+import { toastStyles } from '@/styles/common/toast.styles';
 
 export const toastConfig = {
   success: ({ text1, text2 }) => (

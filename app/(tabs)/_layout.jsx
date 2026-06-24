@@ -5,10 +5,10 @@ import Animated from 'react-native-reanimated';
 
 import { AnimatedTabIcon } from '@/components/bottom-card/animated-tab-icon';
 import { useRequireAuth } from '@/context/AuthPromptContext';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { useHaptics } from '@/hooks/useHaptics';
-import { usePressAnimation } from '@/hooks/usePressAnimation';
-import { useUnreadCount } from '@/hooks/useUnreadCount';
+import { useColorScheme } from '@/hooks/ui/useColorScheme';
+import { useHaptics } from '@/hooks/ui/useHaptics';
+import { usePressAnimation } from '@/hooks/ui/usePressAnimation';
+import { useUnreadCount } from '@/hooks/notifications/useUnreadCount';
 import Colors from '@/styles/theme/Colors';
 
 function ProfileTabIcon({ color, focused }) {

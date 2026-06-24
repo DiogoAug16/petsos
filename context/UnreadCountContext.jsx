@@ -1,5 +1,5 @@
 import { useAuth } from '@/context/AuthContext';
-import { getUnreadCount } from '@/services/notifications.service';
+import { getUnreadCount } from '@/services/notifications/notifications.service';
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 

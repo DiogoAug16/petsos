@@ -1,6 +1,6 @@
 import Colors from '@/styles/theme/Colors';
-import { useHapticPress } from '@/hooks/useHapticPress';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useHapticPress } from '@/hooks/ui/useHapticPress';
+import { useColorScheme } from '@/hooks/ui/useColorScheme';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 export default function Button({

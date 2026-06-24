@@ -4,9 +4,9 @@ import Animated from 'react-native-reanimated';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AuthInput from './AuthInput';
-import { useStaggeredAnimation } from '@/hooks/useStaggeredAnimation';
-import { useButtonPulse } from '@/hooks/useButtonPulse';
-import { useHapticPress } from '@/hooks/useHapticPress';
+import { useStaggeredAnimation } from '@/hooks/ui/useStaggeredAnimation';
+import { useButtonPulse } from '@/hooks/ui/useButtonPulse';
+import { useHapticPress } from '@/hooks/ui/useHapticPress';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 

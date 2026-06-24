@@ -4,13 +4,13 @@ import { useRouter } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
-import { useAddress } from '@/hooks/useAddress';
-import { useComplaintConfig } from '@/hooks/useComplaintConfig';
-import { useHaptics } from '@/hooks/useHaptics';
-import { usePressAnimation } from '@/hooks/usePressAnimation';
-import { useUploadUrl } from '@/hooks/useUploadUrl';
-import { buildUploadPhotoUri, getComplaintCoverPhoto } from '@/utils/photo.utils';
-import { cleanStatusLabel } from '@/utils/status.utils';
+import { useAddress } from '@/hooks/complaints/useAddress';
+import { useComplaintConfig } from '@/hooks/complaints/useComplaintConfig';
+import { useHaptics } from '@/hooks/ui/useHaptics';
+import { usePressAnimation } from '@/hooks/ui/usePressAnimation';
+import { useUploadUrl } from '@/hooks/shared/useUploadUrl';
+import { buildUploadPhotoUri, getComplaintCoverPhoto } from '@/utils/media/photo.utils';
+import { cleanStatusLabel } from '@/utils/complaints/status.utils';
 
 export function ProfileComplaintCard({ complaint, styles }) {
   const router = useRouter();

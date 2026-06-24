@@ -1,4 +1,4 @@
-import { AUTH_ERRORS } from '@/constants/error.messages.constants';
+import { AUTH_ERRORS } from '@/constants/errors/error.messages.constants';
 import { z } from 'zod';
 
 export const registerSchema = z

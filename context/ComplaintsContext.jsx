@@ -1,5 +1,5 @@
 // context/ComplaintsContext.jsx
-import { useComplaintsFetch } from '@/hooks/useComplaintsFetch';
+import { useComplaintsFetch } from '@/hooks/complaints/useComplaintsFetch';
 import { createContext, useContext, useEffect } from 'react';
 
 const ComplaintsContext = createContext(null);

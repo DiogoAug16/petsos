@@ -1,7 +1,7 @@
-import { FILTER_CHIPS } from '@/constants/complaints.constants';
-import { filterChipsStyles } from '@/styles/filter-chips.style';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { useHaptics } from '@/hooks/useHaptics';
+import { FILTER_CHIPS } from '@/constants/complaints/complaints.constants';
+import { filterChipsStyles } from '@/styles/common/filter-chips.style';
+import { useColorScheme } from '@/hooks/ui/useColorScheme';
+import { useHaptics } from '@/hooks/ui/useHaptics';
 import { ScrollView, Text, TouchableOpacity } from 'react-native';
 
 export function FilterChips({ activeChip = null, onChipPress }) {

@@ -1,6 +1,6 @@
 import { auth } from '@/config/firebase';
-import { deleteAuthToken, saveFirebaseUserToken } from '@/services/auth-token.service';
-import * as authService from '@/services/auth.service';
+import { deleteAuthToken, saveFirebaseUserToken } from '@/services/auth/auth-token.service';
+import * as authService from '@/services/auth/auth.service';
 import { onAuthStateChanged } from 'firebase/auth';
 import { createContext, useContext, useEffect, useState } from 'react';
 

@@ -9,7 +9,7 @@ import { useComplaintConfig } from '@/hooks/useComplaintConfig';
 import { useHaptics } from '@/hooks/useHaptics';
 import { usePressAnimation } from '@/hooks/usePressAnimation';
 import { useUploadUrl } from '@/hooks/useUploadUrl';
-import { buildUploadPhotoUri } from '@/utils/photo.utils';
+import { buildUploadPhotoUri, getComplaintCoverPhoto } from '@/utils/photo.utils';
 import { cleanStatusLabel } from '@/utils/status.utils';
 
 export function ProfileComplaintCard({ complaint, styles }) {
@@ -20,7 +20,10 @@ export function ProfileComplaintCard({ complaint, styles }) {
   const { status, type, emoji } = useComplaintConfig(complaint);
   const uploadUrl = useUploadUrl();
 
-  const photoUri = buildUploadPhotoUri(complaint.photos?.[0], uploadUrl);
+  const photoUri = buildUploadPhotoUri(
+    getComplaintCoverPhoto(complaint, { preferThumbnail: true }),
+    uploadUrl
+  );
   const handlePressIn = () => {
     onPressIn();
     triggerHaptics('soft');
@@ -41,7 +44,7 @@ export function ProfileComplaintCard({ complaint, styles }) {
               source={{ uri: photoUri }}
               style={styles.cardThumb}
               contentFit="cover"
-              cachePolicy="memory-disk"
+              cachePolicy="disk"
               transition={120}
             />
           ) : (

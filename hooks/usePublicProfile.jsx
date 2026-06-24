@@ -1,12 +1,16 @@
 import {
   getPublicUserProfile,
   getUserFollowedComplaints,
+  getUserFollowedComplaintsSummary,
 } from '@/services/users.service';
 import { useCallback, useEffect, useState } from 'react';
 
-export function usePublicProfile(username) {
+const EMPTY_SUMMARY = { total: 0, resolved: 0 };
+
+export function usePublicProfile(username, { includeFollowedComplaints = true } = {}) {
   const [profile, setProfile] = useState(null);
   const [followedComplaints, setFollowedComplaints] = useState([]);
+  const [followedSummary, setFollowedSummary] = useState(EMPTY_SUMMARY);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
@@ -16,6 +20,7 @@ export function usePublicProfile(username) {
       if (!username) {
         setProfile(null);
         setFollowedComplaints([]);
+        setFollowedSummary(EMPTY_SUMMARY);
         setError('Perfil não encontrado.');
         setLoading(false);
         return;
@@ -29,13 +34,26 @@ export function usePublicProfile(username) {
         }
         setError(null);
 
-        const [profileResult, complaintsResult] = await Promise.all([
+        const [profileResult, followedResult] = await Promise.all([
           getPublicUserProfile(username),
-          getUserFollowedComplaints(username),
+          includeFollowedComplaints
+            ? getUserFollowedComplaints(username)
+            : getUserFollowedComplaintsSummary(username),
         ]);
 
         setProfile(profileResult);
-        setFollowedComplaints(complaintsResult);
+        if (includeFollowedComplaints) {
+          setFollowedComplaints(followedResult);
+          setFollowedSummary({
+            total: followedResult.length,
+            resolved: followedResult.filter((complaint) =>
+              ['resolvido', 'resolved'].includes(complaint?.status)
+            ).length,
+          });
+        } else {
+          setFollowedComplaints([]);
+          setFollowedSummary(followedResult);
+        }
       } catch (err) {
         setError(err?.message ?? 'Não foi possível carregar o perfil.');
       } finally {
@@ -43,7 +61,7 @@ export function usePublicProfile(username) {
         setRefreshing(false);
       }
     },
-    [username],
+    [includeFollowedComplaints, username],
   );
 
   const refresh = useCallback(() => {
@@ -53,14 +71,27 @@ export function usePublicProfile(username) {
   const softReload = useCallback(async () => {
     if (!username) return;
     try {
-      const [profileResult, complaintsResult] = await Promise.all([
+      const [profileResult, followedResult] = await Promise.all([
         getPublicUserProfile(username),
-        getUserFollowedComplaints(username),
+        includeFollowedComplaints
+          ? getUserFollowedComplaints(username)
+          : getUserFollowedComplaintsSummary(username),
       ]);
       setProfile(profileResult);
-      setFollowedComplaints(complaintsResult);
+      if (includeFollowedComplaints) {
+        setFollowedComplaints(followedResult);
+        setFollowedSummary({
+          total: followedResult.length,
+          resolved: followedResult.filter((complaint) =>
+            ['resolvido', 'resolved'].includes(complaint?.status)
+          ).length,
+        });
+      } else {
+        setFollowedComplaints([]);
+        setFollowedSummary(followedResult);
+      }
     } catch {}
-  }, [username]);
+  }, [includeFollowedComplaints, username]);
 
   useEffect(() => {
     loadProfile();
@@ -69,6 +100,7 @@ export function usePublicProfile(username) {
   return {
     profile,
     followedComplaints,
+    followedSummary,
     loading,
     refreshing,
     error,

@@ -18,3 +18,11 @@ export const buildUploadPhotoUri = (photo, uploadUrl) => {
   const normalizedPath = photoPath.startsWith('/') ? photoPath : `/${photoPath}`;
   return `${baseUrl}${normalizedPath}`;
 };
+
+export const getComplaintCoverPhoto = (complaint, { preferThumbnail = false } = {}) => {
+  if (!complaint) return null;
+  if (preferThumbnail) {
+    return complaint.thumbnailPhotos?.[0] ?? complaint.photos?.[0] ?? null;
+  }
+  return complaint.photos?.[0] ?? complaint.thumbnailPhotos?.[0] ?? null;
+};

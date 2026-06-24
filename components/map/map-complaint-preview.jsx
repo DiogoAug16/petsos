@@ -4,7 +4,7 @@ import { Pressable, Text, View } from 'react-native';
 
 import { useComplaintConfig } from '@/hooks/useComplaintConfig';
 import { useUploadUrl } from '@/hooks/useUploadUrl';
-import { buildUploadPhotoUri } from '@/utils/photo.utils';
+import { buildUploadPhotoUri, getComplaintCoverPhoto } from '@/utils/photo.utils';
 
 export function MapComplaintPreview({
   complaint,
@@ -16,7 +16,10 @@ export function MapComplaintPreview({
 }) {
   const { type, emoji } = useComplaintConfig(complaint);
   const uploadUrl = useUploadUrl();
-  const coverPhotoUri = buildUploadPhotoUri(complaint?.photos?.[0], uploadUrl);
+  const coverPhotoUri = buildUploadPhotoUri(
+    getComplaintCoverPhoto(complaint, { preferThumbnail: true }),
+    uploadUrl
+  );
 
   if (!complaint) return null;
 
@@ -38,7 +41,7 @@ export function MapComplaintPreview({
               source={{ uri: coverPhotoUri }}
               style={styles.markerPreviewImage}
               contentFit="cover"
-              cachePolicy="memory-disk"
+              cachePolicy="disk"
               transition={120}
             />
           ) : (

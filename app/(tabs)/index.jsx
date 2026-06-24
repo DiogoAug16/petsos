@@ -7,16 +7,15 @@ import { HighlightedCircle } from '@/components/map/highlighted-circle';
 import { MapComplaintPreview } from '@/components/map/map-complaint-preview';
 import { NoResultsBadge } from '@/components/map/no-results-badge';
 import { SearchBar } from '@/components/search-bar/search-bar';
-import { useComplaints } from '@/context/ComplaintsContext';
 import { useBottomCardAnimation } from '@/hooks/useBottomCardAnimation';
 import { useColorScheme } from '@/hooks/useColorScheme.jsx';
 import { useFloatingButtonsAnimation } from '@/hooks/useFloatingButtonsAnimation';
 import { useLocation } from '@/hooks/useLocation.jsx';
 import { useMapHandlers } from '@/hooks/useMapHandlers';
+import { useMapComplaints } from '@/hooks/useMapComplaints';
 import { useMapSearchAutocomplete } from '@/hooks/useMapSearchAutocomplete';
 import { useMapTypeFilter } from '@/hooks/useMapTypeFilter';
 import { useNearbyComplaints } from '@/hooks/useNearbyComplaints';
-import { useVisibleMapComplaints } from '@/hooks/useVisibleMapComplaints';
 import { getDrivingRoute } from '@/services/routes.service';
 import { mapScreenStyles } from '@/styles/mapScreen';
 import { useFocusEffect } from '@react-navigation/native';
@@ -37,7 +36,6 @@ export default function MapScreen() {
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [routeComplaintId, setRouteComplaintId] = useState(null);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
-  const { data: allComplaints = [], refetchSilent } = useComplaints();
 
   const { translateY: buttonsTranslateY, animateTo } =
     useFloatingButtonsAnimation();
@@ -70,10 +68,9 @@ export default function MapScreen() {
   useFocusEffect(
     useCallback(() => {
       refetchNearby();
-      refetchSilent();
       const timer = setTimeout(focusMapOnComplaint, 80);
       return () => clearTimeout(timer);
-    }, [focusMapOnComplaint, refetchNearby, refetchSilent])
+    }, [focusMapOnComplaint, refetchNearby])
   );
 
   const styles = mapScreenStyles(colorScheme);
@@ -162,10 +159,10 @@ export default function MapScreen() {
     focusMapOnComplaint();
   }, [focusMapOnComplaint]);
 
-  const { shouldShowComplaintMarkers, validComplaints } = useVisibleMapComplaints(
-    allComplaints,
-    region
-  );
+  const {
+    complaints: mapComplaints,
+    shouldShowComplaintMarkers,
+  } = useMapComplaints(region ?? location);
 
   const {
     selectedType,
@@ -178,7 +175,7 @@ export default function MapScreen() {
     clearTypeFilter,
     toggleFilter,
     closeFilter,
-  } = useMapTypeFilter(validComplaints);
+  } = useMapTypeFilter(mapComplaints);
 
   const {
     searchText,

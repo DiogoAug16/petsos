@@ -6,6 +6,10 @@ import { router } from 'expo-router';
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export async function apiFetch(endpoint, options = {}) {
+  if (!API_URL) {
+    throw new Error('EXPO_PUBLIC_API_URL não configurada.');
+  }
+
   const { skipAuthRedirect = false, ...fetchOptions } = options;
   const headers = { ...fetchOptions.headers };
 
@@ -38,8 +42,13 @@ export async function apiFetch(endpoint, options = {}) {
   }
 
   if (!response.ok) {
-    throw new Error(`Erro ${response.status}: ${response.statusText}`);
+    const errorBody = await response.json().catch(() => null);
+    const message =
+      errorBody?.message || `Erro ${response.status}: ${response.statusText}`;
+    throw new Error(message);
   }
+
+  if (response.status === 204) return null;
 
   return response.json();
 }

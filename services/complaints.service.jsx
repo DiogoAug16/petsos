@@ -5,13 +5,38 @@ import { apiFetch } from "./api";
 const MAX_UPLOAD_DIMENSION = 1280;
 const JPEG_UPLOAD_QUALITY = 0.72;
 
-export async function getComplaints(signal) {
-  const result = await apiFetch("/complaints", { signal, skipAuthRedirect: true });
+export async function getComplaints({ signal, cursor, limit = 50 } = {}) {
+  const params = new URLSearchParams({ limit: String(limit) });
+  if (cursor) params.set('cursor', cursor);
 
-  if (Array.isArray(result)) return result;
+  const result = await apiFetch(`/complaints?${params}`, {
+    signal,
+    skipAuthRedirect: true,
+  });
 
-  const arrayKey = Object.keys(result).find((key) => Array.isArray(result[key]));
-  return arrayKey ? result[arrayKey] : [];
+  if (Array.isArray(result)) {
+    return {
+      items: result,
+      pageInfo: {
+        limit,
+        hasMore: false,
+        nextCursor: null,
+        totalItems: result.length,
+      },
+    };
+  }
+
+  const data = result?.data ?? result;
+  const items = Array.isArray(data?.items) ? data.items : [];
+  return {
+    items,
+    pageInfo: data?.pageInfo ?? {
+      limit,
+      hasMore: false,
+      nextCursor: null,
+      totalItems: items.length,
+    },
+  };
 }
 
 //Envio do Formulario de criação de denúncia para o backend
@@ -178,6 +203,28 @@ export async function getNearbyComplaints(lat, lng, radiusKm = 5) {
   return apiFetch(`/complaints/nearest?lat=${lat}&lng=${lng}&radiusKm=${radiusKm}`, {
     skipAuthRedirect: true,
   });
+}
+
+export async function getMapComplaints(region, signal) {
+  if (!region) return [];
+
+  const north = Number(region.latitude) + Number(region.latitudeDelta) / 2;
+  const south = Number(region.latitude) - Number(region.latitudeDelta) / 2;
+  const east = Number(region.longitude) + Number(region.longitudeDelta) / 2;
+  const west = Number(region.longitude) - Number(region.longitudeDelta) / 2;
+  const params = new URLSearchParams({
+    north: String(north),
+    south: String(south),
+    east: String(east),
+    west: String(west),
+    limit: '120',
+  });
+  const response = await apiFetch(`/complaints/map?${params}`, {
+    signal,
+    skipAuthRedirect: true,
+  });
+  const data = response?.data ?? response;
+  return Array.isArray(data) ? data : [];
 }
 
 export async function requestComplaintValidation(id, { reasonType, reasonText, evidenceIds }) {

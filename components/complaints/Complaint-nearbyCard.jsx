@@ -12,6 +12,7 @@ import { usePressAnimation } from '@/hooks/usePressAnimation';
 import { useUploadUrl } from '@/hooks/useUploadUrl';
 import { complaintsStyles } from '@/styles/complaints';
 import { formatDate } from '@/utils/date.utils';
+import { getComplaintCoverPhoto } from '@/utils/photo.utils';
 
 function ComplaintNearbyCardComponent({ complaint }) {
   const { address, loadingAddress } = useAddress(complaint.location);
@@ -33,7 +34,9 @@ function ComplaintNearbyCardComponent({ complaint }) {
     return `${baseUrl}${normalizedPath}`;
   };
 
-  const coverPhotoUri = resolvePhotoUri(complaint.photos?.[0]);
+  const coverPhotoUri = resolvePhotoUri(
+    getComplaintCoverPhoto(complaint, { preferThumbnail: true })
+  );
 
   const handlePressIn = () => {
     onPressIn();
@@ -74,7 +77,7 @@ function ComplaintNearbyCardComponent({ complaint }) {
               source={{ uri: coverPhotoUri }}
               style={{ width: '100%', height: '100%', borderRadius: 14 }}
               contentFit="cover"
-              cachePolicy="memory-disk"
+              cachePolicy="disk"
               transition={120}
             />
           ) : (

@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { Marker } from 'react-native-maps';
 import { complaintMarkerStyles as styles } from '@/styles/mapScreen/complaint-marker.styles';
 
-export const ComplaintMarker = ({ complaint, onPress }) => {
+function ComplaintMarkerComponent({ complaint, onPress }) {
+  const [tracksViewChanges, setTracksViewChanges] = useState(true);
+
+  useEffect(() => {
+    setTracksViewChanges(true);
+    const timer = setTimeout(() => setTracksViewChanges(false), 700);
+    return () => clearTimeout(timer);
+  }, [complaint.id, complaint.type, complaint.animal]);
+
   const getTheme = (type) => {
     switch (type?.toLowerCase()) {
       case 'abandono':
@@ -67,7 +75,7 @@ export const ComplaintMarker = ({ complaint, onPress }) => {
         onPress?.();
       }}
       anchor={{ x: 0.5, y: 1 }}
-      tracksViewChanges
+      tracksViewChanges={tracksViewChanges}
     >
       <View style={styles.markerShell}>
         <View style={[styles.halo, { backgroundColor: theme.soft }]} />
@@ -85,4 +93,6 @@ export const ComplaintMarker = ({ complaint, onPress }) => {
       </View>
     </Marker>
   );
-};
+}
+
+export const ComplaintMarker = memo(ComplaintMarkerComponent);

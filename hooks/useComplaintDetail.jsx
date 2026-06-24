@@ -1,32 +1,16 @@
 import { useFocusEffect } from '@react-navigation/native';
-import { useComplaints } from '@/context/ComplaintsContext';
 import { deleteComplaint, getComplaintById } from '@/services/complaints.service';
 import { useRouter } from 'expo-router';
 import { Alert } from 'react-native';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 export function useComplaintDetail(id) {
   const router = useRouter();
-  const { data: complaintsList } = useComplaints();
-  const complaintFromCache = complaintsList?.find((item) => item.id === id);
 
-  const [complaint, setComplaint] = useState(complaintFromCache ?? null);
-  const [loading, setLoading] = useState(!complaintFromCache);
+  const [complaint, setComplaint] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  useEffect(() => {
-    setError(null);
-
-    if (complaintFromCache) {
-      setComplaint(complaintFromCache);
-      setLoading(false);
-      return;
-    }
-
-    setComplaint(null);
-    setLoading(true);
-  }, [complaintFromCache, id]);
 
   const fetchComplaintDetails = useCallback(() => {
     if (!id) {
@@ -36,11 +20,8 @@ export function useComplaintDetail(id) {
     }
 
     const controller = new AbortController();
-    const hasCachedComplaint = Boolean(complaintFromCache);
 
-    if (!hasCachedComplaint) {
-      setLoading(true);
-    }
+    setLoading(true);
     setError(null);
 
     getComplaintById(id, controller.signal)
@@ -49,14 +30,14 @@ export function useComplaintDetail(id) {
         setComplaint(data);
       })
       .catch((err) => {
-        if (err.name !== 'AbortError' && !hasCachedComplaint) {
+        if (err.name !== 'AbortError') {
           setError('Não foi possível carregar os detalhes da denúncia.');
         }
       })
       .finally(() => setLoading(false));
 
     return controller;
-  }, [complaintFromCache, id]);
+  }, [id]);
 
   useFocusEffect(
     useCallback(() => {

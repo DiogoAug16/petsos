@@ -7,13 +7,16 @@ const ComplaintsContext = createContext(null);
 export function ComplaintsProvider({ children }) {
   const {
     data,
+    pageInfo,
     loading,
+    loadingMore,
     refreshing,
     error,
     fetchComplaints,
     refresh,
     refetchSilent,
     refetch,
+    loadMore,
   } = useComplaintsFetch();
 
   useEffect(() => {
@@ -31,12 +34,15 @@ export function ComplaintsProvider({ children }) {
       value={{
         data,
         complaints: data,
+        pageInfo,
         loading,
+        loadingMore,
         refreshing,
         error,
         refetch,
         refetchSilent,
         refresh,
+        loadMore,
       }}
     >
       {children}

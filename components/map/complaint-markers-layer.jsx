@@ -1,5 +1,7 @@
 import { ComplaintMarker } from '@/components/map/complaint-marker';
 
+const MAX_MARKERS = 120;
+
 export function ComplaintMarkersLayer({
   complaints = [],
   shouldRender = false,
@@ -7,7 +9,7 @@ export function ComplaintMarkersLayer({
 }) {
   if (!shouldRender) return null;
 
-  return complaints.map((complaint, index) => {
+  return complaints.slice(0, MAX_MARKERS).map((complaint, index) => {
     const complaintId = complaint?.id ?? complaint?._id;
     const markerKey =
       complaintId !== undefined && complaintId !== null

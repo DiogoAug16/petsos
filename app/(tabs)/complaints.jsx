@@ -5,23 +5,32 @@ import { ErrorState } from '@/components/complaints/error-state';
 import { FilterChips } from '@/components/filter-chips/filter-chips';
 import { LoadingState } from '@/components/complaints/loading-state';
 import { SearchBar } from '@/components/search-bar/search-bar';
-import { useComplaints } from '@/context/ComplaintsContext';
+import { ComplaintsProvider, useComplaints } from '@/context/ComplaintsContext';
 import { useComplaintsListControls } from '@/hooks/useComplaintsListControls';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { complaintsStyles } from '@/styles/complaints';
 import { useFocusEffect } from '@react-navigation/native';
 import { Image } from 'expo-image';
 import { useCallback } from 'react';
-import { FlatList, RefreshControl, View } from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, View } from 'react-native';
 
 const COMPLAINTS_BACKGROUND = require('@/assets/images/pets/denuncias_bg.webp');
 const keyExtractor = (item) => String(item.id);
 const renderItem = ({ item }) => <ComplaintCard complaint={item} />;
 
-export default function ComplaintsScreen() {
+function ComplaintsScreenContent() {
   const colorScheme = useColorScheme();
   const styles = complaintsStyles(colorScheme);
-  const { data, loading, refreshing, error, refetchSilent, refresh } = useComplaints();
+  const {
+    data,
+    loading,
+    loadingMore,
+    refreshing,
+    error,
+    refetchSilent,
+    refresh,
+    loadMore,
+  } = useComplaints();
   const {
     search,
     setSearch,
@@ -71,6 +80,11 @@ export default function ComplaintsScreen() {
           data={visibleComplaints}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.35}
+          ListFooterComponent={
+            loadingMore ? <ActivityIndicator color="#FF9F1C" /> : null
+          }
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           refreshControl={
@@ -84,5 +98,13 @@ export default function ComplaintsScreen() {
         />
       )}
     </View>
+  );
+}
+
+export default function ComplaintsScreen() {
+  return (
+    <ComplaintsProvider>
+      <ComplaintsScreenContent />
+    </ComplaintsProvider>
   );
 }

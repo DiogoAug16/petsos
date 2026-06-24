@@ -143,84 +143,84 @@ export default function TabLayout() {
         tabBarShowLabel: false,
       }}
     >
-      <Tabs.Screen
-        name="complaints"
-        listeners={{
-          tabPress: () => {
-            triggerHaptics('soft');
-          },
-        }}
-        options={{
-          title: 'Denúncias',
-          tabBarIcon: ({ color, focused }) => (
-            <AnimatedTabIcon
-              name="warning-outline"
-              nameActive="warning"
-              color={color}
-              focused={focused}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="index"
-        listeners={{
-          tabPress: () => {
-            triggerHaptics('soft');
-          },
-        }}
-        options={{
-          title: 'Mapa',
-          tabBarIcon: ({ color, focused }) => (
-            <AnimatedTabIcon
-              name="map-outline"
-              nameActive="map"
-              color={color}
-              focused={focused}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="create"
-        listeners={{
-          tabPress: (event) => {
-            event.preventDefault();
-          },
-        }}
-        options={{
-          title: 'Criar',
-          tabBarButton: () => <CreateComplaintTabButton />,
-        }}
-      />
-      <Tabs.Screen
-        name="notifications-tab"
-        listeners={{
-          tabPress: () => {
-            triggerHaptics('soft');
-          },
-        }}
-        options={{
-          title: 'Notificações',
-          tabBarIcon: ({ color, focused }) => (
-            <NotificationsTabIcon color={color} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        listeners={{
-          tabPress: () => {
-            triggerHaptics('soft');
-          },
-        }}
-        options={{
-          title: 'Perfil',
-          tabBarIcon: ({ color, focused }) => (
-            <ProfileTabIcon color={color} focused={focused} />
-          ),
-        }}
-      />
+        <Tabs.Screen
+          name="complaints"
+          listeners={{
+            tabPress: () => {
+              triggerHaptics('soft');
+            },
+          }}
+          options={{
+            title: 'Denúncias',
+            tabBarIcon: ({ color, focused }) => (
+              <AnimatedTabIcon
+                name="warning-outline"
+                nameActive="warning"
+                color={color}
+                focused={focused}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="index"
+          listeners={{
+            tabPress: () => {
+              triggerHaptics('soft');
+            },
+          }}
+          options={{
+            title: 'Mapa',
+            tabBarIcon: ({ color, focused }) => (
+              <AnimatedTabIcon
+                name="map-outline"
+                nameActive="map"
+                color={color}
+                focused={focused}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="create"
+          listeners={{
+            tabPress: (event) => {
+              event.preventDefault();
+            },
+          }}
+          options={{
+            title: 'Criar',
+            tabBarButton: () => <CreateComplaintTabButton />,
+          }}
+        />
+        <Tabs.Screen
+          name="notifications-tab"
+          listeners={{
+            tabPress: () => {
+              triggerHaptics('soft');
+            },
+          }}
+          options={{
+            title: 'Notificações',
+            tabBarIcon: ({ color, focused }) => (
+              <NotificationsTabIcon color={color} focused={focused} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          listeners={{
+            tabPress: () => {
+              triggerHaptics('soft');
+            },
+          }}
+          options={{
+            title: 'Perfil',
+            tabBarIcon: ({ color, focused }) => (
+              <ProfileTabIcon color={color} focused={focused} />
+            ),
+          }}
+        />
     </Tabs>
   );
 }

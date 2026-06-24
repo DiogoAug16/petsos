@@ -10,7 +10,6 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from '@/config/toast.config';
 import { AuthProvider } from '@/context/AuthContext';
 import { AuthPromptProvider } from '@/context/AuthPromptContext';
-import { ComplaintsProvider } from '@/context/ComplaintsContext';
 import { UnreadCountProvider } from '@/context/UnreadCountContext';
 
 const AppTheme = {
@@ -61,18 +60,16 @@ function RootLayoutNav() {
         <AuthProvider>
           <UnreadCountProvider>
             <AuthPromptProvider>
-              <ComplaintsProvider>
-                <Stack screenOptions={{ detachInactiveScreens: true, animation: 'none' }}>
-                  <Stack.Screen name="index" options={{ headerShown: false }} />
-                  <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                  <Stack.Screen name="complaint/[id]" options={{ headerShown: false }} />
-                  <Stack.Screen name="complaint/create" />
-                  <Stack.Screen name="users/[username]" options={{ headerShown: false }} />
-                  <Stack.Screen name="notifications/index" options={{ headerShown: false }} />
-                </Stack>
-                <Toast config={toastConfig} topOffset={60} />
-              </ComplaintsProvider>
+              <Stack screenOptions={{ detachInactiveScreens: true, animation: 'none' }}>
+                <Stack.Screen name="index" options={{ headerShown: false }} />
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="complaint/[id]" options={{ headerShown: false }} />
+                <Stack.Screen name="complaint/create" />
+                <Stack.Screen name="users/[username]" options={{ headerShown: false }} />
+                <Stack.Screen name="notifications/index" options={{ headerShown: false }} />
+              </Stack>
+              <Toast config={toastConfig} topOffset={60} />
             </AuthPromptProvider>
           </UnreadCountProvider>
         </AuthProvider>

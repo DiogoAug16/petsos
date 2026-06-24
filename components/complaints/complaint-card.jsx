@@ -7,6 +7,7 @@ import { useComplaintConfig } from '@/hooks/useComplaintConfig';
 import { StatusBadge } from '@/components/complaints/status-badge';
 import { complaintsStyles } from '@/styles/complaints';
 import { formatDate } from '@/utils/date.utils';
+import { getComplaintCoverPhoto } from '@/utils/photo.utils';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
@@ -35,7 +36,9 @@ function ComplaintCardComponent({ complaint }) {
     return `${baseUrl}${normalizedPath}`;
   };
 
-  const coverPhotoUri = resolvePhotoUri(complaint.photos?.[0]);
+  const coverPhotoUri = resolvePhotoUri(
+    getComplaintCoverPhoto(complaint, { preferThumbnail: true })
+  );
 
   const handlePressIn = () => {
     onPressIn();
@@ -58,7 +61,7 @@ function ComplaintCardComponent({ complaint }) {
                 source={{ uri: coverPhotoUri }}
                 style={styles.cardPhotoImage}
                 contentFit="cover"
-                cachePolicy="memory-disk"
+                cachePolicy="disk"
                 transition={120}
               />
             ) : (

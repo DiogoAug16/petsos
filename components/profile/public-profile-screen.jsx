@@ -43,13 +43,16 @@ export function PublicProfileScreen({
   const {
     profile,
     followedComplaints,
+    followedSummary,
     loading,
     refreshing,
     error,
     refresh,
     softReload,
     reload,
-  } = usePublicProfile(username);
+  } = usePublicProfile(username, {
+    includeFollowedComplaints: !isCurrentUser || followedOnly,
+  });
 
   useFocusEffect(
     useCallback(() => {
@@ -142,8 +145,8 @@ export function PublicProfileScreen({
         />
         <ProfileHeader
           profile={profile}
-          followedCount={followedComplaints.length}
-          followedComplaints={followedComplaints}
+          followedCount={followedSummary.total}
+          resolvedFollowedCount={followedSummary.resolved}
           styles={styles}
           isCurrentUser={isCurrentUser}
           showBack={showBack}

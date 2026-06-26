@@ -1,4 +1,4 @@
-import { useUnreadCount } from '@/hooks/useUnreadCount';
+import { useUnreadCount } from '@/hooks/notifications/useUnreadCount';
 import { styles } from '@/styles/notifications/bell.styles';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';

@@ -1,4 +1,4 @@
-import { ComplaintNearbyCard } from '@/components/complaints/Complaint-nearbyCard';
+import { ComplaintNearbyCard } from '@/components/complaints/list/Complaint-nearbyCard';
 import { Animated, Text, View } from 'react-native';
 
 export function BottomCard({ style, complaint, animation }) {

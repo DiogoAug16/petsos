@@ -5,11 +5,12 @@ import { Alert, Modal, Pressable, Text, View } from 'react-native';
 
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { useAuth } from '@/context/AuthContext';
-import { getJoinedYear } from '@/utils/profile.utils';
+import { getJoinedYear } from '@/utils/profile/profile.utils';
 
 export function ProfileHeader({
   profile,
   followedCount,
+  resolvedFollowedCount: resolvedFollowedCountProp,
   followedComplaints = [],
   styles,
   isCurrentUser,
@@ -24,9 +25,11 @@ export function ProfileHeader({
   const joinedYear = getJoinedYear(profile.createdAt);
   const displayName = profile.name || profile.username;
   const shouldShowBack = showBack && !isCurrentUser;
-  const resolvedFollowedCount = followedComplaints.filter((complaint) =>
-    ['resolvido', 'resolved'].includes(complaint?.status)
-  ).length;
+  const resolvedFollowedCount =
+    resolvedFollowedCountProp ??
+    followedComplaints.filter((complaint) =>
+      ['resolvido', 'resolved'].includes(complaint?.status)
+    ).length;
 
   const handleEdit = () => {
     setMenuVisible(false);

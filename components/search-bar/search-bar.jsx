@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useHapticPress } from '@/hooks/useHapticPress';
-import { useSortOrderButtonAnimation } from '@/hooks/useSortOrderButtonAnimation';
-import { sortButtonStyles } from '@/styles/search-bar-sort-button.styles';
+import { useHapticPress } from '@/hooks/ui/useHapticPress';
+import { useSortOrderButtonAnimation } from '@/hooks/ui/useSortOrderButtonAnimation';
+import { sortButtonStyles } from '@/styles/common/search-bar-sort-button.styles';
 import { Animated, TextInput, TouchableOpacity, View } from 'react-native';
 
 export function SearchBar({

@@ -3,14 +3,14 @@ import { Image } from 'expo-image';
 import { useCallback } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import { ErrorState } from '@/components/complaints/error-state';
-import { LoadingState } from '@/components/complaints/loading-state';
+import { ErrorState } from '@/components/complaints/states/error-state';
+import { LoadingState } from '@/components/complaints/states/loading-state';
 import { PublicProfileScreen } from '@/components/profile/public-profile-screen';
 import { useAuth } from '@/context/AuthContext';
 import { useAuthPrompt } from '@/context/AuthPromptContext';
-import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { profileStyles } from '@/styles/profile.styles';
+import { useCurrentUserProfile } from '@/hooks/profile/useCurrentUserProfile';
+import { useColorScheme } from '@/hooks/ui/useColorScheme';
+import { profileStyles } from '@/styles/profile/profile.styles';
 
 const PROFILE_BACKGROUND = require('@/assets/images/pets/perfil_bg.webp');
 

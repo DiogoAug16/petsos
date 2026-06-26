@@ -5,14 +5,14 @@ import { useRouter } from 'expo-router';
 import { useCallback } from 'react';
 import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 
-import { ErrorState } from '@/components/complaints/error-state';
-import { LoadingState } from '@/components/complaints/loading-state';
+import { ErrorState } from '@/components/complaints/states/error-state';
+import { LoadingState } from '@/components/complaints/states/loading-state';
 import { ProfileComplaintCard } from '@/components/profile/profile-complaint-card';
 import { ProfileHeader } from '@/components/profile/profile-header';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { useHapticPress } from '@/hooks/useHapticPress';
-import { usePublicProfile } from '@/hooks/usePublicProfile';
-import { profileStyles } from '@/styles/profile.styles';
+import { useColorScheme } from '@/hooks/ui/useColorScheme';
+import { useHapticPress } from '@/hooks/ui/useHapticPress';
+import { usePublicProfile } from '@/hooks/profile/usePublicProfile';
+import { profileStyles } from '@/styles/profile/profile.styles';
 
 const PROFILE_BACKGROUND = require('@/assets/images/pets/perfil_bg.webp');
 const FOLLOWED_BACKGROUND = require('@/assets/images/pets/denuncias_perfil_bg.webp');
@@ -43,13 +43,16 @@ export function PublicProfileScreen({
   const {
     profile,
     followedComplaints,
+    followedSummary,
     loading,
     refreshing,
     error,
     refresh,
     softReload,
     reload,
-  } = usePublicProfile(username);
+  } = usePublicProfile(username, {
+    includeFollowedComplaints: !isCurrentUser || followedOnly,
+  });
 
   useFocusEffect(
     useCallback(() => {
@@ -142,8 +145,8 @@ export function PublicProfileScreen({
         />
         <ProfileHeader
           profile={profile}
-          followedCount={followedComplaints.length}
-          followedComplaints={followedComplaints}
+          followedCount={followedSummary.total}
+          resolvedFollowedCount={followedSummary.resolved}
           styles={styles}
           isCurrentUser={isCurrentUser}
           showBack={showBack}

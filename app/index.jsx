@@ -5,8 +5,8 @@ import { useRouter } from 'expo-router';
 import { Pressable, Text, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useHapticPress } from '@/hooks/useHapticPress';
-import { onboardingStyles as styles } from '@/styles/onboarding.styles';
+import { useHapticPress } from '@/hooks/ui/useHapticPress';
+import { onboardingStyles as styles } from '@/styles/onboarding/onboarding.styles';
 
 const WELCOME_IMAGE = require('@/assets/images/pets/bem_vindo.webp');
 const START_BACKGROUND = require('@/assets/images/pets/startpage.webp');

@@ -1,17 +1,17 @@
-import { LoadingState } from '@/components/complaints/loading-state';
+import { LoadingState } from '@/components/complaints/states/loading-state';
 import { NotificationCard } from '@/components/notifications/NotificationCard';
 import { useAuth } from '@/context/AuthContext';
 import { useAuthPrompt } from '@/context/AuthPromptContext';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { useHapticPress } from '@/hooks/useHapticPress';
-import { useNotifications } from '@/hooks/useNotifications';
-import { useUnreadCount } from '@/hooks/useUnreadCount';
+import { useColorScheme } from '@/hooks/ui/useColorScheme';
+import { useHapticPress } from '@/hooks/ui/useHapticPress';
+import { useNotifications } from '@/hooks/notifications/useNotifications';
+import { useUnreadCount } from '@/hooks/notifications/useUnreadCount';
 import {
   clearNotifications,
   markNotificationAsRead,
-} from '@/services/notifications.service';
+} from '@/services/notifications/notifications.service';
 import { styles } from '@/styles/notifications/screen.styles';
-import { profileStyles } from '@/styles/profile.styles';
+import { profileStyles } from '@/styles/profile/profile.styles';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { Image } from 'expo-image';

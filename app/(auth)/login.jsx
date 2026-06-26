@@ -1,9 +1,9 @@
 import { ScrollView, KeyboardAvoidingView, Platform, View } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useColorScheme } from '@/hooks/ui/useColorScheme';
 import Colors from '@/styles/theme/Colors';
-import { useLoginForm } from '@/hooks/useLoginForm';
-import { useEntranceAnimation } from '@/hooks/useEntranceAnimation';
+import { useLoginForm } from '@/hooks/auth/useLoginForm';
+import { useEntranceAnimation } from '@/hooks/ui/useEntranceAnimation';
 import PawBackground from '@/components/auth/PawBackground';
 import AuthHero from '@/components/auth/AuthHero';
 import LoginForm from '@/components/auth/LoginForm';

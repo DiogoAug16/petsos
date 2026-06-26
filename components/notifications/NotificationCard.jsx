@@ -1,6 +1,6 @@
 import { styles } from '@/styles/notifications/card.styles';
-import { useHaptics } from '@/hooks/useHaptics';
-import { usePressAnimation } from '@/hooks/usePressAnimation';
+import { useHaptics } from '@/hooks/ui/useHaptics';
+import { usePressAnimation } from '@/hooks/ui/usePressAnimation';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';

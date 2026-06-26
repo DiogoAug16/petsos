@@ -5,10 +5,10 @@ import Animated from 'react-native-reanimated';
 
 import { AnimatedTabIcon } from '@/components/bottom-card/animated-tab-icon';
 import { useRequireAuth } from '@/context/AuthPromptContext';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { useHaptics } from '@/hooks/useHaptics';
-import { usePressAnimation } from '@/hooks/usePressAnimation';
-import { useUnreadCount } from '@/hooks/useUnreadCount';
+import { useColorScheme } from '@/hooks/ui/useColorScheme';
+import { useHaptics } from '@/hooks/ui/useHaptics';
+import { usePressAnimation } from '@/hooks/ui/usePressAnimation';
+import { useUnreadCount } from '@/hooks/notifications/useUnreadCount';
 import Colors from '@/styles/theme/Colors';
 
 function ProfileTabIcon({ color, focused }) {
@@ -143,84 +143,84 @@ export default function TabLayout() {
         tabBarShowLabel: false,
       }}
     >
-      <Tabs.Screen
-        name="complaints"
-        listeners={{
-          tabPress: () => {
-            triggerHaptics('soft');
-          },
-        }}
-        options={{
-          title: 'Denúncias',
-          tabBarIcon: ({ color, focused }) => (
-            <AnimatedTabIcon
-              name="warning-outline"
-              nameActive="warning"
-              color={color}
-              focused={focused}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="index"
-        listeners={{
-          tabPress: () => {
-            triggerHaptics('soft');
-          },
-        }}
-        options={{
-          title: 'Mapa',
-          tabBarIcon: ({ color, focused }) => (
-            <AnimatedTabIcon
-              name="map-outline"
-              nameActive="map"
-              color={color}
-              focused={focused}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="create"
-        listeners={{
-          tabPress: (event) => {
-            event.preventDefault();
-          },
-        }}
-        options={{
-          title: 'Criar',
-          tabBarButton: () => <CreateComplaintTabButton />,
-        }}
-      />
-      <Tabs.Screen
-        name="notifications-tab"
-        listeners={{
-          tabPress: () => {
-            triggerHaptics('soft');
-          },
-        }}
-        options={{
-          title: 'Notificações',
-          tabBarIcon: ({ color, focused }) => (
-            <NotificationsTabIcon color={color} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        listeners={{
-          tabPress: () => {
-            triggerHaptics('soft');
-          },
-        }}
-        options={{
-          title: 'Perfil',
-          tabBarIcon: ({ color, focused }) => (
-            <ProfileTabIcon color={color} focused={focused} />
-          ),
-        }}
-      />
+        <Tabs.Screen
+          name="complaints"
+          listeners={{
+            tabPress: () => {
+              triggerHaptics('soft');
+            },
+          }}
+          options={{
+            title: 'Denúncias',
+            tabBarIcon: ({ color, focused }) => (
+              <AnimatedTabIcon
+                name="warning-outline"
+                nameActive="warning"
+                color={color}
+                focused={focused}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="index"
+          listeners={{
+            tabPress: () => {
+              triggerHaptics('soft');
+            },
+          }}
+          options={{
+            title: 'Mapa',
+            tabBarIcon: ({ color, focused }) => (
+              <AnimatedTabIcon
+                name="map-outline"
+                nameActive="map"
+                color={color}
+                focused={focused}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="create"
+          listeners={{
+            tabPress: (event) => {
+              event.preventDefault();
+            },
+          }}
+          options={{
+            title: 'Criar',
+            tabBarButton: () => <CreateComplaintTabButton />,
+          }}
+        />
+        <Tabs.Screen
+          name="notifications-tab"
+          listeners={{
+            tabPress: () => {
+              triggerHaptics('soft');
+            },
+          }}
+          options={{
+            title: 'Notificações',
+            tabBarIcon: ({ color, focused }) => (
+              <NotificationsTabIcon color={color} focused={focused} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          listeners={{
+            tabPress: () => {
+              triggerHaptics('soft');
+            },
+          }}
+          options={{
+            title: 'Perfil',
+            tabBarIcon: ({ color, focused }) => (
+              <ProfileTabIcon color={color} focused={focused} />
+            ),
+          }}
+        />
     </Tabs>
   );
 }

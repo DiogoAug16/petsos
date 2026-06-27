@@ -15,17 +15,19 @@ const DISMISS_VELOCITY = 650;
 const DISMISS_OFFSET = 380;
 
 export function AuthPromptBottomSheet({
+  primaryLabel = 'Criar conta',
+  secondaryLabel = 'Entrar',
   visible,
   title,
   message,
   onClose,
-  onLogin,
-  onRegister,
+  onPrimaryPress,
+  onSecondaryPress,
 }) {
   const translateY = useSharedValue(0);
   const handleClose = useHapticPress(onClose);
-  const handleLogin = useHapticPress(onLogin);
-  const handleRegister = useHapticPress(onRegister);
+  const handlePrimaryPress = useHapticPress(onPrimaryPress);
+  const handleSecondaryPress = useHapticPress(onSecondaryPress);
 
   useEffect(() => {
     if (visible) {
@@ -77,12 +79,15 @@ export function AuthPromptBottomSheet({
             <Text style={styles.message}>{message}</Text>
 
             <View style={styles.actions}>
-              <Pressable style={styles.primaryButton} onPress={handleRegister}>
-                <Text style={styles.primaryText}>Criar conta</Text>
+              <Pressable style={styles.primaryButton} onPress={handlePrimaryPress}>
+                <Text style={styles.primaryText}>{primaryLabel}</Text>
               </Pressable>
 
-              <Pressable style={styles.secondaryButton} onPress={handleLogin}>
-                <Text style={styles.secondaryText}>Entrar</Text>
+              <Pressable
+                style={styles.secondaryButton}
+                onPress={handleSecondaryPress}
+              >
+                <Text style={styles.secondaryText}>{secondaryLabel}</Text>
               </Pressable>
             </View>
 

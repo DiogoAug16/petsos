@@ -10,12 +10,14 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         setUser(firebaseUser);
         setIsAuthenticated(true);
+        setIsEmailVerified(firebaseUser.emailVerified === true);
 
         try {
           await saveFirebaseUserToken(firebaseUser);
@@ -26,6 +28,7 @@ export function AuthProvider({ children }) {
       } else {
         setUser(null);
         setIsAuthenticated(false);
+        setIsEmailVerified(false);
         await deleteAuthToken();
       }
 
@@ -38,6 +41,7 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     const userCredential = await authService.login(email, password);
     await saveFirebaseUserToken(userCredential.user);
+    setIsEmailVerified(userCredential.user.emailVerified === true);
     return userCredential;
   };
 
@@ -49,7 +53,24 @@ export function AuthProvider({ children }) {
   const register = async (email, password, name, username) => {
     const userCredential = await authService.register(email, password, name, username);
     await saveFirebaseUserToken(userCredential.user);
+    setIsEmailVerified(userCredential.user.emailVerified === true);
     return userCredential;
+  };
+
+  const resendVerificationEmail = async () => {
+    await authService.resendVerificationEmail();
+  };
+
+  const refreshEmailVerification = async () => {
+    const verified = await authService.refreshEmailVerification();
+
+    if (auth.currentUser) {
+      setUser(auth.currentUser);
+      await saveFirebaseUserToken(auth.currentUser);
+    }
+
+    setIsEmailVerified(verified);
+    return verified;
   };
 
   return (
@@ -58,9 +79,12 @@ export function AuthProvider({ children }) {
         user,
         isLoading,
         isAuthenticated,
+        isEmailVerified,
         login,
         logout,
         register,
+        resendVerificationEmail,
+        refreshEmailVerification,
       }}
     >
       {children}

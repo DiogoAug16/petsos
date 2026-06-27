@@ -97,4 +97,20 @@ export const createComplaintStyles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '900',
   },
+  authRequiredSecondaryButton: {
+    minHeight: 44,
+    marginTop: 10,
+    paddingHorizontal: 18,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: createComplaintColors.border,
+  },
+  authRequiredSecondaryButtonText: {
+    color: '#272A3A',
+    fontSize: 14,
+    fontWeight: '900',
+  },
 });

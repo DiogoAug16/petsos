@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import Toast from 'react-native-toast-message';
 
 import { REQUEST_VALIDATION_REASONS } from '@/constants/complaints/complaint-request-validation.constants';
+import { useRequireVerifiedEmail } from '@/hooks/auth/useRequireVerifiedEmail';
 import { requestComplaintValidation } from '@/services/complaints/complaints.service';
 
 export function useRequestValidation({ complaint, evidences, onRequested }) {
+  const requireVerifiedEmail = useRequireVerifiedEmail();
   const [visible, setVisible] = useState(false);
   const [selectedReason, setSelectedReason] = useState(
     REQUEST_VALIDATION_REASONS[0].type,
@@ -38,6 +39,16 @@ export function useRequestValidation({ complaint, evidences, onRequested }) {
     closeModal();
   };
 
+  const openModal = () => {
+    requireVerifiedEmail(
+      () => setVisible(true),
+      {
+        title: 'Confirme seu email',
+        message: 'Confirme seu email para solicitar validação da denúncia.',
+      },
+    );
+  };
+
   const toggleEvidence = (evidenceId) => {
     setSelectedEvidenceIds((prev) =>
       prev.includes(evidenceId)
@@ -58,12 +69,16 @@ export function useRequestValidation({ complaint, evidences, onRequested }) {
   const handleSubmit = async () => {
     if (loading || alreadyRequested) return;
 
+    if (
+      !requireVerifiedEmail(null, {
+        title: 'Confirme seu email',
+        message: 'Confirme seu email para solicitar validação da denúncia.',
+      })
+    ) {
+      return;
+    }
+
     if (selectedReason === 'evidence_selection' && selectedEvidenceIds.length === 0) {
-      Toast.show({
-        type: 'info',
-        text1: 'Selecione evidências',
-        text2: 'Escolha ao menos uma evidência para propor à comunidade.',
-      });
       return;
     }
 
@@ -76,21 +91,12 @@ export function useRequestValidation({ complaint, evidences, onRequested }) {
           selectedReason === 'evidence_selection' ? selectedEvidenceIds : undefined,
       });
 
-      Toast.show({
-        type: 'success',
-        text1: 'Votação solicitada à comunidade',
-      });
-
       closeModal();
       setReasonText('');
       setSelectedEvidenceIds([]);
       onRequested?.();
     } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: 'Erro ao solicitar votação',
-        text2: error?.message || 'Não foi possível abrir a votação.',
-      });
+      console.warn('Request validation failed', error?.message);
     } finally {
       setLoading(false);
     }
@@ -115,6 +121,7 @@ export function useRequestValidation({ complaint, evidences, onRequested }) {
     setSelectedReason,
     setStep,
     setVisible,
+    openModal,
     toggleEvidence,
   };
 }

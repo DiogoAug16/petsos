@@ -5,9 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
-import Toast from 'react-native-toast-message';
 
-import { toastConfig } from '@/config/toast.config';
 import { AuthProvider } from '@/context/AuthContext';
 import { AuthPromptProvider } from '@/context/AuthPromptContext';
 import { UnreadCountProvider } from '@/context/UnreadCountContext';
@@ -68,8 +66,8 @@ function RootLayoutNav() {
                 <Stack.Screen name="complaint/create" />
                 <Stack.Screen name="users/[username]" options={{ headerShown: false }} />
                 <Stack.Screen name="notifications/index" options={{ headerShown: false }} />
+                <Stack.Screen name="profile/edit" options={{ headerShown: false }} />
               </Stack>
-              <Toast config={toastConfig} topOffset={60} />
             </AuthPromptProvider>
           </UnreadCountProvider>
         </AuthProvider>

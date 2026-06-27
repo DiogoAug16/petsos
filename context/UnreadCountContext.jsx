@@ -8,12 +8,12 @@ const POLLING_INTERVAL = 30000;
 const UnreadCountContext = createContext({});
 
 export function UnreadCountProvider({ children }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isEmailVerified } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
   const intervalRef = useRef(null);
 
   const loadUnreadCount = useCallback(async () => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || !isEmailVerified) return;
 
     try {
       const response = await getUnreadCount();
@@ -21,10 +21,10 @@ export function UnreadCountProvider({ children }) {
     } catch (error) {
       console.log('Erro ao buscar contador de notificações:', error);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isEmailVerified]);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !isEmailVerified) {
       setUnreadCount(0);
       return;
     }
@@ -43,7 +43,7 @@ export function UnreadCountProvider({ children }) {
       clearInterval(intervalRef.current);
       subscription.remove();
     };
-  }, [loadUnreadCount, isAuthenticated]);
+  }, [loadUnreadCount, isAuthenticated, isEmailVerified]);
 
   return (
     <UnreadCountContext.Provider value={{ unreadCount, reloadUnreadCount: loadUnreadCount }}>

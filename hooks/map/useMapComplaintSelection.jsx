@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import Toast from 'react-native-toast-message';
 
 import { getDrivingRoute } from '@/services/map/routes.service';
 
@@ -98,11 +97,6 @@ export function useMapComplaintSelection({ location, mapRef, router }) {
       setRouteComplaintId(null);
       setRouteCoordinates([]);
       setRouteRenderKey((current) => current + 1);
-      Toast.show({
-        type: 'error',
-        text1: 'Rota indisponível',
-        text2: 'Não foi possível traçar uma rota pelas ruas agora.',
-      });
       return;
     }
 

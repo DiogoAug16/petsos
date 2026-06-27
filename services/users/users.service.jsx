@@ -1,4 +1,5 @@
 import { apiFetch } from '@/services/api';
+import { buildImageUploadFile, isLocalMediaUri } from '@/utils/media/image-upload.utils';
 
 const unwrapData = (response) => response?.data ?? response;
 
@@ -29,4 +30,28 @@ export async function getUserFollowedComplaintsSummary(username) {
     total: Number(data?.total ?? 0),
     resolved: Number(data?.resolved ?? 0),
   };
+}
+
+export async function updateCurrentUserProfile({
+  name,
+  locationLabel,
+  description,
+  photoUri,
+}) {
+  const formData = new FormData();
+  formData.append('name', name.trim());
+  formData.append('locationLabel', locationLabel.trim());
+  formData.append('description', description.trim());
+
+  if (photoUri && isLocalMediaUri(photoUri)) {
+    const photo = await buildImageUploadFile(photoUri, 'perfil.jpg');
+    formData.append('photo', photo);
+  }
+
+  const response = await apiFetch('/users/me', {
+    method: 'PATCH',
+    body: formData,
+  });
+
+  return unwrapData(response);
 }

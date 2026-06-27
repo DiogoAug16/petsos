@@ -7,6 +7,7 @@ import {
 } from '@/services/complaints/complaint-followers.service';
 import { useAuth } from '@/context/AuthContext';
 import { useRequireAuth } from '@/context/AuthPromptContext';
+import { useRequireVerifiedEmail } from '@/hooks/auth/useRequireVerifiedEmail';
 import { useCallback, useEffect, useState } from 'react';
 
 const normalizeFollowers = (response) =>
@@ -19,8 +20,9 @@ const normalizeFollowersCount = (response) => {
 };
 
 export function useComplaintFollowers(complaintId) {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isEmailVerified, isLoading: authLoading } = useAuth();
   const requireAuth = useRequireAuth();
+  const requireVerifiedEmail = useRequireVerifiedEmail();
   const [isFollowing, setIsFollowing] = useState(false);
   const [followers, setFollowers] = useState([]);
   const [totalFollowers, setTotalFollowers] = useState(0);
@@ -38,14 +40,9 @@ export function useComplaintFollowers(complaintId) {
 
     setTotalFollowers(normalizeFollowersCount(countResponse));
 
-    if (!isAuthenticated) {
-      setFollowers([]);
-      return;
-    }
-
     const followersResponse = await getComplaintFollowers(complaintId);
     setFollowers(normalizeFollowers(followersResponse));
-  }, [complaintId, isAuthenticated]);
+  }, [complaintId]);
 
   const refresh = useCallback(async () => {
     if (!complaintId) {
@@ -64,7 +61,7 @@ export function useComplaintFollowers(complaintId) {
       setInitialReady(false);
       setInitialError(null);
 
-      if (!isAuthenticated) {
+      if (!isAuthenticated || !isEmailVerified) {
         await loadFollowers();
         setIsFollowing(false);
         setInitialReady(true);
@@ -89,7 +86,7 @@ export function useComplaintFollowers(complaintId) {
     } finally {
       setLoading(false);
     }
-  }, [authLoading, complaintId, isAuthenticated, loadFollowers]);
+  }, [authLoading, complaintId, isAuthenticated, isEmailVerified, loadFollowers]);
 
   const refreshFollowers = useCallback(async () => {
     if (!complaintId) return false;
@@ -111,6 +108,15 @@ export function useComplaintFollowers(complaintId) {
         message:
           'Faça login ou crie uma conta para acompanhar denúncias e receber atualizações.',
       });
+      return false;
+    }
+
+    if (
+      !requireVerifiedEmail(null, {
+        title: 'Confirme seu email',
+        message: 'Confirme seu email para acompanhar denúncias.',
+      })
+    ) {
       return false;
     }
 
@@ -153,6 +159,7 @@ export function useComplaintFollowers(complaintId) {
     isFollowing,
     refreshFollowers,
     requireAuth,
+    requireVerifiedEmail,
   ]);
 
   const unfollow = useCallback(async () => {
@@ -164,6 +171,15 @@ export function useComplaintFollowers(complaintId) {
         message:
           'Faça login ou crie uma conta para acompanhar denúncias e receber atualizações.',
       });
+      return false;
+    }
+
+    if (
+      !requireVerifiedEmail(null, {
+        title: 'Confirme seu email',
+        message: 'Confirme seu email para alterar denúncias acompanhadas.',
+      })
+    ) {
       return false;
     }
 
@@ -196,11 +212,21 @@ export function useComplaintFollowers(complaintId) {
     isFollowing,
     refreshFollowers,
     requireAuth,
+    requireVerifiedEmail,
   ]);
 
   const toggleFollow = useCallback(() => {
     requireAuth(
       () => {
+        if (
+          !requireVerifiedEmail(null, {
+            title: 'Confirme seu email',
+            message: 'Confirme seu email para acompanhar denúncias.',
+          })
+        ) {
+          return;
+        }
+
         if (isFollowing) {
           setUnfollowModalVisible(true);
           return;
@@ -213,7 +239,7 @@ export function useComplaintFollowers(complaintId) {
           'Faça login ou crie uma conta para acompanhar denúncias e receber atualizações.',
       },
     );
-  }, [isFollowing, requireAuth]);
+  }, [isFollowing, requireAuth, requireVerifiedEmail]);
 
   const closeFollowModal = useCallback(() => {
     setFollowModalVisible(false);

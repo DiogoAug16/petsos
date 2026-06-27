@@ -7,6 +7,10 @@ const DEFAULT_PROMPT = {
   title: 'Entre para continuar',
   message:
     'Crie uma conta ou faça login para participar das denúncias, comentar e acompanhar atualizações.',
+  primaryLabel: 'Criar conta',
+  secondaryLabel: 'Entrar',
+  onPrimaryPress: null,
+  onSecondaryPress: null,
 };
 
 const AuthPromptContext = createContext(null);
@@ -38,6 +42,24 @@ export function AuthPromptProvider({ children }) {
     router.push('/(auth)/register');
   }, [closeAuthPrompt, router]);
 
+  const handlePrimaryPress = useCallback(() => {
+    if (prompt.onPrimaryPress) {
+      prompt.onPrimaryPress();
+      return;
+    }
+
+    goToRegister();
+  }, [goToRegister, prompt]);
+
+  const handleSecondaryPress = useCallback(() => {
+    if (prompt.onSecondaryPress) {
+      prompt.onSecondaryPress();
+      return;
+    }
+
+    goToLogin();
+  }, [goToLogin, prompt]);
+
   const value = useMemo(
     () => ({
       openAuthPrompt,
@@ -53,9 +75,11 @@ export function AuthPromptProvider({ children }) {
         visible={promptVisible}
         title={prompt.title}
         message={prompt.message}
+        primaryLabel={prompt.primaryLabel}
+        secondaryLabel={prompt.secondaryLabel}
         onClose={closeAuthPrompt}
-        onLogin={goToLogin}
-        onRegister={goToRegister}
+        onPrimaryPress={handlePrimaryPress}
+        onSecondaryPress={handleSecondaryPress}
       />
     </AuthPromptContext.Provider>
   );

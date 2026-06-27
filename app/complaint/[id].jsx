@@ -14,6 +14,7 @@ import { EvidenceValidationSection } from "@/components/complaints/evidence-vali
 import { LoadingState } from "@/components/complaints/states/loading-state";
 import { RequestValidationButton } from "@/components/complaints/request-validation/request-validation-button";
 import { useAuth } from "@/context/AuthContext";
+import { useRequireVerifiedEmail } from "@/hooks/auth/useRequireVerifiedEmail";
 import { useAddress } from "@/hooks/complaints/useAddress";
 import { useColorScheme } from "@/hooks/ui/useColorScheme";
 import { useCommentComposerVisibility } from "@/hooks/complaints/useCommentComposerVisibility";
@@ -28,7 +29,8 @@ export default function ComplaintDetailScreen() {
   const { id } = useLocalSearchParams();
   const complaintId = Array.isArray(id) ? id[0] : id;
   const router = useRouter();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isEmailVerified } = useAuth();
+  const requireVerifiedEmail = useRequireVerifiedEmail();
   const colorScheme = useColorScheme();
   const styles = complaintsStyles(colorScheme);
   const theme = Colors[colorScheme ?? "light"];
@@ -86,6 +88,7 @@ export default function ComplaintDetailScreen() {
   const { address } = useAddress(complaint?.location);
   const { status, type, emoji } = useComplaintConfig(complaint);
   const isOwner = Boolean(user?.uid && user.uid === complaint?.createdById);
+  const canParticipate = isAuthenticated && isEmailVerified;
 
   const { composerState, handleReplyPress, handleComposerSubmit } =
     useComplaintReplyComposer({ addComment, handleInputFocus });
@@ -134,7 +137,7 @@ export default function ComplaintDetailScreen() {
           contentContainerStyle={[
             styles.detailScrollContent,
             composerVisible &&
-              isAuthenticated &&
+              canParticipate &&
               styles.detailScrollContentWithComposer,
           ]}
           onLayout={handleViewportLayout}
@@ -158,7 +161,12 @@ export default function ComplaintDetailScreen() {
             followersState={followersState}
             isOwner={isOwner}
             volunteersState={volunteersState}
-            onSubmitEvidence={() => setEvidenceModalVisible(true)}
+            onSubmitEvidence={() => {
+              requireVerifiedEmail(() => setEvidenceModalVisible(true), {
+                title: "Confirme seu email",
+                message: "Confirme seu email para enviar evidências.",
+              });
+            }}
             styles={styles}
           />
 
@@ -183,7 +191,7 @@ export default function ComplaintDetailScreen() {
 
           <RequestValidationButton
             complaint={complaint}
-            isVolunteer={volunteersState.isVolunteer}
+            isVolunteer={canParticipate && volunteersState.isVolunteer}
             evidences={evidences}
             onRequested={() => {
               fetchComplaintDetails();
@@ -193,8 +201,8 @@ export default function ComplaintDetailScreen() {
           <EvidenceValidationSection
             complaint={complaint}
             isOwner={isOwner}
-            isVolunteer={volunteersState.isVolunteer}
-            isFollowing={followersState.isFollowing}
+            isVolunteer={canParticipate && volunteersState.isVolunteer}
+            isFollowing={canParticipate && followersState.isFollowing}
             evidences={evidences}
             onStatusChanged={() => {
               fetchComplaintDetails();
@@ -220,7 +228,7 @@ export default function ComplaintDetailScreen() {
           />
         </ScrollView>
 
-        {isAuthenticated && (
+        {canParticipate && (
           <DetailCommentComposerBar
             animatedStyle={commentComposerAnimatedStyle}
             composerState={composerState}

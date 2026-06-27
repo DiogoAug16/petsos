@@ -1,6 +1,6 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, Text, View } from 'react-native';
+import { Alert, Pressable, Text, View } from 'react-native';
 
 import { CreateAuthRequired } from '@/components/complaints/create/create-auth-required';
 import { CreateComplaintFooter } from '@/components/complaints/create/create-complaint-footer';
@@ -17,7 +17,13 @@ export default function CreateComplaintScreen() {
   const router = useRouter();
   const { edit, id } = useLocalSearchParams();
   const complaintId = Array.isArray(id) ? id[0] : id;
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const {
+    isAuthenticated,
+    isEmailVerified,
+    isLoading: authLoading,
+    refreshEmailVerification,
+    resendVerificationEmail,
+  } = useAuth();
   const { openAuthPrompt } = useAuthPrompt();
   const isEdit = edit === 'true' && complaintId;
   const {
@@ -48,6 +54,42 @@ export default function CreateComplaintScreen() {
     return (
       <CreateAuthRequired
         onPress={handleAuthRequiredPress}
+        styles={styles}
+      />
+    );
+  }
+
+  if (!isEmailVerified) {
+    return (
+      <CreateAuthRequired
+        title="Confirme seu email"
+        message="Confirme seu email para criar denúncias e participar das ações da comunidade."
+        buttonText="Reenviar email"
+        secondaryButtonText="Já confirmei"
+        onPress={async () => {
+          try {
+            await resendVerificationEmail();
+            Alert.alert(
+              'Email enviado',
+              'Enviamos um novo link de confirmação para o seu email.',
+            );
+          } catch {
+            Alert.alert('Erro', 'Não foi possível reenviar o email agora.');
+          }
+        }}
+        onSecondaryPress={async () => {
+          try {
+            const verified = await refreshEmailVerification();
+            if (!verified) {
+              Alert.alert(
+                'Ainda não confirmado',
+                'Abra o link enviado para seu email e tente novamente.',
+              );
+            }
+          } catch {
+            Alert.alert('Erro', 'Não foi possível verificar seu email agora.');
+          }
+        }}
         styles={styles}
       />
     );

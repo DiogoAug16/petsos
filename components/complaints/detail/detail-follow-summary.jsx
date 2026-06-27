@@ -1,6 +1,5 @@
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { UserLink } from '@/components/ui/UserLink';
-import { useAuth } from '@/context/AuthContext';
 import { useRequireAuth } from '@/context/AuthPromptContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
@@ -21,7 +20,6 @@ export function DetailFollowSummary({
   onToggleFollow,
   styles,
 }) {
-  const { isAuthenticated } = useAuth();
   const requireAuth = useRequireAuth();
   const [modalVisible, setModalVisible] = useState(false);
   const followerList = Array.isArray(followers) ? followers : [];
@@ -29,15 +27,7 @@ export function DetailFollowSummary({
   const followersLabel = followersLoading ? '...' : formatFollowersCount(totalFollowers);
   const openFollowers = () => {
     if (!canOpenFollowers) return;
-
-    requireAuth(
-      () => setModalVisible(true),
-      {
-        title: 'Entre para ver acompanhantes',
-        message:
-          'Faça login ou crie uma conta para ver quem acompanha esta denúncia.',
-      },
-    );
+    setModalVisible(true);
   };
 
   return (
@@ -111,7 +101,7 @@ export function DetailFollowSummary({
             </View>
 
             <ScrollView style={styles.followersModalList}>
-              {isAuthenticated && followerList.length > 0 ? (
+              {followerList.length > 0 ? (
                 followerList.map((username) => (
                   <UserLink
                     key={username}

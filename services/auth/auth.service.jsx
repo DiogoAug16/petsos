@@ -18,12 +18,7 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL;
  * @returns {Promise<UserCredential>} Credenciais do usuário autenticado
  */
 export async function register(email, password, name, username) {
-  const available = await checkUsername(username);
-  if (!available) {
-    const error = new Error('Este username já está em uso');
-    error.code = 'USERNAME_ALREADY_EXISTS';
-    throw error;
-  }
+  await validateEmail(email);
 
   const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
@@ -54,7 +49,9 @@ export async function register(email, password, name, username) {
       throw error;
     }
 
-    await sendEmailVerification(userCredential.user);
+    sendEmailVerification(userCredential.user).catch((error) => {
+      console.warn('Erro ao enviar email de verificação:', error?.message);
+    });
 
     return userCredential;
   } catch (error) {
@@ -72,6 +69,45 @@ export async function checkUsername(username) {
   const response = await fetch(`${API_URL}/auth/check-username/${username}`);
   const data = await response.json();
   return data.data.available;
+}
+
+export async function validateEmail(email) {
+  const response = await fetch(`${API_URL}/auth/validate-email`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    const error = new Error(data?.message || 'Email inválido');
+    error.code = data?.errorCode || 'INVALID_EMAIL';
+    throw error;
+  }
+
+  return data?.data?.valid === true;
+}
+
+export async function resendVerificationEmail() {
+  if (!auth.currentUser) {
+    const error = new Error('Usuário não autenticado.');
+    error.code = 'auth/user-not-found';
+    throw error;
+  }
+
+  await sendEmailVerification(auth.currentUser);
+}
+
+export async function refreshEmailVerification() {
+  if (!auth.currentUser) return false;
+
+  await auth.currentUser.reload();
+  await auth.currentUser.getIdToken(true);
+
+  return auth.currentUser.emailVerified === true;
 }
 
 /**

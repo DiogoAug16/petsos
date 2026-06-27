@@ -1,13 +1,14 @@
 import { MAP_PREFETCH_MAX_DELTA } from '@/constants/map/map.constants';
 
 const MAX_CACHED_MARKERS = 500;
+const MAX_VISIBLE_TILE_HINTS = 80;
 const MAX_RENDERED_MARKERS = 150;
 const MAX_TILE_FETCHES_PER_REGION = 4;
 const TILE_CACHE_TTL_MS = 10 * 60 * 1000;
 const TILE_QUERY_OVERLAP = 0.75;
 const TILE_MIN_DELTA = 0.07;
 const TILE_OVERSCAN = 1.1;
-const MAP_TILE_ZOOM = 12;
+export const MAP_TILE_ZOOM = 12;
 
 const getComplaintId = (complaint) => complaint?.id ?? complaint?._id;
 
@@ -76,6 +77,54 @@ export const getMapTileBounds = ({ tileZ, tileX, tileY }) => {
     west: (tileX / tiles) * 360 - 180,
     east: ((tileX + 1) / tiles) * 360 - 180,
   };
+};
+
+export const getMapTileCenter = (tile) => {
+  const bounds = getMapTileBounds(tile);
+  return {
+    latitude: (bounds.north + bounds.south) / 2,
+    longitude: (bounds.east + bounds.west) / 2,
+  };
+};
+
+const normalizeTileHint = (hint) => {
+  const z = Number(hint?.z);
+  const x = Number(hint?.x);
+  const y = Number(hint?.y);
+  const count = Number(hint?.count ?? 0);
+
+  if (!Number.isInteger(z) || !Number.isInteger(x) || !Number.isInteger(y) || count <= 0) {
+    return null;
+  }
+
+  const key = hint.tileKey || `${z}:${x}:${y}`;
+  const tile = { key, tileZ: z, tileX: x, tileY: y };
+  const coordinate = getMapTileCenter(tile);
+
+  return {
+    ...hint,
+    ...tile,
+    count,
+    coordinate,
+  };
+};
+
+const regionContainsCoordinate = (region, coordinate) => {
+  if (!region || !coordinate) return false;
+
+  const latitudeDelta = Number(region.latitudeDelta || 0);
+  const longitudeDelta = Number(region.longitudeDelta || 0);
+  const north = Number(region.latitude) + latitudeDelta / 2;
+  const south = Number(region.latitude) - latitudeDelta / 2;
+  const east = Number(region.longitude) + longitudeDelta / 2;
+  const west = Number(region.longitude) - longitudeDelta / 2;
+
+  return (
+    coordinate.latitude <= north &&
+    coordinate.latitude >= south &&
+    coordinate.longitude <= east &&
+    coordinate.longitude >= west
+  );
 };
 
 const getTileCoordinates = (tile) => {
@@ -174,17 +223,48 @@ export const createMapMarkerCache = () => {
   const tileCache = new Map();
   const tileCacheBusters = new Map();
   const tileComplaintIds = new Map();
+  const tileHints = new Map();
   const inFlightTiles = new Set();
+  let tileHintsReady = false;
 
   const getVisible = (region) => getVisibleComplaints(complaintsCache, region);
+
+  const getVisibleTileHints = (region) => {
+    return [...tileHints.values()]
+      .filter((hint) => {
+        if (tileComplaintIds.has(hint.key)) return false;
+        return regionContainsCoordinate(region, hint.coordinate);
+      })
+      .sort((first, second) => second.count - first.count)
+      .slice(0, MAX_VISIBLE_TILE_HINTS);
+  };
+
+  const setTileHints = (hints = []) => {
+    tileHintsReady = true;
+    hints.forEach((hint) => {
+      const normalized = normalizeTileHint(hint);
+      if (!normalized) return;
+      tileHints.set(normalized.key, normalized);
+    });
+  };
+
+  const markTileHintsUnavailable = () => {
+    tileHintsReady = false;
+  };
 
   const getMissingFetchRegions = (params) => {
     const now = Date.now();
     return buildFetchRegions(params)
       .filter((fetchRegion) => {
         const cachedAt = tileCache.get(fetchRegion.key);
+        const hasFreshTile = cachedAt && now - cachedAt <= TILE_CACHE_TTL_MS;
+        const hint = tileHints.get(fetchRegion.key);
+        const shouldFetchByHint =
+          !tileHintsReady || Boolean(hint) || tileCacheBusters.has(fetchRegion.key);
+
         return (
-          (!cachedAt || now - cachedAt > TILE_CACHE_TTL_MS) &&
+          !hasFreshTile &&
+          shouldFetchByHint &&
           !inFlightTiles.has(fetchRegion.key)
         );
       })
@@ -213,6 +293,7 @@ export const createMapMarkerCache = () => {
 
     tileCache.set(fetchRegion.key, Date.now());
     tileCacheBusters.delete(fetchRegion.key);
+    tileHints.delete(fetchRegion.key);
 
     for (const complaint of data) {
       const complaintId = getComplaintId(complaint);
@@ -235,6 +316,7 @@ export const createMapMarkerCache = () => {
   const invalidateTiles = ({ tileKeys = [], complaintId, action }) => {
     tileKeys.forEach((tileKey) => {
       tileCache.delete(tileKey);
+      tileHints.delete(tileKey);
       tileCacheBusters.set(tileKey, Date.now());
     });
 
@@ -258,6 +340,9 @@ export const createMapMarkerCache = () => {
 
   return {
     getVisible,
+    getVisibleTileHints,
+    setTileHints,
+    markTileHintsUnavailable,
     getMissingFetchRegions,
     markInFlight,
     settleFetchRegions,

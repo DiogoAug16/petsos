@@ -215,6 +215,22 @@ export async function getMapComplaints(region, signal) {
   return Array.isArray(data) ? data : [];
 }
 
+export async function getMapTileHints({ lat, lng, radiusKm = 10, z = 12 }, signal) {
+  const params = new URLSearchParams({
+    lat: String(lat),
+    lng: String(lng),
+    radiusKm: String(radiusKm),
+    z: String(z),
+  });
+
+  const response = await apiFetch(`/complaints/map/tiles-index?${params}`, {
+    signal,
+    skipAuthRedirect: true,
+  });
+  const data = response?.data ?? response;
+  return Array.isArray(data?.items) ? data.items : [];
+}
+
 export async function requestComplaintValidation(id, { reasonType, reasonText, evidenceIds }) {
   return apiFetch(`/complaints/${id}/request-validation`, {
     method: "POST",

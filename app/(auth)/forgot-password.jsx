@@ -1,37 +1,30 @@
-import { ScrollView, KeyboardAvoidingView, Platform, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { useColorScheme } from '@/hooks/ui/useColorScheme';
-import Colors from '@/styles/theme/Colors';
-import { useLoginForm } from '@/hooks/auth/useLoginForm';
-import { useEntranceAnimation } from '@/hooks/ui/useEntranceAnimation';
-import PawBackground from '@/components/auth/PawBackground';
 import AuthHero from '@/components/auth/AuthHero';
-import LoginForm from '@/components/auth/LoginForm';
-import CatAndDogPeeking from '@/components/auth/CatAndDogPeeking';
-import LoginSocialPlaceholder from '@/components/auth/LoginSocialPlaceholder';
+import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm';
+import PawBackground from '@/components/auth/PawBackground';
+import { useForgotPasswordForm } from '@/hooks/auth/useForgotPasswordForm';
+import { useColorScheme } from '@/hooks/ui/useColorScheme';
+import { useEntranceAnimation } from '@/hooks/ui/useEntranceAnimation';
 import { createLoginStyles } from '@/styles/auth';
+import Colors from '@/styles/theme/Colors';
 
-export default function LoginScreen() {
+export default function ForgotPasswordScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
+  const animatedStyle = useEntranceAnimation();
+  const themedStyles = createLoginStyles(colors);
+  const isDark = colors.background !== '#FFF6EC';
 
   const {
     form,
     errors,
-    loginError,
+    successMessage,
+    submitError,
     isSubmitting,
-    showPassword,
-    rememberMe,
     updateField,
     handleSubmit,
-    isFormValid,
-    setShowPassword,
-    setRememberMe,
-  } = useLoginForm();
-
-  const animatedStyle = useEntranceAnimation();
-  const themedStyles = createLoginStyles(colors);
-  const isDark = colors.background !== '#FFF6EC';
+  } = useForgotPasswordForm();
 
   return (
     <KeyboardAvoidingView
@@ -50,31 +43,24 @@ export default function LoginScreen() {
           <AuthHero
             colors={colors}
             styles={themedStyles}
-            title="Bem-vindo de Volta"
-            subtitle="Entre para continuar sua missão"
+            title="Acesse novamente"
+            subtitle="Recupere sua conta com segurança"
           />
 
           <View>
-            <CatAndDogPeeking />
-            <LoginForm
+            <ForgotPasswordForm
               form={form}
               errors={errors}
-              loginError={loginError}
+              successMessage={successMessage}
+              submitError={submitError}
               isSubmitting={isSubmitting}
-              showPassword={showPassword}
-              rememberMe={rememberMe}
               updateField={updateField}
               handleSubmit={handleSubmit}
-              isFormValid={isFormValid}
-              setShowPassword={setShowPassword}
-              setRememberMe={setRememberMe}
               colors={colors}
               isDark={isDark}
               styles={themedStyles}
             />
           </View>
-
-          <LoginSocialPlaceholder styles={themedStyles} />
         </ScrollView>
       </Animated.View>
     </KeyboardAvoidingView>

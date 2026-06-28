@@ -55,12 +55,37 @@ export const registerSchema = z
     path: ['confirmPassword'],
   });
 
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .refine((val) => val.trim().length > 0, {
+      message: AUTH_ERRORS.EMAIL_REQUIRED,
+    })
+    .transform((val) => val.trim())
+    .pipe(z.email({ message: AUTH_ERRORS.EMAIL_INVALID })),
+});
+
 export const validateForm = (formData) => {
   const result = registerSchema.safeParse(formData);
 
   if (result.success) {
     return {};
   }
+
+  const errors = {};
+  result.error.issues.forEach((issue) => {
+    if (issue.path && issue.path.length > 0) {
+      errors[issue.path[0]] = issue.message;
+    }
+  });
+
+  return errors;
+};
+
+export const validateForgotPasswordForm = (formData) => {
+  const result = forgotPasswordSchema.safeParse(formData);
+
+  if (result.success) return {};
 
   const errors = {};
   result.error.issues.forEach((issue) => {

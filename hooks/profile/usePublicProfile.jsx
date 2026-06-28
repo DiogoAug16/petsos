@@ -3,6 +3,7 @@ import {
   getUserFollowedComplaints,
   getUserFollowedComplaintsSummary,
 } from '@/services/users/users.service';
+import { appLogger } from '@/utils/shared/app-logger';
 import { useCallback, useEffect, useState } from 'react';
 
 const EMPTY_SUMMARY = { total: 0, resolved: 0 };
@@ -81,7 +82,7 @@ export function usePublicProfile(username, { includeFollowedComplaints = true } 
     try {
       applyProfilePayload(await fetchProfilePayload());
     } catch (error) {
-      console.warn('Erro ao recarregar perfil público', error?.message);
+      appLogger.warn('Erro ao recarregar perfil público', { error });
     }
   }, [applyProfilePayload, fetchProfilePayload, username]);
 

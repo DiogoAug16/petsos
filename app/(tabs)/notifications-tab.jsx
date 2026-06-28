@@ -12,6 +12,7 @@ import {
 } from '@/services/notifications/notifications.service';
 import { styles } from '@/styles/notifications/screen.styles';
 import { profileStyles } from '@/styles/profile/profile.styles';
+import { appLogger } from '@/utils/shared/app-logger';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { Image } from 'expo-image';
@@ -164,7 +165,7 @@ function NotificationsContent() {
               await reload();
               reloadUnreadCount();
             } catch (error) {
-              console.log('Erro ao limpar notificações:', error);
+              appLogger.warn('Erro ao limpar notificações', { error });
             }
           },
         },
@@ -189,7 +190,7 @@ function NotificationsContent() {
       await reload();
       router.push(`/complaint/${notification.complaintId}`);
     } catch (error) {
-      console.log('Erro ao abrir notificação:', error);
+      appLogger.warn('Erro ao abrir notificação', { error });
     }
   }
 

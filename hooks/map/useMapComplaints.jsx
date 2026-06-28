@@ -1,32 +1,40 @@
 import { CITY_LEVEL_MAX_DELTA, MAP_PREFETCH_MAX_DELTA } from '@/constants/map/map.constants';
 import { useMapTileInvalidations } from '@/hooks/map/useMapTileInvalidations';
 import {
+  getMapComplaintTilesBatch,
   getMapComplaints,
-  getMapTileHints,
+  getMapTilesIndex,
 } from '@/services/complaints/complaints.service';
 import {
   buildFetchRegions,
   createMapMarkerCache,
   getMapTile,
+  getMapTilesForRegion,
   MAP_TILE_ZOOM,
 } from '@/utils/map/map-marker-cache';
 import { drainMapTileInvalidations } from '@/utils/map/map-tile-invalidation-store';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-const MAP_FETCH_DEBOUNCE_MS = 120;
-const TILE_HINT_RADIUS_KM = 10;
-const TILE_HINT_REGION_TTL_MS = 60 * 1000;
+const MAP_FETCH_DEBOUNCE_MS = 350;
+const INITIAL_MAP_BOOTSTRAP_DELTA = 0.12;
+const TILE_INDEX_RADIUS_KM = 10;
+const TILE_INDEX_REGION_TTL_MS = 60 * 1000;
 
-export function useMapComplaints({ visibleRegion, prefetchRegion, movement }) {
+export function useMapComplaints({
+  visibleRegion,
+  prefetchRegion,
+  movement,
+  enabled = true,
+}) {
   const [complaints, setComplaints] = useState([]);
-  const [tileHints, setTileHints] = useState([]);
   const hasFetchedRef = useRef(false);
   const latestRequestRef = useRef(0);
   const latestVisibleRegionRef = useRef(visibleRegion);
   const latestTileParamsRef = useRef({ visibleRegion, prefetchRegion, movement });
-  const tileHintRegionCacheRef = useRef(new Map());
+  const tileIndexRegionCacheRef = useRef(new Map());
   const cacheRef = useRef(createMapMarkerCache());
   const shouldFetch =
+    enabled &&
     visibleRegion &&
     prefetchRegion &&
     visibleRegion.latitudeDelta <= CITY_LEVEL_MAX_DELTA &&
@@ -36,122 +44,134 @@ export function useMapComplaints({ visibleRegion, prefetchRegion, movement }) {
 
   const regionKey = useMemo(() => {
     if (!shouldFetch) return null;
-    return [
-      Number(prefetchRegion.latitude).toFixed(3),
-      Number(prefetchRegion.longitude).toFixed(3),
-      Number(prefetchRegion.latitudeDelta).toFixed(3),
-      Number(prefetchRegion.longitudeDelta).toFixed(3),
-    ].join(':');
+    const indexTile = getMapTile(
+      prefetchRegion.latitude,
+      prefetchRegion.longitude,
+      MAP_TILE_ZOOM
+    );
+    return `${indexTile.key}:${TILE_INDEX_RADIUS_KM}`;
   }, [prefetchRegion, shouldFetch]);
 
   useEffect(() => {
     latestVisibleRegionRef.current = visibleRegion;
     latestTileParamsRef.current = { visibleRegion, prefetchRegion, movement };
     setComplaints(cacheRef.current.getVisible(visibleRegion));
-    setTileHints(cacheRef.current.getVisibleTileHints(visibleRegion));
   }, [movement, prefetchRegion, visibleRegion]);
 
-  const loadTileHints = useCallback(async () => {
+  const loadTileIndex = useCallback(async () => {
     if (!shouldFetch || !regionKey) return;
 
-    const cachedAt = tileHintRegionCacheRef.current.get(regionKey);
-    if (cachedAt && Date.now() - cachedAt <= TILE_HINT_REGION_TTL_MS) {
-      setTileHints(cacheRef.current.getVisibleTileHints(latestVisibleRegionRef.current));
+    const cachedAt = tileIndexRegionCacheRef.current.get(regionKey);
+    if (cachedAt && Date.now() - cachedAt <= TILE_INDEX_REGION_TTL_MS) {
       return;
     }
 
     try {
-      const hints = await getMapTileHints({
+      const indexItems = await getMapTilesIndex({
         lat: prefetchRegion.latitude,
         lng: prefetchRegion.longitude,
-        radiusKm: TILE_HINT_RADIUS_KM,
+        radiusKm: TILE_INDEX_RADIUS_KM,
         z: MAP_TILE_ZOOM,
       });
-      tileHintRegionCacheRef.current.set(regionKey, Date.now());
-      cacheRef.current.setTileHints(hints);
+      tileIndexRegionCacheRef.current.set(regionKey, Date.now());
+      cacheRef.current.setTileIndex(indexItems);
     } catch {
-      cacheRef.current.markTileHintsUnavailable();
+      cacheRef.current.markTileIndexUnavailable();
     }
-
-    setTileHints(cacheRef.current.getVisibleTileHints(latestVisibleRegionRef.current));
   }, [prefetchRegion, regionKey, shouldFetch]);
 
   const refetch = useCallback(
-    async () => {
+    async ({ forceTileKeys = [] } = {}) => {
       const requestId = latestRequestRef.current + 1;
       latestRequestRef.current = requestId;
+      const shouldBootstrapInitialRegion =
+        !hasFetchedRef.current && forceTileKeys.length === 0;
 
       if (!shouldFetch) {
-        return;
+        return false;
       }
 
-      await loadTileHints();
+      await loadTileIndex();
 
-      const fetchRegions = cacheRef.current.getMissingFetchRegions({
+      const forcedFetchRegions = cacheRef.current.getFetchRegionsForTileKeys(
+        forceTileKeys
+      );
+      const missingFetchRegions = cacheRef.current.getMissingFetchRegions({
         visibleRegion,
         prefetchRegion,
         movement,
       });
+      const fetchRegionsByKey = new Map();
 
-      if (fetchRegions.length === 0) {
-        setComplaints(cacheRef.current.getVisible(latestVisibleRegionRef.current));
-        setTileHints(cacheRef.current.getVisibleTileHints(latestVisibleRegionRef.current));
-        return;
-      }
-
-      cacheRef.current.markInFlight(fetchRegions);
-
-      const responses = await Promise.allSettled(
-        fetchRegions.map(async (fetchRegion) => {
-          const data = await getMapComplaints(fetchRegion);
-          return { fetchRegion, data };
-        })
-      );
-
-      responses.forEach((response) => {
-        if (response.status !== 'fulfilled') return;
-
-        cacheRef.current.addFetchResult(response.value);
+      [...forcedFetchRegions, ...missingFetchRegions].forEach((fetchRegion) => {
+        fetchRegionsByKey.set(fetchRegion.key, fetchRegion);
       });
 
-      cacheRef.current.settleFetchRegions(fetchRegions);
-      cacheRef.current.prune(latestVisibleRegionRef.current);
+      const fetchRegions = [...fetchRegionsByKey.values()];
+
+      if (fetchRegions.length > 0) {
+        cacheRef.current.markInFlight(fetchRegions);
+
+        try {
+          const tiles = await getMapComplaintTilesBatch(fetchRegions);
+          cacheRef.current.addBatchFetchResults({ fetchRegions, tiles });
+        } finally {
+          cacheRef.current.settleFetchRegions(fetchRegions);
+        }
+        cacheRef.current.prune(latestVisibleRegionRef.current);
+      }
+
+      if (
+        shouldBootstrapInitialRegion &&
+        cacheRef.current.getVisible(latestVisibleRegionRef.current).length === 0
+      ) {
+        const bootstrapComplaints = await getMapComplaints({
+          latitude: visibleRegion.latitude,
+          longitude: visibleRegion.longitude,
+          latitudeDelta: Math.max(
+            Number(visibleRegion.latitudeDelta || 0),
+            INITIAL_MAP_BOOTSTRAP_DELTA
+          ),
+          longitudeDelta: Math.max(
+            Number(visibleRegion.longitudeDelta || 0),
+            INITIAL_MAP_BOOTSTRAP_DELTA
+          ),
+        });
+        cacheRef.current.addComplaints(bootstrapComplaints);
+        cacheRef.current.prune(latestVisibleRegionRef.current);
+      }
 
       if (requestId === latestRequestRef.current) {
         setComplaints(cacheRef.current.getVisible(latestVisibleRegionRef.current));
-        setTileHints(cacheRef.current.getVisibleTileHints(latestVisibleRegionRef.current));
       }
+
+      return true;
     },
-    [loadTileHints, movement, prefetchRegion, shouldFetch, visibleRegion]
+    [loadTileIndex, movement, prefetchRegion, shouldFetch, visibleRegion]
   );
 
   const applyTileInvalidation = useCallback(
     ({ tileKeys, complaintId, action }) => {
       cacheRef.current.invalidateTiles({ tileKeys, complaintId, action });
-      tileHintRegionCacheRef.current.clear();
+      tileIndexRegionCacheRef.current.clear();
 
       const latestParams = latestTileParamsRef.current;
-      const visibleTileKey = latestParams.visibleRegion
-        ? getMapTile(
-            latestParams.visibleRegion.latitude,
-            latestParams.visibleRegion.longitude
-          ).key
-        : null;
       const activeTileKeys = [
-        visibleTileKey,
+        ...getMapTilesForRegion(latestParams.visibleRegion).map((tile) => tile.key),
+        ...getMapTilesForRegion(latestParams.prefetchRegion).map((tile) => tile.key),
         ...buildFetchRegions(latestParams).map((fetchRegion) => fetchRegion.key),
       ].filter(Boolean);
-      const shouldRefresh = tileKeys?.some((tileKey) =>
-        activeTileKeys.includes(tileKey)
+      const activeTileKeySet = new Set(activeTileKeys);
+      const affectedTileKeys = (tileKeys || []).filter((tileKey) =>
+        activeTileKeySet.has(tileKey)
       );
 
-      if (shouldRefresh) {
-        refetch();
+      if (affectedTileKeys.length > 0) {
+        refetch({ forceTileKeys: affectedTileKeys });
         return;
       }
 
       setComplaints(cacheRef.current.getVisible(latestVisibleRegionRef.current));
-      setTileHints(cacheRef.current.getVisibleTileHints(latestVisibleRegionRef.current));
     },
     [refetch]
   );
@@ -174,8 +194,10 @@ export function useMapComplaints({ visibleRegion, prefetchRegion, movement }) {
     const delay = hasFetchedRef.current ? MAP_FETCH_DEBOUNCE_MS : 0;
     const timer = setTimeout(() => {
       refetch()
-        .then(() => {
-          hasFetchedRef.current = true;
+        .then((didFetch) => {
+          if (didFetch) {
+            hasFetchedRef.current = true;
+          }
         })
         .catch((error) => {
           if (error.name !== 'AbortError') setComplaints([]);
@@ -189,7 +211,6 @@ export function useMapComplaints({ visibleRegion, prefetchRegion, movement }) {
 
   return {
     complaints,
-    tileHints,
     shouldShowComplaintMarkers: Boolean(shouldFetch),
     refetchMapComplaints: refetch,
   };

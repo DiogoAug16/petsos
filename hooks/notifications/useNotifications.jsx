@@ -1,4 +1,5 @@
 import { getNotifications } from '@/services/notifications/notifications.service';
+import { appLogger } from '@/utils/shared/app-logger';
 import { useCallback, useEffect, useState } from 'react';
 
 export function useNotifications() {
@@ -19,7 +20,7 @@ export function useNotifications() {
 
       setNotifications(visibleNotifications);
     } catch (error) {
-      console.log('Erro ao buscar notificações:', error);
+      appLogger.warn('Erro ao buscar notificações', { error });
     } finally {
       setLoading(false);
       setRefreshing(false);

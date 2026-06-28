@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { getDrivingRoute } from '@/services/map/routes.service';
+import { appLogger } from '@/utils/shared/app-logger';
 
 export function useMapComplaintSelection({ location, mapRef, router }) {
   const routeRequestRef = useRef(0);
@@ -87,7 +88,7 @@ export function useMapComplaintSelection({ location, mapRef, router }) {
         nextRoute = route;
       }
     } catch (error) {
-      console.warn('OpenRouteService route failed', error?.message);
+      appLogger.warn('Falha ao buscar rota no mapa', { error });
     }
 
     if (requestId !== routeRequestRef.current) return;

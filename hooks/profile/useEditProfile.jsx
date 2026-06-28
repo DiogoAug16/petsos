@@ -6,6 +6,7 @@ import { Alert } from 'react-native';
 import { useHapticPress } from '@/hooks/ui/useHapticPress';
 import { updateCurrentUserProfile } from '@/services/users/users.service';
 import { buildUploadPhotoUri } from '@/utils/media/photo.utils';
+import { appLogger } from '@/utils/shared/app-logger';
 
 const isImageAsset = (asset) => {
   if (!asset) return false;
@@ -159,7 +160,7 @@ export function useEditProfile({ profile, uploadUrl }) {
 
         goBack();
       } catch (error) {
-        console.warn('Profile update failed', error?.message);
+        appLogger.warn('Falha ao atualizar perfil', { error });
       } finally {
         setIsSaving(false);
       }

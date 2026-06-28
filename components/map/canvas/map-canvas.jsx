@@ -2,7 +2,6 @@ import MapView, { Polyline } from 'react-native-maps';
 
 import { TileDebugLayer } from '@/components/debug/map/tile-debug-layer';
 import { ComplaintMarkersLayer } from '@/components/map/markers/complaint-markers-layer';
-import { TileHintLayer } from '@/components/map/markers/tile-hint-layer';
 import { HighlightedCircle } from '@/components/map/overlays/highlighted-circle';
 
 export function MapCanvas({
@@ -21,7 +20,6 @@ export function MapCanvas({
   selectedCoordinate,
   shouldShowComplaintMarkers,
   styles,
-  tileHints,
   updateRegion,
   visibleRegion,
 }) {
@@ -47,11 +45,6 @@ export function MapCanvas({
         visibleRegion={visibleRegion ?? location}
         prefetchRegion={prefetchRegion ?? location}
         movement={movement}
-      />
-
-      <TileHintLayer
-        tileHints={tileHints}
-        shouldRender={shouldShowComplaintMarkers}
       />
 
       <ComplaintMarkersLayer

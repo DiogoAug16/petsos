@@ -215,7 +215,28 @@ export async function getMapComplaints(region, signal) {
   return Array.isArray(data) ? data : [];
 }
 
-export async function getMapTileHints({ lat, lng, radiusKm = 10, z = 12 }, signal) {
+export async function getMapComplaintTilesBatch(fetchRegions = [], signal) {
+  if (!fetchRegions.length) return [];
+
+  const response = await apiFetch('/complaints/map/tiles/batch', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      limit: 120,
+      tiles: fetchRegions.map((region) => ({
+        z: region.tileZ,
+        x: region.tileX,
+        y: region.tileY,
+      })),
+    }),
+    signal,
+    skipAuthRedirect: true,
+  });
+  const data = response?.data ?? response;
+  return Array.isArray(data?.tiles) ? data.tiles : [];
+}
+
+export async function getMapTilesIndex({ lat, lng, radiusKm = 10, z = 12 }, signal) {
   const params = new URLSearchParams({
     lat: String(lat),
     lng: String(lng),

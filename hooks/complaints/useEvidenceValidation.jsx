@@ -10,6 +10,7 @@ import {
   isRejectedByCommunity,
   isResolvedByCommunity,
 } from "@/utils/complaints/evidence-validation.utils";
+import { appLogger } from "@/utils/shared/app-logger";
 
 export const useEvidenceValidation = ({
   complaint,
@@ -128,7 +129,7 @@ export const useEvidenceValidation = ({
         setSelectedIds([]);
         onStatusChanged?.();
       } catch (err) {
-        console.warn("Evidence validation failed", err?.message);
+        appLogger.warn("Falha ao validar evidência", { error: err });
       } finally {
         setLoading(false);
       }
@@ -174,7 +175,7 @@ export const useEvidenceValidation = ({
           await loadVoteStatus();
         }
       } catch (err) {
-        console.warn("Complaint vote failed", err?.message);
+        appLogger.warn("Falha ao votar na resolução da denúncia", { error: err });
       } finally {
         setVoteLoading(false);
       }

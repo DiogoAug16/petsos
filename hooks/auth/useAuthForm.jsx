@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { checkUsername } from '@/services/auth/auth.service';
+import { appLogger } from '@/utils/shared/app-logger';
 
 const USERNAME_CHECK_DEBOUNCE_MS = 450;
 const isUsernameSyntaxValid = (username) => {
@@ -72,7 +73,7 @@ export function useAuthForm() {
           return next;
         });
       } catch (error) {
-        console.warn('Username availability check failed', error?.message);
+        appLogger.warn('Falha ao verificar disponibilidade de username', { error });
       }
     }, USERNAME_CHECK_DEBOUNCE_MS);
 

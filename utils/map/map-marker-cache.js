@@ -1,9 +1,8 @@
 import { MAP_PREFETCH_MAX_DELTA } from '@/constants/map/map.constants';
 
 const MAX_CACHED_MARKERS = 500;
-const MAX_VISIBLE_TILE_HINTS = 80;
 const MAX_RENDERED_MARKERS = 150;
-const MAX_TILE_FETCHES_PER_REGION = 4;
+const MAX_TILE_FETCHES_PER_REGION = 3;
 const TILE_CACHE_TTL_MS = 10 * 60 * 1000;
 const TILE_QUERY_OVERLAP = 0.75;
 const TILE_MIN_DELTA = 0.07;
@@ -37,6 +36,19 @@ const getNearestComplaints = (cache, region) => {
 };
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+const isFiniteNumber = (value) => Number.isFinite(Number(value));
+
+const isValidMapRegion = (region) => {
+  return (
+    region &&
+    isFiniteNumber(region.latitude) &&
+    isFiniteNumber(region.longitude) &&
+    isFiniteNumber(region.latitudeDelta) &&
+    isFiniteNumber(region.longitudeDelta) &&
+    Number(region.latitudeDelta) > 0 &&
+    Number(region.longitudeDelta) > 0
+  );
+};
 
 export const getMapTile = (latitude, longitude, zoom = MAP_TILE_ZOOM) => {
   const safeLatitude = clamp(latitude, -85.05112878, 85.05112878);
@@ -64,6 +76,21 @@ export const getMapTile = (latitude, longitude, zoom = MAP_TILE_ZOOM) => {
   };
 };
 
+export const parseMapTileKey = (tileKey) => {
+  const [tileZ, tileX, tileY] = String(tileKey || '')
+    .split(':')
+    .map(Number);
+
+  if (![tileZ, tileX, tileY].every(Number.isInteger)) return null;
+
+  return {
+    key: `${tileZ}:${tileX}:${tileY}`,
+    tileZ,
+    tileX,
+    tileY,
+  };
+};
+
 const tileYToLatitude = (y, zoom) => {
   const radians = Math.atan(Math.sinh(Math.PI * (1 - (2 * y) / 2 ** zoom)));
   return (radians * 180) / Math.PI;
@@ -79,7 +106,7 @@ export const getMapTileBounds = ({ tileZ, tileX, tileY }) => {
   };
 };
 
-export const getMapTileCenter = (tile) => {
+const getMapTileCenter = (tile) => {
   const bounds = getMapTileBounds(tile);
   return {
     latitude: (bounds.north + bounds.south) / 2,
@@ -87,54 +114,68 @@ export const getMapTileCenter = (tile) => {
   };
 };
 
-const normalizeTileHint = (hint) => {
-  const z = Number(hint?.z);
-  const x = Number(hint?.x);
-  const y = Number(hint?.y);
-  const count = Number(hint?.count ?? 0);
+export const getMapTilesForRegion = (region, zoom = MAP_TILE_ZOOM) => {
+  if (!isValidMapRegion(region)) return [];
+
+  const latitudeDelta = Number(region.latitudeDelta);
+  const longitudeDelta = Number(region.longitudeDelta);
+  const north = Number(region.latitude) + latitudeDelta / 2;
+  const south = Number(region.latitude) - latitudeDelta / 2;
+  const west = Number(region.longitude) - longitudeDelta / 2;
+  const east = Number(region.longitude) + longitudeDelta / 2;
+  const northWest = getMapTile(north, west, zoom);
+  const southEast = getMapTile(south, east, zoom);
+  const tiles = [];
+
+  for (let tileX = northWest.tileX; tileX <= southEast.tileX; tileX += 1) {
+    for (let tileY = northWest.tileY; tileY <= southEast.tileY; tileY += 1) {
+      tiles.push({
+        key: `${zoom}:${tileX}:${tileY}`,
+        tileZ: zoom,
+        tileX,
+        tileY,
+      });
+    }
+  }
+
+  return tiles;
+};
+
+const normalizeTileIndexItem = (item) => {
+  const z = Number(item?.z);
+  const x = Number(item?.x);
+  const y = Number(item?.y);
+  const count = Number(item?.count ?? 0);
 
   if (!Number.isInteger(z) || !Number.isInteger(x) || !Number.isInteger(y) || count <= 0) {
     return null;
   }
 
-  const key = hint.tileKey || `${z}:${x}:${y}`;
+  const key = item.tileKey || `${z}:${x}:${y}`;
   const tile = { key, tileZ: z, tileX: x, tileY: y };
-  const coordinate = getMapTileCenter(tile);
 
   return {
-    ...hint,
+    ...item,
     ...tile,
     count,
-    coordinate,
   };
-};
-
-const regionContainsCoordinate = (region, coordinate) => {
-  if (!region || !coordinate) return false;
-
-  const latitudeDelta = Number(region.latitudeDelta || 0);
-  const longitudeDelta = Number(region.longitudeDelta || 0);
-  const north = Number(region.latitude) + latitudeDelta / 2;
-  const south = Number(region.latitude) - latitudeDelta / 2;
-  const east = Number(region.longitude) + longitudeDelta / 2;
-  const west = Number(region.longitude) - longitudeDelta / 2;
-
-  return (
-    coordinate.latitude <= north &&
-    coordinate.latitude >= south &&
-    coordinate.longitude <= east &&
-    coordinate.longitude >= west
-  );
 };
 
 const getTileCoordinates = (tile) => {
   const bounds = getMapTileBounds(tile);
-  return [
+  const coordinates = [
     { latitude: bounds.north, longitude: bounds.west },
     { latitude: bounds.north, longitude: bounds.east },
     { latitude: bounds.south, longitude: bounds.east },
     { latitude: bounds.south, longitude: bounds.west },
   ];
+
+  return coordinates.every(
+    (coordinate) =>
+      isFiniteNumber(coordinate.latitude) && isFiniteNumber(coordinate.longitude),
+  )
+    ? coordinates
+    : [];
 };
 
 export const buildFetchRegions = ({ visibleRegion, prefetchRegion, movement }) => {
@@ -170,16 +211,15 @@ export const buildFetchRegions = ({ visibleRegion, prefetchRegion, movement }) =
     addOffset(0, 1, 1);
   }
 
-  const visibleTile = getMapTile(visibleRegion.latitude, visibleRegion.longitude);
-  const visibleFetchRegion = {
-    ...visibleTile,
-    latitude: visibleRegion.latitude,
-    longitude: visibleRegion.longitude,
+  const visibleFetchRegions = getMapTilesForRegion(visibleRegion).map((tile) => ({
+    ...tile,
+    ...getMapTileCenter(tile),
     latitudeDelta,
     longitudeDelta,
-  };
+    visible: true,
+  }));
 
-  return [visibleFetchRegion, ...offsets
+  return [...visibleFetchRegions, ...offsets
     .sort((first, second) => first.priority - second.priority)
     .map(({ latitudeOffset, longitudeOffset }) => {
       const latitude = prefetchRegion.latitude + latitudeOffset * latitudeStep;
@@ -192,6 +232,7 @@ export const buildFetchRegions = ({ visibleRegion, prefetchRegion, movement }) =
         longitude,
         latitudeDelta,
         longitudeDelta,
+        visible: false,
       };
     })]
     .filter((fetchRegion) => {
@@ -202,15 +243,18 @@ export const buildFetchRegions = ({ visibleRegion, prefetchRegion, movement }) =
 };
 
 export const buildDebugTiles = ({ visibleRegion, prefetchRegion, movement }) => {
-  if (!visibleRegion || !prefetchRegion) return [];
+  if (!isValidMapRegion(visibleRegion) || !isValidMapRegion(prefetchRegion)) return [];
 
   const activeTile = getMapTile(visibleRegion.latitude, visibleRegion.longitude);
   const tilesByKey = new Map();
 
   for (const tile of [activeTile, ...buildFetchRegions({ visibleRegion, prefetchRegion, movement })]) {
+    const coordinates = getTileCoordinates(tile);
+    if (coordinates.length < 4) continue;
+
     tilesByKey.set(tile.key, {
       key: tile.key,
-      coordinates: getTileCoordinates(tile),
+      coordinates,
       active: tile.key === activeTile.key,
     });
   }
@@ -223,33 +267,23 @@ export const createMapMarkerCache = () => {
   const tileCache = new Map();
   const tileCacheBusters = new Map();
   const tileComplaintIds = new Map();
-  const tileHints = new Map();
+  const tileIndex = new Map();
   const inFlightTiles = new Set();
-  let tileHintsReady = false;
+  let tileIndexReady = false;
 
   const getVisible = (region) => getVisibleComplaints(complaintsCache, region);
 
-  const getVisibleTileHints = (region) => {
-    return [...tileHints.values()]
-      .filter((hint) => {
-        if (tileComplaintIds.has(hint.key)) return false;
-        return regionContainsCoordinate(region, hint.coordinate);
-      })
-      .sort((first, second) => second.count - first.count)
-      .slice(0, MAX_VISIBLE_TILE_HINTS);
-  };
-
-  const setTileHints = (hints = []) => {
-    tileHintsReady = true;
-    hints.forEach((hint) => {
-      const normalized = normalizeTileHint(hint);
+  const setTileIndex = (items = []) => {
+    tileIndexReady = true;
+    items.forEach((item) => {
+      const normalized = normalizeTileIndexItem(item);
       if (!normalized) return;
-      tileHints.set(normalized.key, normalized);
+      tileIndex.set(normalized.key, normalized);
     });
   };
 
-  const markTileHintsUnavailable = () => {
-    tileHintsReady = false;
+  const markTileIndexUnavailable = () => {
+    tileIndexReady = false;
   };
 
   const getMissingFetchRegions = (params) => {
@@ -258,13 +292,16 @@ export const createMapMarkerCache = () => {
       .filter((fetchRegion) => {
         const cachedAt = tileCache.get(fetchRegion.key);
         const hasFreshTile = cachedAt && now - cachedAt <= TILE_CACHE_TTL_MS;
-        const hint = tileHints.get(fetchRegion.key);
-        const shouldFetchByHint =
-          !tileHintsReady || Boolean(hint) || tileCacheBusters.has(fetchRegion.key);
+        const indexItem = tileIndex.get(fetchRegion.key);
+        const shouldFetchByIndex =
+          fetchRegion.visible ||
+          !tileIndexReady ||
+          Boolean(indexItem) ||
+          tileCacheBusters.has(fetchRegion.key);
 
         return (
           !hasFreshTile &&
-          shouldFetchByHint &&
+          shouldFetchByIndex &&
           !inFlightTiles.has(fetchRegion.key)
         );
       })
@@ -273,6 +310,22 @@ export const createMapMarkerCache = () => {
         cacheBuster: tileCacheBusters.get(fetchRegion.key),
       }))
       .slice(0, MAX_TILE_FETCHES_PER_REGION);
+  };
+
+  const getFetchRegionsForTileKeys = (tileKeys = []) => {
+    return tileKeys
+      .map((tileKey) => {
+        const tile = parseMapTileKey(tileKey);
+        if (!tile || inFlightTiles.has(tile.key)) return null;
+
+        const center = getMapTileCenter(tile);
+        return {
+          ...tile,
+          ...center,
+          cacheBuster: tileCacheBusters.get(tile.key),
+        };
+      })
+      .filter(Boolean);
   };
 
   const markInFlight = (fetchRegions) => {
@@ -293,7 +346,7 @@ export const createMapMarkerCache = () => {
 
     tileCache.set(fetchRegion.key, Date.now());
     tileCacheBusters.delete(fetchRegion.key);
-    tileHints.delete(fetchRegion.key);
+    tileIndex.delete(fetchRegion.key);
 
     for (const complaint of data) {
       const complaintId = getComplaintId(complaint);
@@ -313,10 +366,34 @@ export const createMapMarkerCache = () => {
     tileComplaintIds.set(fetchRegion.key, nextComplaintIds);
   };
 
+  const addBatchFetchResults = ({ fetchRegions, tiles }) => {
+    const regionsByKey = new Map(
+      fetchRegions.map((fetchRegion) => [fetchRegion.key, fetchRegion]),
+    );
+
+    tiles.forEach((tileResult) => {
+      const fetchRegion = regionsByKey.get(tileResult.tileKey);
+      if (!fetchRegion) return;
+
+      addFetchResult({
+        fetchRegion,
+        data: Array.isArray(tileResult.items) ? tileResult.items : [],
+      });
+    });
+  };
+
+  const addComplaints = (complaints = []) => {
+    complaints.forEach((complaint) => {
+      const complaintId = getComplaintId(complaint);
+      if (!complaintId) return;
+      complaintsCache.set(String(complaintId), complaint);
+    });
+  };
+
   const invalidateTiles = ({ tileKeys = [], complaintId, action }) => {
     tileKeys.forEach((tileKey) => {
       tileCache.delete(tileKey);
-      tileHints.delete(tileKey);
+      tileIndex.delete(tileKey);
       tileCacheBusters.set(tileKey, Date.now());
     });
 
@@ -340,13 +417,15 @@ export const createMapMarkerCache = () => {
 
   return {
     getVisible,
-    getVisibleTileHints,
-    setTileHints,
-    markTileHintsUnavailable,
+    setTileIndex,
+    markTileIndexUnavailable,
     getMissingFetchRegions,
+    getFetchRegionsForTileKeys,
     markInFlight,
     settleFetchRegions,
     addFetchResult,
+    addBatchFetchResults,
+    addComplaints,
     invalidateTiles,
     prune,
   };

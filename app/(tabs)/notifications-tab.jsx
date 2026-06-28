@@ -71,6 +71,73 @@ function GuestNotificationsScreen() {
   );
 }
 
+function UnverifiedNotificationsScreen() {
+  const colorScheme = useColorScheme();
+  const unverifiedStyles = profileStyles(colorScheme);
+  const { refreshEmailVerification, resendVerificationEmail } = useAuth();
+
+  const handleResend = useHapticPress(async () => {
+    try {
+      await resendVerificationEmail();
+      Alert.alert(
+        'Email enviado',
+        'Enviamos um novo link de confirmação para o seu email.',
+      );
+    } catch {
+      Alert.alert('Erro', 'Não foi possível reenviar o email agora.');
+    }
+  }, 'normal');
+
+  const handleRefresh = useHapticPress(async () => {
+    try {
+      const verified = await refreshEmailVerification();
+      if (!verified) {
+        Alert.alert(
+          'Ainda não confirmado',
+          'Abra o link enviado para seu email e tente novamente.',
+        );
+      }
+    } catch {
+      Alert.alert('Erro', 'Não foi possível verificar seu email agora.');
+    }
+  }, 'normal');
+
+  return (
+    <View style={unverifiedStyles.authRequiredScreen}>
+      <Image
+        source={NOTIFICATIONS_BACKGROUND}
+        style={unverifiedStyles.backgroundImage}
+        contentFit="cover"
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+      />
+      <View style={unverifiedStyles.authRequiredCard}>
+        <Text style={unverifiedStyles.authRequiredTitle}>Confirme seu email</Text>
+        <Text style={unverifiedStyles.authRequiredText}>
+          Confirme seu email para receber notificações das denúncias que você
+          acompanha.
+        </Text>
+        <Pressable
+          style={unverifiedStyles.authRequiredButton}
+          onPress={handleResend}
+        >
+          <Text style={unverifiedStyles.authRequiredButtonText}>
+            Reenviar email
+          </Text>
+        </Pressable>
+        <Pressable
+          style={unverifiedStyles.authRequiredSecondaryButton}
+          onPress={handleRefresh}
+        >
+          <Text style={unverifiedStyles.authRequiredSecondaryButtonText}>
+            Já confirmei
+          </Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
 function NotificationsContent() {
   const router = useRouter();
   const { reloadUnreadCount } = useUnreadCount();
@@ -201,7 +268,7 @@ function NotificationsContent() {
 }
 
 export default function NotificationsScreen() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isEmailVerified, isLoading } = useAuth();
 
   if (isLoading) {
     return <LoadingState message="Carregando…" />;
@@ -209,6 +276,10 @@ export default function NotificationsScreen() {
 
   if (!isAuthenticated) {
     return <GuestNotificationsScreen />;
+  }
+
+  if (!isEmailVerified) {
+    return <UnverifiedNotificationsScreen />;
   }
 
   return <NotificationsContent />;

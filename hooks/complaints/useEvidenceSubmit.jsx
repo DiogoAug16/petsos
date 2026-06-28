@@ -1,12 +1,12 @@
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
 import { Alert } from 'react-native';
-import Toast from 'react-native-toast-message';
 
 import {
   EVIDENCE_SUBMIT_MAX_PHOTOS,
   EVIDENCE_SUBMIT_MIN_DESCRIPTION,
 } from '@/constants/complaints/complaint-evidence-submit.constants';
+import { useRequireVerifiedEmail } from '@/hooks/auth/useRequireVerifiedEmail';
 import { submitEvidence } from '@/services/complaints/complaint-evidence.service';
 import {
   compressEvidencePhoto,
@@ -14,6 +14,7 @@ import {
 } from '@/utils/complaints/evidence-submit.utils';
 
 export function useEvidenceSubmit({ complaintId, onClose, onSubmitted }) {
+  const requireVerifiedEmail = useRequireVerifiedEmail();
   const [photos, setPhotos] = useState([]);
   const [description, setDescription] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -90,6 +91,15 @@ export function useEvidenceSubmit({ complaintId, onClose, onSubmitted }) {
   const handleSubmit = async () => {
     if (!isValid || submitting) return;
 
+    if (
+      !requireVerifiedEmail(null, {
+        title: 'Confirme seu email',
+        message: 'Confirme seu email para enviar evidências.',
+      })
+    ) {
+      return;
+    }
+
     setSubmitting(true);
     try {
       const formData = new FormData();
@@ -106,21 +116,11 @@ export function useEvidenceSubmit({ complaintId, onClose, onSubmitted }) {
 
       await submitEvidence(complaintId, formData);
 
-      Toast.show({
-        type: 'success',
-        text1: 'Evidência enviada',
-        text2: 'Aguardando validação do criador da denúncia.',
-      });
-
       resetForm();
       onSubmitted?.();
       onClose();
     } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: 'Erro',
-        text2: error?.message || 'Não foi possível enviar a evidência.',
-      });
+      console.warn('Evidence submit failed', error?.message);
     } finally {
       setSubmitting(false);
     }

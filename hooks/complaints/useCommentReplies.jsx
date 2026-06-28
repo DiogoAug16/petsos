@@ -7,6 +7,7 @@ import {
 } from '@/services/complaints/comments.service';
 import { useAuth } from '@/context/AuthContext';
 import { useRequireAuth } from '@/context/AuthPromptContext';
+import { useRequireVerifiedEmail } from '@/hooks/auth/useRequireVerifiedEmail';
 import { useCallback, useState } from 'react';
 
 const DEFAULT_PAGE_INFO = {
@@ -46,6 +47,7 @@ const getNextLikeState = (reply) => {
 export function useCommentReplies({ complaintId, commentId, onReplyCreated }) {
   const { isAuthenticated } = useAuth();
   const requireAuth = useRequireAuth();
+  const requireVerifiedEmail = useRequireVerifiedEmail();
   const [visible, setVisible] = useState(false);
   const [replies, setReplies] = useState([]);
   const [pageInfo, setPageInfo] = useState(DEFAULT_PAGE_INFO);
@@ -126,6 +128,15 @@ export function useCommentReplies({ complaintId, commentId, onReplyCreated }) {
         return null;
       }
 
+      if (
+        !requireVerifiedEmail(null, {
+          title: 'Confirme seu email',
+          message: 'Confirme seu email para responder comentários.',
+        })
+      ) {
+        return null;
+      }
+
       const trimmedText = String(text ?? '').trim();
       if (!complaintId || !commentId || !trimmedText || submitting) return null;
 
@@ -148,7 +159,15 @@ export function useCommentReplies({ complaintId, commentId, onReplyCreated }) {
         setSubmitting(false);
       }
     },
-    [commentId, complaintId, isAuthenticated, onReplyCreated, requireAuth, submitting],
+    [
+      commentId,
+      complaintId,
+      isAuthenticated,
+      onReplyCreated,
+      requireAuth,
+      requireVerifiedEmail,
+      submitting,
+    ],
   );
 
   const updateReply = useCallback((replyId, updater) => {
@@ -167,6 +186,15 @@ export function useCommentReplies({ complaintId, commentId, onReplyCreated }) {
           message:
             'Faça login ou crie uma conta para curtir comentários.',
         });
+        return;
+      }
+
+      if (
+        !requireVerifiedEmail(null, {
+          title: 'Confirme seu email',
+          message: 'Confirme seu email para curtir comentários.',
+        })
+      ) {
         return;
       }
 
@@ -194,7 +222,7 @@ export function useCommentReplies({ complaintId, commentId, onReplyCreated }) {
         updateReply(reply.id, () => previousReply);
       }
     },
-    [complaintId, isAuthenticated, requireAuth, updateReply],
+    [complaintId, isAuthenticated, requireAuth, requireVerifiedEmail, updateReply],
   );
 
   return {

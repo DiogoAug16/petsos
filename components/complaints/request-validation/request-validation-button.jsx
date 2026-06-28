@@ -44,7 +44,7 @@ export function RequestValidationButton({
   return (
     <>
       <RequestValidationCard
-        onOpen={() => requestValidation.setVisible(true)}
+        onOpen={requestValidation.openModal}
         styles={styles}
       />
 

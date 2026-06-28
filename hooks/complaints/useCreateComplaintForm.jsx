@@ -7,6 +7,7 @@ import {
   INITIAL_COMPLAINT_FORM,
 } from '@/constants/complaints/complaints.constants';
 import { useHapticPress } from '@/hooks/ui/useHapticPress';
+import { useRequireVerifiedEmail } from '@/hooks/auth/useRequireVerifiedEmail';
 import { useLocation } from '@/hooks/map/useLocation';
 import {
   createComplaint,
@@ -35,6 +36,7 @@ export function useCreateComplaintForm({
   router,
 }) {
   const { location } = useLocation();
+  const requireVerifiedEmail = useRequireVerifiedEmail();
   const [form, setForm] = useState(INITIAL_COMPLAINT_FORM);
   const [manualLocation, setManualLocation] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -129,6 +131,15 @@ export function useCreateComplaintForm({
   const handleSubmit = async () => {
     if (!isAuthenticated) {
       openAuthPrompt(AUTH_PROMPT);
+      return;
+    }
+
+    if (
+      !requireVerifiedEmail(null, {
+        title: 'Confirme seu email',
+        message: 'Confirme seu email para criar ou editar denúncias.',
+      })
+    ) {
       return;
     }
 

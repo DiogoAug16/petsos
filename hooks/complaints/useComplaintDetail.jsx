@@ -1,11 +1,13 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { deleteComplaint, getComplaintById } from '@/services/complaints/complaints.service';
+import { useRequireVerifiedEmail } from '@/hooks/auth/useRequireVerifiedEmail';
 import { useRouter } from 'expo-router';
 import { Alert } from 'react-native';
 import { useCallback, useState } from 'react';
 
 export function useComplaintDetail(id) {
   const router = useRouter();
+  const requireVerifiedEmail = useRequireVerifiedEmail();
 
   const [complaint, setComplaint] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -47,8 +49,14 @@ export function useComplaintDetail(id) {
   );
 
   const handleEdit = useCallback(() => {
-    router.push(`/complaint/create?edit=true&id=${id}`);
-  }, [router, id]);
+    requireVerifiedEmail(
+      () => router.push(`/complaint/create?edit=true&id=${id}`),
+      {
+        title: 'Confirme seu email',
+        message: 'Confirme seu email para editar denúncias.',
+      },
+    );
+  }, [router, id, requireVerifiedEmail]);
 
   const handleOpenMap = useCallback(() => {
     if (!complaint?.location) return;
@@ -64,6 +72,15 @@ export function useComplaintDetail(id) {
 
   const handleDelete = useCallback(async () => {
     if (isDeleting) return;
+
+    if (
+      !requireVerifiedEmail(null, {
+        title: 'Confirme seu email',
+        message: 'Confirme seu email para excluir denúncias.',
+      })
+    ) {
+      return;
+    }
 
     Alert.alert(
       'Excluir denúncia',
@@ -88,7 +105,7 @@ export function useComplaintDetail(id) {
         },
       ]
     );
-  }, [id, isDeleting, router]);
+  }, [id, isDeleting, requireVerifiedEmail, router]);
 
   const handleStatusUpdated = useCallback((updatedComplaint) => {
     setComplaint((prev) => ({ ...prev, ...updatedComplaint }));

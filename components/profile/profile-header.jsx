@@ -5,6 +5,8 @@ import { Alert, Modal, Pressable, Text, View } from 'react-native';
 
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { useAuth } from '@/context/AuthContext';
+import { useUploadUrl } from '@/hooks/shared/useUploadUrl';
+import { buildUploadPhotoUri } from '@/utils/media/photo.utils';
 import { getJoinedYear } from '@/utils/profile/profile.utils';
 
 export function ProfileHeader({
@@ -20,11 +22,21 @@ export function ProfileHeader({
   onViewFollowed,
 }) {
   const router = useRouter();
-  const { logout } = useAuth();
+  const {
+    isEmailVerified,
+    logout,
+    refreshEmailVerification,
+    resendVerificationEmail,
+  } = useAuth();
+  const uploadUrl = useUploadUrl();
   const [menuVisible, setMenuVisible] = useState(false);
   const joinedYear = getJoinedYear(profile.createdAt);
   const displayName = profile.name || profile.username;
+  const photoUri = buildUploadPhotoUri(profile.photoUrl, uploadUrl);
+  const locationLabel = profile.locationLabel?.trim() || '';
+  const description = profile.description?.trim() || '';
   const shouldShowBack = showBack && !isCurrentUser;
+  const shouldShowOwnEmailStatus = isCurrentUser;
   const resolvedFollowedCount =
     resolvedFollowedCountProp ??
     followedComplaints.filter((complaint) =>
@@ -33,7 +45,7 @@ export function ProfileHeader({
 
   const handleEdit = () => {
     setMenuVisible(false);
-    Alert.alert('Editar perfil', 'Edição de perfil em breve.');
+    router.push('/profile/edit');
   };
 
   const handleBack = () => {
@@ -49,6 +61,32 @@ export function ProfileHeader({
     setMenuVisible(false);
     await logout();
     router.replace('/(tabs)');
+  };
+
+  const handleResendVerification = async () => {
+    try {
+      await resendVerificationEmail();
+      Alert.alert(
+        'Email enviado',
+        'Enviamos um novo link de confirmação para o seu email.',
+      );
+    } catch {
+      Alert.alert('Erro', 'Não foi possível reenviar o email agora.');
+    }
+  };
+
+  const handleRefreshVerification = async () => {
+    try {
+      const verified = await refreshEmailVerification();
+      if (!verified) {
+        Alert.alert(
+          'Ainda não confirmado',
+          'Abra o link enviado para seu email e tente novamente.',
+        );
+      }
+    } catch {
+      Alert.alert('Erro', 'Não foi possível verificar seu email agora.');
+    }
   };
 
   return (
@@ -79,18 +117,22 @@ export function ProfileHeader({
 
       <View style={styles.profileBody}>
         <View style={styles.avatarWrap}>
-          <UserAvatar username={profile.username} size={96} textSize={36} />
+          <UserAvatar
+            username={profile.username}
+            imageUri={photoUri}
+            size={96}
+            textSize={36}
+          />
         </View>
 
         <View style={styles.nameRow}>
           <Text style={styles.name}>{displayName}</Text>
         </View>
-        <Text style={styles.username}>@{profile.username} - Cuiabá, MT</Text>
-
-        <Text style={styles.bio}>
-          Voluntário animal desde 2026. Acredito que todo ser vivo merece
-          respeito e cuidado.
+        <Text style={styles.username}>
+          {locationLabel ? `@${profile.username} - ${locationLabel}` : `@${profile.username}`}
         </Text>
+
+        {description ? <Text style={styles.bio}>{description}</Text> : null}
 
         <View style={styles.profileStatsRow}>
           <View style={styles.profileStat}>
@@ -116,18 +158,59 @@ export function ProfileHeader({
             <Text style={styles.accountStatusText}>Voluntário</Text>
           </View>
           <View style={styles.accountStatusItem}>
-            <Ionicons name="checkmark-circle" size={18} color="#1A936F" />
-            <Text style={styles.accountStatusText}>Conta verificada</Text>
+            <Ionicons
+              name={
+                shouldShowOwnEmailStatus && !isEmailVerified
+                  ? 'mail-unread-outline'
+                  : 'checkmark-circle'
+              }
+              size={18}
+              color={
+                shouldShowOwnEmailStatus && !isEmailVerified ? '#E29A2F' : '#1A936F'
+              }
+            />
+            <Text style={styles.accountStatusText}>
+              {shouldShowOwnEmailStatus
+                ? isEmailVerified
+                  ? 'Email confirmado'
+                  : 'Email pendente'
+                : 'Conta verificada'}
+            </Text>
           </View>
           <View style={styles.accountStatusItem}>
             <Ionicons name="calendar-outline" size={18} color="#FF9F1C" />
             <Text style={styles.accountStatusText}>Membro desde {joinedYear}</Text>
           </View>
-          <View style={styles.accountStatusItem}>
-            <Ionicons name="location-outline" size={18} color="#7C5CFF" />
-            <Text style={styles.accountStatusText}>Cuiabá, MT</Text>
-          </View>
+          {locationLabel ? (
+            <View style={styles.accountStatusItem}>
+              <Ionicons name="location-outline" size={18} color="#7C5CFF" />
+              <Text style={styles.accountStatusText}>{locationLabel}</Text>
+            </View>
+          ) : null}
         </View>
+
+        {isCurrentUser && !isEmailVerified ? (
+          <View style={styles.emailVerificationCard}>
+            <View style={styles.emailVerificationContent}>
+              <Ionicons name="mail-unread-outline" size={18} color="#E29A2F" />
+              <View style={styles.emailVerificationCopy}>
+                <Text style={styles.emailVerificationTitle}>Email pendente</Text>
+                <Text style={styles.emailVerificationText}>
+                  Confirme para participar.
+                </Text>
+              </View>
+            </View>
+            <View style={styles.emailVerificationActions}>
+              <Pressable onPress={handleResendVerification} hitSlop={8}>
+                <Text style={styles.emailVerificationActionText}>Reenviar</Text>
+              </Pressable>
+              <View style={styles.emailVerificationDivider} />
+              <Pressable onPress={handleRefreshVerification} hitSlop={8}>
+                <Text style={styles.emailVerificationActionText}>Verificar</Text>
+              </Pressable>
+            </View>
+          </View>
+        ) : null}
 
         {onViewFollowed && (
           <Pressable

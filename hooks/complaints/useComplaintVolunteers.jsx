@@ -7,6 +7,7 @@ import {
 } from '@/services/complaints/complaint-volunteers.service';
 import { useAuth } from '@/context/AuthContext';
 import { useRequireAuth } from '@/context/AuthPromptContext';
+import { useRequireVerifiedEmail } from '@/hooks/auth/useRequireVerifiedEmail';
 import { useCallback, useEffect, useState } from 'react';
 
 const normalizeVolunteers = (response) =>
@@ -18,8 +19,9 @@ const normalizeCount = (response) => {
 };
 
 export function useComplaintVolunteers(complaintId, { onStatusChanged } = {}) {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isEmailVerified, isLoading: authLoading } = useAuth();
   const requireAuth = useRequireAuth();
+  const requireVerifiedEmail = useRequireVerifiedEmail();
   const [isVolunteer, setIsVolunteer] = useState(false);
   const [volunteers, setVolunteers] = useState([]);
   const [totalVolunteers, setTotalVolunteers] = useState(0);
@@ -36,14 +38,14 @@ export function useComplaintVolunteers(complaintId, { onStatusChanged } = {}) {
     const countResponse = await getVolunteersCount(complaintId);
     setTotalVolunteers(normalizeCount(countResponse));
 
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !isEmailVerified) {
       setVolunteers([]);
       return;
     }
 
     const volunteersResponse = await getComplaintVolunteers(complaintId);
     setVolunteers(normalizeVolunteers(volunteersResponse));
-  }, [complaintId, isAuthenticated]);
+  }, [complaintId, isAuthenticated, isEmailVerified]);
 
   const refresh = useCallback(async () => {
     if (!complaintId) {
@@ -62,9 +64,9 @@ export function useComplaintVolunteers(complaintId, { onStatusChanged } = {}) {
       setInitialReady(false);
       setInitialError(null);
 
-      if (!isAuthenticated) {
+      if (!isAuthenticated || !isEmailVerified) {
+        await loadVolunteers();
         setVolunteers([]);
-        setTotalVolunteers(0);
         setIsVolunteer(false);
         setInitialReady(true);
         return true;
@@ -88,7 +90,13 @@ export function useComplaintVolunteers(complaintId, { onStatusChanged } = {}) {
     } finally {
       setLoading(false);
     }
-  }, [authLoading, complaintId, isAuthenticated, loadVolunteers]);
+  }, [
+    authLoading,
+    complaintId,
+    isAuthenticated,
+    isEmailVerified,
+    loadVolunteers,
+  ]);
 
   const refreshVolunteers = useCallback(async () => {
     if (!complaintId) return false;
@@ -110,6 +118,15 @@ export function useComplaintVolunteers(complaintId, { onStatusChanged } = {}) {
         message:
           'Faça login ou crie uma conta para se voluntariar em denúncias.',
       });
+      return false;
+    }
+
+    if (
+      !requireVerifiedEmail(null, {
+        title: 'Confirme seu email',
+        message: 'Confirme seu email para se voluntariar em denúncias.',
+      })
+    ) {
       return false;
     }
 
@@ -153,6 +170,7 @@ export function useComplaintVolunteers(complaintId, { onStatusChanged } = {}) {
     onStatusChanged,
     refreshVolunteers,
     requireAuth,
+    requireVerifiedEmail,
   ]);
 
   const doUnvolunteer = useCallback(async () => {
@@ -164,6 +182,15 @@ export function useComplaintVolunteers(complaintId, { onStatusChanged } = {}) {
         message:
           'Faça login ou crie uma conta para se voluntariar em denúncias.',
       });
+      return false;
+    }
+
+    if (
+      !requireVerifiedEmail(null, {
+        title: 'Confirme seu email',
+        message: 'Confirme seu email para alterar seus voluntariados.',
+      })
+    ) {
       return false;
     }
 
@@ -198,11 +225,21 @@ export function useComplaintVolunteers(complaintId, { onStatusChanged } = {}) {
     onStatusChanged,
     refreshVolunteers,
     requireAuth,
+    requireVerifiedEmail,
   ]);
 
   const toggleVolunteer = useCallback(() => {
     requireAuth(
       () => {
+        if (
+          !requireVerifiedEmail(null, {
+            title: 'Confirme seu email',
+            message: 'Confirme seu email para se voluntariar em denúncias.',
+          })
+        ) {
+          return;
+        }
+
         if (isVolunteer) {
           setUnvolunteerModalVisible(true);
           return;
@@ -215,7 +252,7 @@ export function useComplaintVolunteers(complaintId, { onStatusChanged } = {}) {
           'Faça login ou crie uma conta para se voluntariar em denúncias.',
       },
     );
-  }, [isVolunteer, requireAuth]);
+  }, [isVolunteer, requireAuth, requireVerifiedEmail]);
 
   const closeVolunteerModal = useCallback(() => {
     setVolunteerModalVisible(false);

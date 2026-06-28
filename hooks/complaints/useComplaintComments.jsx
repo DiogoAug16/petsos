@@ -6,6 +6,7 @@ import {
 } from '@/services/complaints/comments.service';
 import { useAuth } from '@/context/AuthContext';
 import { useRequireAuth } from '@/context/AuthPromptContext';
+import { useRequireVerifiedEmail } from '@/hooks/auth/useRequireVerifiedEmail';
 import { useCallback, useEffect, useState } from 'react';
 
 export const COMMENTS_PAGE_SIZE = 10;
@@ -57,6 +58,7 @@ const getNextLikeState = (comment) => {
 export function useComplaintComments(complaintId) {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const requireAuth = useRequireAuth();
+  const requireVerifiedEmail = useRequireVerifiedEmail();
   const [comments, setComments] = useState([]);
   const [pageInfo, setPageInfo] = useState(DEFAULT_PAGE_INFO);
   const [loading, setLoading] = useState(false);
@@ -150,6 +152,15 @@ export function useComplaintComments(complaintId) {
         return null;
       }
 
+      if (
+        !requireVerifiedEmail(null, {
+          title: 'Confirme seu email',
+          message: 'Confirme seu email para comentar em denúncias.',
+        })
+      ) {
+        return null;
+      }
+
       const trimmedText = String(text ?? '').trim();
       if (!complaintId || !trimmedText || submitting) return null;
 
@@ -167,7 +178,7 @@ export function useComplaintComments(complaintId) {
         setSubmitting(false);
       }
     },
-    [complaintId, isAuthenticated, requireAuth, submitting],
+    [complaintId, isAuthenticated, requireAuth, requireVerifiedEmail, submitting],
   );
 
   const updateComment = useCallback((commentId, updater) => {
@@ -196,6 +207,15 @@ export function useComplaintComments(complaintId) {
         return;
       }
 
+      if (
+        !requireVerifiedEmail(null, {
+          title: 'Confirme seu email',
+          message: 'Confirme seu email para curtir comentários.',
+        })
+      ) {
+        return;
+      }
+
       if (!complaintId || !comment?.id) return;
 
       const previousComment = comment;
@@ -220,7 +240,7 @@ export function useComplaintComments(complaintId) {
         updateComment(comment.id, () => previousComment);
       }
     },
-    [complaintId, isAuthenticated, requireAuth, updateComment],
+    [complaintId, isAuthenticated, requireAuth, requireVerifiedEmail, updateComment],
   );
 
   useEffect(() => {

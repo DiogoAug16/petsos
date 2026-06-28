@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import Toast from "react-native-toast-message";
 
 import { DISPLAY_STATUSES } from "@/constants/complaints/complaint-evidence-validation.constants";
+import { useRequireVerifiedEmail } from "@/hooks/auth/useRequireVerifiedEmail";
 import { useUploadUrl } from "@/hooks/shared/useUploadUrl";
 import { validateEvidence } from "@/services/complaints/complaint-evidence.service";
 import { getVoteStatus, voteOnComplaint } from "@/services/complaints/complaint-votes.service";
@@ -20,6 +20,7 @@ export const useEvidenceValidation = ({
   onStatusChanged,
 }) => {
   const uploadUrl = useUploadUrl();
+  const requireVerifiedEmail = useRequireVerifiedEmail();
   const [loading, setLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [voteStatus, setVoteStatus] = useState(null);
@@ -99,11 +100,15 @@ export const useEvidenceValidation = ({
   const handleValidate = useCallback(
     async (approved) => {
       if (selectedIds.length === 0) {
-        Toast.show({
-          type: "info",
-          text1: "Selecione evidências",
-          text2: "Toque nas evidências que deseja validar.",
-        });
+        return;
+      }
+
+      if (
+        !requireVerifiedEmail(null, {
+          title: "Confirme seu email",
+          message: "Confirme seu email para validar evidências.",
+        })
+      ) {
         return;
       }
 
@@ -116,22 +121,6 @@ export const useEvidenceValidation = ({
         const data = response?.data || response;
         const resolvedByCommunity = isResolvedByCommunity(complaint, data);
 
-        Toast.show({
-          type: "success",
-          text1: resolvedByCommunity
-            ? "Denúncia resolvida"
-            : approved
-              ? "Evidências aprovadas"
-              : "Evidências rejeitadas",
-          text2: resolvedByCommunity
-            ? "Denúncia resolvida pela comunidade."
-            : approved
-              ? "Denúncia marcada como resolvida."
-              : data?.hasPending
-                ? "Ainda há evidências pendentes."
-                : "Denúncia voltou para em andamento.",
-        });
-
         if (resolvedByCommunity) {
           setCommunityResolved(true);
         }
@@ -139,20 +128,25 @@ export const useEvidenceValidation = ({
         setSelectedIds([]);
         onStatusChanged?.();
       } catch (err) {
-        Toast.show({
-          type: "error",
-          text1: "Erro",
-          text2: err?.message || "Não foi possível validar.",
-        });
+        console.warn("Evidence validation failed", err?.message);
       } finally {
         setLoading(false);
       }
     },
-    [complaint, onStatusChanged, selectedIds],
+    [complaint, onStatusChanged, requireVerifiedEmail, selectedIds],
   );
 
   const handleVote = useCallback(
     async (approved) => {
+      if (
+        !requireVerifiedEmail(null, {
+          title: "Confirme seu email",
+          message: "Confirme seu email para votar em validações.",
+        })
+      ) {
+        return;
+      }
+
       setVoteLoading(true);
       try {
         const response = await voteOnComplaint(complaint.id, approved);
@@ -166,55 +160,26 @@ export const useEvidenceValidation = ({
         const evidenceProposalRejected = data?.evidenceSelectionRejected === true;
 
         if (resolvedByCommunity) {
-          Toast.show({
-            type: "success",
-            text1: "Denúncia resolvida",
-            text2: "Denúncia resolvida pela comunidade.",
-          });
           setCommunityResolved(true);
           onStatusChanged?.();
         } else if (closedByCommunity) {
-          Toast.show({
-            type: "success",
-            text1: "Denúncia fechada",
-            text2: "Denúncia fechada pela comunidade.",
-          });
           setCommunityClosed(true);
           onStatusChanged?.();
         } else if (evidenceProposalRejected) {
-          Toast.show({
-            type: "info",
-            text1: "Proposta rejeitada",
-            text2: "A proposta de evidências foi rejeitada. Uma nova votação pode ser aberta.",
-          });
           onStatusChanged?.();
         } else if (rejectedByCommunity) {
-          Toast.show({
-            type: "info",
-            text1: "Denúncia rejeitada",
-            text2: "A comunidade rejeitou esta denúncia.",
-          });
           setCommunityRejected(true);
           onStatusChanged?.();
         } else {
-          Toast.show({
-            type: "success",
-            text1: "Voto registrado",
-            text2: "Seu voto foi contabilizado.",
-          });
           await loadVoteStatus();
         }
       } catch (err) {
-        Toast.show({
-          type: "error",
-          text1: "Erro",
-          text2: err?.message || "Não foi possível votar.",
-        });
+        console.warn("Complaint vote failed", err?.message);
       } finally {
         setVoteLoading(false);
       }
     },
-    [complaint, loadVoteStatus, onStatusChanged],
+    [complaint, loadVoteStatus, onStatusChanged, requireVerifiedEmail],
   );
 
   return {

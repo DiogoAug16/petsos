@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { REQUEST_VALIDATION_REASONS } from '@/constants/complaints/complaint-request-validation.constants';
 import { useRequireVerifiedEmail } from '@/hooks/auth/useRequireVerifiedEmail';
 import { requestComplaintValidation } from '@/services/complaints/complaints.service';
+import { appLogger } from '@/utils/shared/app-logger';
 
 export function useRequestValidation({ complaint, evidences, onRequested }) {
   const requireVerifiedEmail = useRequireVerifiedEmail();
@@ -96,7 +97,7 @@ export function useRequestValidation({ complaint, evidences, onRequested }) {
       setSelectedEvidenceIds([]);
       onRequested?.();
     } catch (error) {
-      console.warn('Request validation failed', error?.message);
+      appLogger.warn('Falha ao solicitar validação da denúncia', { error });
     } finally {
       setLoading(false);
     }

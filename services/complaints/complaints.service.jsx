@@ -1,6 +1,7 @@
 import { enqueueComplaintMapTileInvalidation } from '@/utils/map/map-tile-invalidation-store';
 import { apiFetch } from '@/services/api';
 import { buildImageUploadFile, isLocalMediaUri } from '@/utils/media/image-upload.utils';
+import { writeLocalCache } from '@/utils/shared/local-cache';
 
 const getResponseData = (response) => response?.data ?? response?.complaint ?? response;
 
@@ -76,6 +77,21 @@ export async function createComplaint(data) {
 
 export async function getComplaintById(id, signal) {
   return await apiFetch(`/complaints/${id}`, { signal, skipAuthRedirect: true });
+}
+
+export async function prefetchComplaintById(id) {
+  if (!id) return null;
+
+  try {
+    const response = await getComplaintById(id);
+    const complaint = response?.data || response?.complaint || response;
+    if (complaint) {
+      writeLocalCache(`complaint:detail:${id}`, complaint);
+    }
+    return complaint;
+  } catch {
+    return null;
+  }
 }
 
 export async function deleteComplaint(id) {
@@ -215,7 +231,28 @@ export async function getMapComplaints(region, signal) {
   return Array.isArray(data) ? data : [];
 }
 
-export async function getMapTileHints({ lat, lng, radiusKm = 10, z = 12 }, signal) {
+export async function getMapComplaintTilesBatch(fetchRegions = [], signal) {
+  if (!fetchRegions.length) return [];
+
+  const response = await apiFetch('/complaints/map/tiles/batch', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      limit: 120,
+      tiles: fetchRegions.map((region) => ({
+        z: region.tileZ,
+        x: region.tileX,
+        y: region.tileY,
+      })),
+    }),
+    signal,
+    skipAuthRedirect: true,
+  });
+  const data = response?.data ?? response;
+  return Array.isArray(data?.tiles) ? data.tiles : [];
+}
+
+export async function getMapTilesIndex({ lat, lng, radiusKm = 10, z = 12 }, signal) {
   const params = new URLSearchParams({
     lat: String(lat),
     lng: String(lng),

@@ -8,9 +8,36 @@ export async function getCurrentUserProfile() {
   return unwrapData(response);
 }
 
+export async function getCurrentUserProfileSummary() {
+  const response = await apiFetch('/users/me/summary');
+  const data = unwrapData(response);
+  return {
+    profile: data?.profile ?? null,
+    followedSummary: {
+      total: Number(data?.followedSummary?.total ?? 0),
+      resolved: Number(data?.followedSummary?.resolved ?? 0),
+    },
+    unreadNotifications: Number(data?.unreadNotifications ?? 0),
+  };
+}
+
 export async function getPublicUserProfile(username) {
   const response = await apiFetch(`/users/${encodeURIComponent(username)}`);
   return unwrapData(response);
+}
+
+export async function getPublicUserProfileSummary(username) {
+  const response = await apiFetch(
+    `/users/${encodeURIComponent(username)}/profile-summary`
+  );
+  const data = unwrapData(response);
+  return {
+    profile: data?.profile ?? null,
+    followedSummary: {
+      total: Number(data?.followedSummary?.total ?? 0),
+      resolved: Number(data?.followedSummary?.resolved ?? 0),
+    },
+  };
 }
 
 export async function getUserFollowedComplaints(username) {

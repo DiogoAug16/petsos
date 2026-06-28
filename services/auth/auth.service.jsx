@@ -3,9 +3,11 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   sendEmailVerification,
+  sendPasswordResetEmail,
   updateProfile,
 } from 'firebase/auth';
 import { auth } from '@/config/firebase';
+import { appLogger } from '@/utils/shared/app-logger';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -50,7 +52,7 @@ export async function register(email, password, name, username) {
     }
 
     sendEmailVerification(userCredential.user).catch((error) => {
-      console.warn('Erro ao enviar email de verificação:', error?.message);
+      appLogger.warn('Erro ao enviar email de verificação', { error });
     });
 
     return userCredential;
@@ -99,6 +101,10 @@ export async function resendVerificationEmail() {
   }
 
   await sendEmailVerification(auth.currentUser);
+}
+
+export async function sendPasswordReset(email) {
+  return await sendPasswordResetEmail(auth, email.trim());
 }
 
 export async function refreshEmailVerification() {

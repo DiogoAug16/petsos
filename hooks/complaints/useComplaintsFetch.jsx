@@ -1,5 +1,6 @@
 // hooks/useComplaintsFetch.jsx
 import { getComplaints } from '@/services/complaints/complaints.service';
+import { readLocalCache, writeLocalCache } from '@/utils/shared/local-cache';
 import { useCallback, useState } from 'react';
 
 const DEFAULT_PAGE_INFO = {
@@ -8,6 +9,8 @@ const DEFAULT_PAGE_INFO = {
   nextCursor: null,
   totalItems: 0,
 };
+const FIRST_PAGE_CACHE_KEY = 'complaints:first-page';
+const FIRST_PAGE_CACHE_MAX_AGE_MS = 6 * 60 * 60 * 1000;
 
 export function useComplaintsFetch() {
   const [data, setData] = useState([]);
@@ -21,9 +24,22 @@ export function useComplaintsFetch() {
     const { silent = false, append = false, cursor } = options;
 
     try {
+      let cacheApplied = false;
+      if (!append && !cursor && !silent) {
+        const cached = await readLocalCache(FIRST_PAGE_CACHE_KEY, {
+          maxAgeMs: FIRST_PAGE_CACHE_MAX_AGE_MS,
+        });
+        if (cached?.items) {
+          setData(cached.items);
+          setPageInfo(cached.pageInfo ?? DEFAULT_PAGE_INFO);
+          setLoading(false);
+          cacheApplied = true;
+        }
+      }
+
       if (append) {
         setLoadingMore(true);
-      } else if (!silent) {
+      } else if (!silent && !cacheApplied) {
         setLoading(true);
       }
       setError(null);
@@ -31,6 +47,9 @@ export function useComplaintsFetch() {
 
       setData((current) => (append ? [...current, ...result.items] : result.items));
       setPageInfo(result.pageInfo);
+      if (!append && !cursor) {
+        writeLocalCache(FIRST_PAGE_CACHE_KEY, result);
+      }
     } catch (err) {
       if (err.name === 'AbortError') return;
       setError(err.message ?? 'Erro ao carregar denúncias');

@@ -1,5 +1,6 @@
 import { useAuth } from '@/context/AuthContext';
 import { useAuthPrompt } from '@/context/AuthPromptContext';
+import { appLogger } from '@/utils/shared/app-logger';
 import { useCallback } from 'react';
 
 const DEFAULT_TITLE = 'Confirme seu email';
@@ -36,7 +37,7 @@ export function useRequireVerifiedEmail() {
           try {
             await resendVerificationEmail();
           } catch (error) {
-            console.warn('Verification email resend failed', error?.message);
+            appLogger.warn('Falha ao reenviar email de verificação', { error });
           }
         },
         onSecondaryPress: async () => {
@@ -48,7 +49,7 @@ export function useRequireVerifiedEmail() {
               action?.();
             }
           } catch (error) {
-            console.warn('Email verification refresh failed', error?.message);
+            appLogger.warn('Falha ao atualizar verificação de email', { error });
           }
         },
       });

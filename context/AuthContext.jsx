@@ -1,6 +1,7 @@
 import { auth } from '@/config/firebase';
 import { deleteAuthToken, saveFirebaseUserToken } from '@/services/auth/auth-token.service';
 import * as authService from '@/services/auth/auth.service';
+import { appLogger } from '@/utils/shared/app-logger';
 import { onAuthStateChanged } from 'firebase/auth';
 import { createContext, useContext, useEffect, useState } from 'react';
 
@@ -22,8 +23,7 @@ export function AuthProvider({ children }) {
         try {
           await saveFirebaseUserToken(firebaseUser);
         } catch(error) {
-          // arrumar isso depois, talvez seja melhor criar um serviço específico para lidar com erros de token
-          console.warn('Erro ao salvar token no SecureStore:', error);
+          appLogger.warn('Erro ao salvar token no SecureStore', { error });
         }
       } else {
         setUser(null);

@@ -1,9 +1,14 @@
+import { auth } from '@/config/firebase';
 import { useAuth } from '@/context/AuthContext';
+import { getAppBootstrap } from '@/services/app/bootstrap.service';
 import { getUnreadCount } from '@/services/notifications/notifications.service';
+import { appLogger } from '@/utils/shared/app-logger';
+import { readLocalCache, writeLocalCache } from '@/utils/shared/local-cache';
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 
 const POLLING_INTERVAL = 30000;
+const UNREAD_CACHE_MAX_AGE_MS = 60 * 60 * 1000;
 
 const UnreadCountContext = createContext({});
 
@@ -11,24 +16,72 @@ export function UnreadCountProvider({ children }) {
   const { isAuthenticated, isEmailVerified } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
   const intervalRef = useRef(null);
+  const unreadCacheKey = auth.currentUser?.uid
+    ? `notifications:unread:${auth.currentUser.uid}`
+    : null;
 
   const loadUnreadCount = useCallback(async () => {
     if (!isAuthenticated || !isEmailVerified) return;
 
     try {
+      if (unreadCacheKey) {
+        const cached = await readLocalCache(unreadCacheKey, {
+          maxAgeMs: UNREAD_CACHE_MAX_AGE_MS,
+        });
+        if (typeof cached === 'number') setUnreadCount(cached);
+      }
+
       const response = await getUnreadCount();
-      setUnreadCount(response?.data?.count || 0);
+      const count = Number(response?.data?.count || 0);
+      setUnreadCount(count);
+      if (unreadCacheKey) writeLocalCache(unreadCacheKey, count);
     } catch (error) {
-      console.log('Erro ao buscar contador de notificações:', error);
+      appLogger.warn('Erro ao buscar contador de notificações', { error });
     }
-  }, [isAuthenticated, isEmailVerified]);
+  }, [isAuthenticated, isEmailVerified, unreadCacheKey]);
+
+  const loadBootstrap = useCallback(async () => {
+    if (!isAuthenticated) return;
+
+    try {
+      const bootstrap = await getAppBootstrap();
+      setUnreadCount(bootstrap.unreadNotifications);
+
+      if (unreadCacheKey) {
+        writeLocalCache(unreadCacheKey, bootstrap.unreadNotifications);
+      }
+
+      if (auth.currentUser?.uid && bootstrap.user) {
+        const cachedSummary = {
+          profile: bootstrap.user,
+          followedSummary: bootstrap.followedSummary,
+          unreadNotifications: bootstrap.unreadNotifications,
+        };
+        writeLocalCache(`profile:me:${auth.currentUser.uid}`, cachedSummary);
+        if (bootstrap.user.username) {
+          writeLocalCache(
+            `profile:${String(bootstrap.user.username).trim().toLowerCase()}:summary`,
+            {
+              profile: bootstrap.user,
+              followedComplaints: [],
+              followedSummary: bootstrap.followedSummary,
+            }
+          );
+        }
+      }
+    } catch (error) {
+      appLogger.warn('Erro ao carregar bootstrap do app', { error });
+    }
+  }, [isAuthenticated, unreadCacheKey]);
 
   useEffect(() => {
     if (!isAuthenticated || !isEmailVerified) {
       setUnreadCount(0);
+      if (isAuthenticated) loadBootstrap();
       return;
     }
 
+    loadBootstrap();
     loadUnreadCount();
 
     intervalRef.current = setInterval(loadUnreadCount, POLLING_INTERVAL);
@@ -43,7 +96,7 @@ export function UnreadCountProvider({ children }) {
       clearInterval(intervalRef.current);
       subscription.remove();
     };
-  }, [loadUnreadCount, isAuthenticated, isEmailVerified]);
+  }, [isAuthenticated, isEmailVerified, loadBootstrap, loadUnreadCount]);
 
   return (
     <UnreadCountContext.Provider value={{ unreadCount, reloadUnreadCount: loadUnreadCount }}>

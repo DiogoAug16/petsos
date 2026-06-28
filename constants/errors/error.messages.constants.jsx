@@ -4,6 +4,9 @@ export const AUTH_ERRORS = {
 
   EMAIL_REQUIRED: 'Email é obrigatório',
   EMAIL_INVALID: 'Email inválido',
+  PASSWORD_RESET_USER_NOT_FOUND: 'Não encontramos uma conta com este email.',
+  PASSWORD_RESET_TOO_MANY_REQUESTS: 'Muitas tentativas. Aguarde um pouco e tente novamente.',
+  PASSWORD_RESET_GENERIC: 'Não foi possível enviar o email de recuperação.',
 
   USERNAME_REQUIRED: 'Username é obrigatório',
   USERNAME_MIN_LENGTH: 'Username deve ter pelo menos 4 caracteres',

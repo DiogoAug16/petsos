@@ -114,6 +114,8 @@ export const createLoginStyles = (colors) => {
       paddingVertical: 16,
       alignItems: 'center',
       justifyContent: 'center',
+      flexDirection: 'row',
+      gap: 8,
       marginTop: 8,
       shadowColor: colors.primary,
       shadowOffset: { width: 0, height: 8 },
@@ -131,6 +133,13 @@ export const createLoginStyles = (colors) => {
       fontWeight: '500',
       textAlign: 'center',
       marginTop: 12,
+    },
+    successText: {
+      color: '#1A936F',
+      fontSize: 13,
+      fontWeight: '700',
+      textAlign: 'center',
+      lineHeight: 19,
     },
     submitButtonText: {
       color: '#FFFFFF',

@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { router } from 'expo-router';
@@ -16,16 +16,16 @@ function LoginForm({
   loginError,
   isSubmitting,
   showPassword,
+  rememberMe,
   updateField,
   handleSubmit,
   isFormValid,
   setShowPassword,
+  setRememberMe,
   colors,
   isDark,
   styles,
 }) {
-  const [rememberMe, setRememberMe] = useState(false);
-
   const titleStyle = useStaggeredAnimation(0);
   const input1Style = useStaggeredAnimation(1);
   const input2Style = useStaggeredAnimation(2);
@@ -36,6 +36,9 @@ function LoginForm({
   const handleRememberPress = useHapticPress(() => setRememberMe(!rememberMe));
   const handleSubmitPress = useHapticPress(handleSubmit, 'normal');
   const handleRegisterPress = useHapticPress(() => router.replace('/(auth)/register'));
+  const handleForgotPasswordPress = useHapticPress(() =>
+    router.push('/(auth)/forgot-password')
+  );
 
   return (
     <View style={styles.formCard}>
@@ -85,13 +88,16 @@ function LoginForm({
         <Pressable
           style={styles.rememberContainer}
           onPress={handleRememberPress}
+          accessibilityRole="checkbox"
+          accessibilityState={{ checked: rememberMe }}
+          accessibilityLabel="Lembrar email ou username neste aparelho"
         >
           <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
             {rememberMe && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
           </View>
           <Text style={styles.rememberText}>Lembrar-me</Text>
         </Pressable>
-        <Pressable onPress={() => {}}>
+        <Pressable onPress={handleForgotPasswordPress}>
           <Text style={[styles.forgotPassword, { color: colors.primary }]}>
             Esqueci minha senha
           </Text>

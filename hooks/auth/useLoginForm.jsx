@@ -1,7 +1,12 @@
 import { AUTH_ERRORS } from '@/constants/errors/error.messages.constants';
 import { useAuth } from '@/context/AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { appLogger } from '@/utils/shared/app-logger';
+
+const REMEMBER_LOGIN_KEY = '@petsos:remember-login';
+const REMEMBERED_IDENTIFIER_KEY = '@petsos:remembered-identifier';
 
 export function useLoginForm() {
   const { login } = useAuth();
@@ -15,6 +20,53 @@ export function useLoginForm() {
   const [loginError, setLoginError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadRememberedIdentifier = async () => {
+      try {
+        const [rememberLogin, rememberedIdentifier] = await Promise.all([
+          AsyncStorage.getItem(REMEMBER_LOGIN_KEY),
+          AsyncStorage.getItem(REMEMBERED_IDENTIFIER_KEY),
+        ]);
+
+        if (!isMounted || rememberLogin !== 'true') return;
+
+        setRememberMe(true);
+        if (rememberedIdentifier) {
+          setForm((prev) => ({
+            ...prev,
+            email: rememberedIdentifier,
+          }));
+        }
+      } catch (error) {
+        appLogger.warn('Erro ao carregar login lembrado', { error });
+      }
+    };
+
+    loadRememberedIdentifier();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const persistRememberedIdentifier = async (identifier) => {
+    if (!rememberMe) {
+      await Promise.all([
+        AsyncStorage.removeItem(REMEMBER_LOGIN_KEY),
+        AsyncStorage.removeItem(REMEMBERED_IDENTIFIER_KEY),
+      ]);
+      return;
+    }
+
+    await Promise.all([
+      AsyncStorage.setItem(REMEMBER_LOGIN_KEY, 'true'),
+      AsyncStorage.setItem(REMEMBERED_IDENTIFIER_KEY, identifier),
+    ]);
+  };
 
   const updateField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -48,7 +100,9 @@ export function useLoginForm() {
 
     try {
       setIsSubmitting(true);
-      await login(form.email.trim(), form.password);
+      const identifier = form.email.trim();
+      await login(identifier, form.password);
+      await persistRememberedIdentifier(identifier);
       router.replace('/(tabs)');
     } catch (error) {
       if (
@@ -77,9 +131,11 @@ export function useLoginForm() {
     loginError,
     isSubmitting,
     showPassword,
+    rememberMe,
     updateField,
     handleSubmit,
     isFormValid,
     setShowPassword,
+    setRememberMe,
   };
 }

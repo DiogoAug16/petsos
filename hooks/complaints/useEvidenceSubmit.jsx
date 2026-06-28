@@ -12,6 +12,7 @@ import {
   compressEvidencePhoto,
   toEvidenceUploadFile,
 } from '@/utils/complaints/evidence-submit.utils';
+import { appLogger } from '@/utils/shared/app-logger';
 
 export function useEvidenceSubmit({ complaintId, onClose, onSubmitted }) {
   const requireVerifiedEmail = useRequireVerifiedEmail();
@@ -120,7 +121,7 @@ export function useEvidenceSubmit({ complaintId, onClose, onSubmitted }) {
       onSubmitted?.();
       onClose();
     } catch (error) {
-      console.warn('Evidence submit failed', error?.message);
+      appLogger.warn('Falha ao enviar evidência', { error });
     } finally {
       setSubmitting(false);
     }

@@ -1,9 +1,12 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { deleteComplaint, getComplaintById } from '@/services/complaints/complaints.service';
 import { useRequireVerifiedEmail } from '@/hooks/auth/useRequireVerifiedEmail';
+import { readLocalCache, writeLocalCache } from '@/utils/shared/local-cache';
 import { useRouter } from 'expo-router';
 import { Alert } from 'react-native';
 import { useCallback, useState } from 'react';
+
+const DETAIL_CACHE_MAX_AGE_MS = 6 * 60 * 60 * 1000;
 
 export function useComplaintDetail(id) {
   const router = useRouter();
@@ -23,13 +26,23 @@ export function useComplaintDetail(id) {
 
     const controller = new AbortController();
 
+    const cacheKey = `complaint:detail:${id}`;
+
     setLoading(true);
+    readLocalCache(cacheKey, { maxAgeMs: DETAIL_CACHE_MAX_AGE_MS }).then((cached) => {
+      if (cached) {
+        setComplaint(cached);
+        setLoading(false);
+      }
+    });
+
     setError(null);
 
     getComplaintById(id, controller.signal)
       .then((response) => {
         const data = response?.data || response?.complaint || response;
         setComplaint(data);
+        writeLocalCache(cacheKey, data);
       })
       .catch((err) => {
         if (err.name !== 'AbortError') {

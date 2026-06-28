@@ -1,14 +1,36 @@
 import { buildDebugTiles } from '@/utils/map/map-marker-cache';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Polygon } from 'react-native-maps';
 
 const TILE_DEBUG_ENABLED = process.env.EXPO_PUBLIC_MAP_TILE_DEBUG === 'true';
+const TILE_DEBUG_UPDATE_MS = 300;
+
+const getTilesKey = (tiles) => tiles.map((tile) => tile.key).join('|');
 
 export function TileDebugLayer({ visibleRegion, prefetchRegion, movement }) {
-  const tiles = useMemo(
-    () => buildDebugTiles({ visibleRegion, prefetchRegion, movement }),
-    [movement, prefetchRegion, visibleRegion]
-  );
+  const nextTiles = useMemo(() => {
+    if (!__DEV__ || !TILE_DEBUG_ENABLED) return [];
+    return buildDebugTiles({ visibleRegion, prefetchRegion, movement });
+  }, [movement, prefetchRegion, visibleRegion]);
+  const [tiles, setTiles] = useState([]);
+
+  useEffect(() => {
+    if (!__DEV__ || !TILE_DEBUG_ENABLED) {
+      setTiles([]);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setTiles((currentTiles) => {
+        if (getTilesKey(currentTiles) === getTilesKey(nextTiles)) {
+          return currentTiles;
+        }
+        return nextTiles;
+      });
+    }, TILE_DEBUG_UPDATE_MS);
+
+    return () => clearTimeout(timer);
+  }, [nextTiles]);
 
   if (!__DEV__ || !TILE_DEBUG_ENABLED || tiles.length === 0) return null;
 

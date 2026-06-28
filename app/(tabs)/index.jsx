@@ -66,14 +66,11 @@ export default function MapScreen() {
     showSelectedRoute,
   } = useMapComplaintSelection({ location, mapRef, router });
 
-  const {
-    complaints: mapComplaints,
-    tileHints,
-    shouldShowComplaintMarkers,
-  } = useMapComplaints({
+  const { complaints: mapComplaints, shouldShowComplaintMarkers } = useMapComplaints({
     visibleRegion: visibleRegion ?? location,
     prefetchRegion: prefetchRegion ?? location,
     movement,
+    enabled: Boolean(mapReady && location),
   });
 
   const {
@@ -138,9 +135,8 @@ export default function MapScreen() {
         routeCoordinates={routeCoordinates}
         routeRenderKey={routeRenderKey}
         selectedCoordinate={selectedCoordinate}
-        shouldShowComplaintMarkers={shouldShowComplaintMarkers}
+        shouldShowComplaintMarkers={mapReady && shouldShowComplaintMarkers}
         styles={styles}
-        tileHints={appliedType ? [] : tileHints}
         updateRegion={updateRegion}
         visibleRegion={visibleRegion}
       />

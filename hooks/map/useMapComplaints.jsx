@@ -13,12 +13,20 @@ import {
   MAP_TILE_ZOOM,
 } from '@/utils/map/map-marker-cache';
 import { drainMapTileInvalidations } from '@/utils/map/map-tile-invalidation-store';
+import {
+  readLocalCache,
+  removeLocalCache,
+  writeLocalCache,
+} from '@/utils/shared/local-cache';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 const MAP_FETCH_DEBOUNCE_MS = 350;
 const INITIAL_MAP_BOOTSTRAP_DELTA = 0.12;
 const TILE_INDEX_RADIUS_KM = 10;
 const TILE_INDEX_REGION_TTL_MS = 60 * 1000;
+const TILE_LOCAL_CACHE_MAX_AGE_MS = 10 * 60 * 1000;
+
+const getTileCacheKey = (tileKey) => `map:tile:${tileKey}`;
 
 export function useMapComplaints({
   visibleRegion,
@@ -109,14 +117,50 @@ export function useMapComplaints({
 
       const fetchRegions = [...fetchRegionsByKey.values()];
 
-      if (fetchRegions.length > 0) {
-        cacheRef.current.markInFlight(fetchRegions);
+      const cachedTiles = await Promise.all(
+        fetchRegions.map(async (fetchRegion) => {
+          const items = await readLocalCache(getTileCacheKey(fetchRegion.key), {
+            maxAgeMs: TILE_LOCAL_CACHE_MAX_AGE_MS,
+          });
+          return Array.isArray(items)
+            ? {
+                fetchRegion,
+                items,
+              }
+            : null;
+        })
+      );
+
+      cachedTiles.filter(Boolean).forEach(({ fetchRegion, items }) => {
+        cacheRef.current.addFetchResult({ fetchRegion, data: items });
+      });
+
+      const cachedTileKeys = new Set(
+        cachedTiles
+          .filter(Boolean)
+          .map(({ fetchRegion }) => fetchRegion.key)
+      );
+      const networkFetchRegions = fetchRegions.filter(
+        (fetchRegion) => !cachedTileKeys.has(fetchRegion.key)
+      );
+
+      if (cachedTileKeys.size > 0) {
+        cacheRef.current.prune(latestVisibleRegionRef.current);
+      }
+
+      if (networkFetchRegions.length > 0) {
+        cacheRef.current.markInFlight(networkFetchRegions);
 
         try {
-          const tiles = await getMapComplaintTilesBatch(fetchRegions);
-          cacheRef.current.addBatchFetchResults({ fetchRegions, tiles });
+          const tiles = await getMapComplaintTilesBatch(networkFetchRegions);
+          cacheRef.current.addBatchFetchResults({ fetchRegions: networkFetchRegions, tiles });
+          tiles.forEach((tile) => {
+            if (tile?.tileKey && Array.isArray(tile.items)) {
+              writeLocalCache(getTileCacheKey(tile.tileKey), tile.items);
+            }
+          });
         } finally {
-          cacheRef.current.settleFetchRegions(fetchRegions);
+          cacheRef.current.settleFetchRegions(networkFetchRegions);
         }
         cacheRef.current.prune(latestVisibleRegionRef.current);
       }
@@ -153,6 +197,7 @@ export function useMapComplaints({
   const applyTileInvalidation = useCallback(
     ({ tileKeys, complaintId, action }) => {
       cacheRef.current.invalidateTiles({ tileKeys, complaintId, action });
+      tileKeys?.forEach((tileKey) => removeLocalCache(getTileCacheKey(tileKey)));
       tileIndexRegionCacheRef.current.clear();
 
       const latestParams = latestTileParamsRef.current;

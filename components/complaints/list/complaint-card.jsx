@@ -8,6 +8,7 @@ import { StatusBadge } from '@/components/complaints/list/status-badge';
 import { complaintsStyles } from '@/styles/complaints';
 import { formatDate } from '@/utils/shared/date.utils';
 import { getComplaintCoverPhoto } from '@/utils/media/photo.utils';
+import { writeLocalCache } from '@/utils/shared/local-cache';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
@@ -45,11 +46,17 @@ function ComplaintCardComponent({ complaint }) {
     triggerHaptics('soft');
   };
 
+  const handlePress = () => {
+    if (!complaintId) return;
+    writeLocalCache(`complaint:detail:${complaintId}`, complaint);
+    router.push(`/complaint/${complaintId}`);
+  };
+
   return (
     <Pressable
       onPressIn={handlePressIn}
       onPressOut={onPressOut}
-      onPress={() => complaintId && router.push(`/complaint/${complaintId}`)}
+      onPress={handlePress}
       accessibilityRole="button"
       accessibilityLabel={`Abrir denúncia ${complaint.title}`}
     >

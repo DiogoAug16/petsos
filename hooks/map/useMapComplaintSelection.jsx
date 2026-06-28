@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { prefetchComplaintById } from '@/services/complaints/complaints.service';
 import { getDrivingRoute } from '@/services/map/routes.service';
 import { appLogger } from '@/utils/shared/app-logger';
 
@@ -25,6 +26,9 @@ export function useMapComplaintSelection({ location, mapRef, router }) {
     (complaint) => {
       setSelectedComplaint(complaint);
       setPreviewVisible(true);
+
+      const complaintId = complaint?.id ?? complaint?._id;
+      if (complaintId) prefetchComplaintById(complaintId);
 
       const latitude = Number(complaint?.location?.latitude);
       const longitude = Number(complaint?.location?.longitude);

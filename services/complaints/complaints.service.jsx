@@ -1,6 +1,7 @@
 import { enqueueComplaintMapTileInvalidation } from '@/utils/map/map-tile-invalidation-store';
 import { apiFetch } from '@/services/api';
 import { buildImageUploadFile, isLocalMediaUri } from '@/utils/media/image-upload.utils';
+import { writeLocalCache } from '@/utils/shared/local-cache';
 
 const getResponseData = (response) => response?.data ?? response?.complaint ?? response;
 
@@ -76,6 +77,21 @@ export async function createComplaint(data) {
 
 export async function getComplaintById(id, signal) {
   return await apiFetch(`/complaints/${id}`, { signal, skipAuthRedirect: true });
+}
+
+export async function prefetchComplaintById(id) {
+  if (!id) return null;
+
+  try {
+    const response = await getComplaintById(id);
+    const complaint = response?.data || response?.complaint || response;
+    if (complaint) {
+      writeLocalCache(`complaint:detail:${id}`, complaint);
+    }
+    return complaint;
+  } catch {
+    return null;
+  }
 }
 
 export async function deleteComplaint(id) {

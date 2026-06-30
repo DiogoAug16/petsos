@@ -64,6 +64,7 @@ export const INITIAL_COMPLAINT_FORM = {
   animalOther: '',
   locationMode: 'auto',
   photos: [],
+  isAnonymous: false,
 };
 
 export const ANIMAL_EMOJI = {

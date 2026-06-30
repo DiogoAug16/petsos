@@ -21,7 +21,8 @@ export function DetailMainCard({
   styles,
 }) {
   const [followersModalVisible, setFollowersModalVisible] = useState(false);
-  const username = complaint.createdByUsername;
+  const isAnonymous = Boolean(complaint.isAnonymous);
+  const username = isAnonymous ? null : complaint.createdByUsername;
   const followerList = Array.isArray(followers) ? followers : [];
   const followersLabel = followersLoading ? '...' : formatFollowersCount(totalFollowers);
   const canOpenFollowers = !followersLoading && totalFollowers > 0;
@@ -55,17 +56,29 @@ export function DetailMainCard({
 
         <View style={styles.detailMainDivider} />
         <View style={styles.detailMainFooter}>
-          <UserLink username={username} style={styles.detailMainRegistrar}>
-            <UserAvatar username={username} size={36} textSize={15} />
-            <View style={styles.detailMainRegistrarCopy}>
-              <Text style={styles.detailRegistrarName}>
-                {username ? `@${username}` : 'Usuário desconhecido'}
-              </Text>
-              <Text style={styles.detailRegistrarDate}>
-                {formatDate(complaint.createdAt)}
-              </Text>
-            </View>
-          </UserLink>
+        {isAnonymous ? (
+              <View style={styles.detailMainRegistrar}>
+                <Ionicons name="person-circle-outline" size={36} color="#8D7D78" />
+                <View style={styles.detailMainRegistrarCopy}>
+                  <Text style={styles.detailRegistrarName}>Usuário anônimo</Text>
+                  <Text style={styles.detailRegistrarDate}>
+                    {formatDate(complaint.createdAt)}
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <UserLink username={username} style={styles.detailMainRegistrar}>
+                <UserAvatar username={username} size={36} textSize={15} />
+                <View style={styles.detailMainRegistrarCopy}>
+                  <Text style={styles.detailRegistrarName}>
+                    {username ? `@${username}` : 'Usuário desconhecido'}
+                  </Text>
+                  <Text style={styles.detailRegistrarDate}>
+                    {formatDate(complaint.createdAt)}
+                  </Text>
+                </View>
+              </UserLink>
+            )}
 
           {showFollowers && (
             <Pressable

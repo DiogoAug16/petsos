@@ -1,5 +1,6 @@
 import { ScrollView } from 'react-native';
 
+import ComplaintAnonymousOption from '@/components/complaints/create/ComplaintAnonymousOption';
 import ComplaintBasicInfo from '@/components/complaints/create/ComplaintBasicInfo';
 import ComplaintLocation from '@/components/complaints/create/ComplaintLocation';
 import ComplaintTypeAnimal from '@/components/complaints/create/ComplaintTypeAnimal';
@@ -24,6 +25,10 @@ export function CreateComplaintForm({
         description={form.description}
         onChangeTitle={(value) => onUpdateField('title', value)}
         onChangeDescription={(value) => onUpdateField('description', value)}
+      />
+      <ComplaintAnonymousOption
+        value={form.isAnonymous}
+        onChange={(value) => onUpdateField('isAnonymous', value)}
       />
 
       <ComplaintTypeAnimal

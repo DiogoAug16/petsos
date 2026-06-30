@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Documentação · PetSOS</title>
+<style>
+:root {
+  --nav: #1f2937;
+  --nav-dark: #111827;
+  --bg: #f3f5f8;
+  --card: #ffffff;
+  --ink: #1f2937;
+  --muted: #6b7280;
+  --line: #d6dbe3;
+  --line-dark: #b8c0cc;
+  --blue: #1d4ed8;
+  --green: #15803d;
+  --amber: #b45309;
+  --purple: #6d28d9;
+  --red: #b91c1c;
+}
+* { box-sizing: border-box; }
+body { margin:0; font-family: Arial, Helvetica, sans-serif; background:var(--bg); color:var(--ink); }
+a { color:inherit; text-decoration:none; }
+code { background:#f3f4f6; border:1px solid var(--line); padding:2px 5px; font-size:.84em; }
+.layout { min-height:100vh; display:grid; grid-template-columns:238px 1fr; }
+.sidebar { background:var(--nav); color:#e5e7eb; border-right:1px solid #0f172a; padding:20px 16px; position:sticky; top:0; height:100vh; }
+.brand { border-bottom:1px solid rgba(255,255,255,.12); padding-bottom:18px; margin-bottom:18px; }
+.brand strong { display:block; font-size:1.15rem; letter-spacing:.02em; }
+.brand span { display:block; margin-top:4px; color:#aeb7c4; font-size:.78rem; }
+.nav-title { color:#9ca3af; text-transform:uppercase; letter-spacing:.12em; font-size:.68rem; margin:20px 8px 8px; }
+.nav a { display:block; padding:10px 11px; color:#d1d5db; border-left:3px solid transparent; font-size:.9rem; }
+.nav a.active, .nav a:hover { background:var(--nav-dark); color:#fff; border-left-color:#60a5fa; }
+.nav a:focus-visible { outline:3px solid rgba(96,165,250,.38); outline-offset:2px; }
+.main { min-width:0; }
+.topbar { height:58px; background:#fff; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; padding:0 26px; position:sticky; top:0; z-index:10; }
+.topbar strong { font-size:.92rem; }
+.topbar span { color:var(--muted); font-size:.84rem; }
+.content { padding:24px 26px 34px; }
+.page-header { display:flex; justify-content:space-between; gap:20px; margin-bottom:20px; align-items:flex-start; }
+.breadcrumb { color:var(--muted); font-size:.82rem; margin-bottom:8px; }
+h1 { margin:0; font-size:1.72rem; font-weight:700; letter-spacing:-.01em; }
+.subtitle { color:var(--muted); margin:7px 0 0; line-height:1.5; max-width:860px; }
+.base-box { background:#fff; border:1px solid var(--line); padding:12px 14px; min-width:260px; font-size:.86rem; color:var(--muted); }
+.panel { background:#fff; border:1px solid var(--line); margin-bottom:18px; }
+.panel-header { padding:14px 16px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; gap:14px; align-items:center; background:#fbfcfe; }
+.panel-header h2 { margin:0; font-size:1rem; font-weight:700; }
+.panel-header span { color:var(--muted); font-size:.82rem; }
+.panel-body { padding:16px; }
+.grid-three { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:16px; margin-bottom:18px; }
+.grid-two { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:16px; }
+.card { background:#fff; border:1px solid var(--line); padding:18px; border-top:4px solid var(--line-dark); min-height:100%; }
+.card.blue { border-top-color:var(--blue); }
+.card.green { border-top-color:var(--green); }
+.card.amber { border-top-color:var(--amber); }
+.card.purple { border-top-color:var(--purple); }
+.card h3 { margin:0 0 8px; font-size:1rem; }
+.card p { margin:0; color:var(--muted); line-height:1.5; font-size:.92rem; }
+.list { margin:10px 0 0; padding-left:18px; color:var(--muted); line-height:1.5; font-size:.92rem; }
+.list li { margin:6px 0; }
+.stack { display:flex; flex-wrap:wrap; gap:8px; }
+.stack span { background:#f8fafc; border:1px solid var(--line); padding:8px 10px; font-size:.84rem; font-weight:700; }
+.cta-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+.button { display:inline-flex; align-items:center; min-height:36px; padding:0 12px; border:1px solid var(--line-dark); background:#fff; font-weight:700; font-size:.88rem; }
+.button.primary { background:var(--blue); color:#fff; border-color:var(--blue); }
+.footer { color:var(--muted); text-align:center; font-size:.82rem; padding:6px 0 2px; }
+@media (max-width:1160px) {
+  .layout { display:block; }
+  .sidebar { position:relative; height:auto; }
+  .nav { display:grid; grid-template-columns:repeat(4, 1fr); gap:4px; }
+  .grid-three, .grid-two { grid-template-columns:1fr; }
+}
+@media (max-width:680px) {
+  .content { padding:16px; }
+  .topbar { padding:0 14px; }
+  .topbar span { display:none; }
+  .page-header { display:block; }
+  .base-box { margin-top:14px; }
+  .nav { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand"><strong>PetSOS</strong><span>Documentação técnica</span></div>
+    <div class="nav-title">Páginas</div>
+    <nav class="nav">
+      <a href="petsos_roadmap_dashboard.html">Roadmap</a>
+      <a class="active" href="petsos_documentacao.html">Visão geral</a>
+      <a href="petsos_frontend.html">Frontend</a>
+      <a href="petsos_backend.html">Backend</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <strong>PetSOS README</strong>
+      <span>Visão geral do produto, arquitetura e entregas</span>
+    </header>
+
+    <section class="content">
+      <div class="page-header">
+        <div>
+          <div class="breadcrumb">Documentação / Visão geral</div>
+          <h1>PetSOS</h1>
+          <p class="subtitle">Aplicativo mobile para registrar, acompanhar e moderar denúncias relacionadas a animais. O projeto combina mapa, notificações, voluntariado, evidências, perfis e painel administrativo para dar visibilidade e organização aos casos.</p>
+          <div class="cta-row">
+            <a class="button primary" href="petsos_frontend.html">Ver frontend</a>
+            <a class="button" href="petsos_backend.html">Ver backend</a>
+          </div>
+        </div>
+      </div>
+
+      <section class="grid-three" aria-label="Resumo do projeto">
+        <article class="card blue">
+          <h3>O que é</h3>
+          <p>Uma plataforma de apoio comunitário para denúncias de abandono, maus-tratos, negligência e outras ocorrências envolvendo animais.</p>
+        </article>
+        <article class="card green">
+          <h3>Para quem</h3>
+          <p>Pessoas que querem reportar casos, acompanhar denúncias próximas, contribuir como voluntárias e validar resoluções com evidências.</p>
+        </article>
+        <article class="card purple">
+          <h3>Estado atual</h3>
+          <p>O roadmap principal está concluído, incluindo denúncia, mapa, autenticação, perfil, comentários, notificações, validação, recuperação de senha e moderação.</p>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header"><h2>Funções do aplicativo</h2><span>Resumo funcional</span></div>
+        <div class="panel-body">
+          <div class="grid-two">
+            <div class="card">
+              <h3>Denúncias e mapa</h3>
+              <ul class="list">
+                <li>Criação de denúncia com fotos, descrição, tipo, animal e localização.</li>
+                <li>Mapa com marcadores, popup de denúncia, detalhe e rota até o local.</li>
+                <li>Lista de denúncias com busca, filtros e cards otimizados.</li>
+                <li>Detalhe público para usuários logados e convidados.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Comunidade e conta</h3>
+              <ul class="list">
+                <li>Cadastro, login, lembrar identificador e recuperação de senha.</li>
+                <li>Perfil com foto, nome, descrição, localização e denúncias acompanhadas.</li>
+                <li>Acompanhamento, comentários, respostas, reportes e notificações.</li>
+                <li>Voluntariado e envio de evidências para apoiar a resolução.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header"><h2>Arquitetura resumida</h2><span>Camadas principais</span></div>
+        <div class="panel-body">
+          <div class="grid-three">
+            <article class="card blue">
+              <h3>App mobile</h3>
+              <p>Expo Router organiza rotas e tabs. Hooks conectam estado de tela, cache local e serviços HTTP. O app usa Firebase Auth para identidade e consome a API Express.</p>
+            </article>
+            <article class="card green">
+              <h3>API backend</h3>
+              <p>Express recebe requests, valida payloads com Zod, aplica permissões, centraliza regras de negócio e acessa Firestore via Firebase Admin.</p>
+            </article>
+            <article class="card amber">
+              <h3>Dados e integrações</h3>
+              <p>Firestore guarda usuários, denúncias, seguidores, notificações, comentários e moderação. OpenRouteService e IBGE são acessados pelo backend.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header"><h2>Tecnologias principais</h2><span>Stack resumida</span></div>
+        <div class="panel-body">
+          <div class="grid-two">
+            <div>
+              <h3>Frontend</h3>
+              <div class="stack">
+                <span>Expo SDK 54</span><span>Expo Router</span><span>React Native</span><span>Firebase JS SDK</span><span>react-native-maps</span><span>expo-image</span><span>Reanimated</span><span>Zod</span>
+              </div>
+            </div>
+            <div>
+              <h3>Backend</h3>
+              <div class="stack">
+                <span>Node.js</span><span>Express 5</span><span>Firebase Admin</span><span>Firestore</span><span>Multer</span><span>Sharp</span><span>Pino</span><span>Swagger UI</span><span>Prometheus</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header"><h2>Sistemas implementados</h2><span>Performance, segurança e operação</span></div>
+        <div class="panel-body">
+          <div class="grid-three">
+            <article class="card blue">
+              <h3>Otimização</h3>
+              <ul class="list">
+                <li>Cache local com stale-while-revalidate.</li>
+                <li>Endpoints agregados para reduzir round-trips.</li>
+                <li>Tiles de mapa com índice, batch e invalidação em tempo real.</li>
+                <li>Thumbnails com Sharp e cache de imagens no app.</li>
+              </ul>
+            </article>
+            <article class="card green">
+              <h3>Segurança</h3>
+              <ul class="list">
+                <li>Backend como autoridade final das permissões.</li>
+                <li>Roles administrativas e proteção de rotas sensíveis.</li>
+                <li>Validação de input com Zod.</li>
+                <li>Chaves externas mantidas no backend.</li>
+              </ul>
+            </article>
+            <article class="card amber">
+              <h3>Observabilidade</h3>
+              <ul class="list">
+                <li>Logs estruturados com Pino.</li>
+                <li>Métricas Prometheus protegidas por token.</li>
+                <li>Swagger/OpenAPI para consulta das rotas.</li>
+                <li>Benchmarks com Autocannon.</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer">Documentação estática do PetSOS · Página geral</div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

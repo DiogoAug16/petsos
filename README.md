@@ -1,201 +1,167 @@
-# 🐾 PetSOS — Frontend
+# PetSOS — Frontend Mobile
 
-Aplicativo mobile do **PetSOS**, uma plataforma colaborativa de denúncias de maus-tratos contra animais. Construído com **React Native + Expo**, organizado em monorepo junto ao backend Node.js + Express.
+Aplicativo mobile do **PetSOS**, uma plataforma colaborativa para registrar, visualizar, acompanhar e moderar denúncias relacionadas a animais. O app é construído com **Expo Router + React Native** e consome a API do repositório `petsos-api`.
 
----
+## O que o app faz
 
-## 🗂️ Estrutura do Projeto
+- Exibe denúncias em mapa com marcadores personalizados.
+- Permite criar denúncias com fotos, localização, tipo de animal e tipo de ocorrência.
+- Mostra lista e detalhe público de denúncias para usuários logados e convidados.
+- Permite acompanhar denúncias, comentar, responder comentários e reportar conteúdo.
+- Suporta voluntariado, evidências e validação de resolução.
+- Possui login, cadastro, verificação de email, recuperação de senha e lembrar identificador.
+- Possui perfil público/privado, edição de perfil, foto, descrição e localização.
+- Exibe notificações, contador de não lidas e limpeza de notificações.
+- Inclui fluxo administrativo para moderação de denúncias e comentários.
 
-```
-frontend/
-├── app/
-│   ├── (tabs)/
-│   └── _layout.tsx
-├── assets/
-│   ├── fonts/
-│   └── images/
-├── components/
-├── constants/
-├── hooks/
-├── scripts/
-├── .env.example
-├── .gitignore
-├── package.json
-└── README.md
-```
+## Stack principal
 
----
+| Tecnologia | Uso |
+| --- | --- |
+| Expo SDK 54 | Base do app mobile |
+| Expo Router 6 | Navegação por arquivos |
+| React 19 / React Native 0.81 | UI e runtime mobile |
+| Firebase JS SDK | Autenticação no app |
+| react-native-maps | Mapa, marcadores e rotas |
+| expo-location | Localização do dispositivo |
+| expo-image / expo-image-picker | Cache de imagem e seleção de fotos |
+| expo-secure-store | Armazenamento seguro local |
+| expo-haptics | Feedback tátil |
+| Reanimated / Gesture Handler | Animações e interações |
+| Zod / zxcvbn | Validação e força de senha |
 
-## 📁 Descrição das Pastas
+## Estrutura do projeto
 
-### `app/`
-Coração da navegação do aplicativo. O Expo Router usa **file-based routing**, ou seja, cada arquivo dentro de `app/` vira automaticamente uma rota — sem precisar configurar navegação manualmente.
-
-```
-app/
-├── (tabs)/                  # Grupo de rotas com navegação por abas
-│   ├── _layout.tsx          # Define as abas e seus ícones
-│   ├── index.tsx            # Tela inicial (ex: mapa de denúncias)
-│   └── profile.tsx          # Tela de perfil do usuário
-├── complaint/
-│   ├── create.tsx           # Tela de criação de denúncia
-│   ├── [id].tsx             # Tela de detalhes de uma denúncia
-│   └── edit/[id].tsx        # Tela de edição de denúncia
-└── _layout.tsx              # Layout raiz do app (navegação global)
-```
-
-> 📌 O `(tabs)` entre parênteses é uma convenção do Expo Router para agrupar rotas sem afetar a URL — as rotas dentro dele compartilham a barra de navegação inferior.
-
-**Convenções de nomeação do Expo Router:**
-
-| Convenção | Exemplo | Significado |
-|---|---|---|
-| `(nome)/` | `(tabs)/` | Grupo sem afetar a URL — usado para organizar rotas e compartilhar layouts |
-| `[param].tsx` | `[id].tsx` | Rota dinâmica — o valor é acessado via `useLocalSearchParams()` |
-| `_layout.tsx` | `_layout.tsx` | Define o layout compartilhado entre as rotas do mesmo nível |
-| `+not-found.tsx` | `+not-found.tsx` | Tela exibida quando a rota acessada não existe (404) |
-
----
-
-### `assets/`
-Arquivos estáticos do aplicativo como imagens e fontes.
-
-```
-assets/
-├── fonts/       # Fontes customizadas do app
-└── images/      # Ícones, logo do PetSOS e imagens estáticas
+```txt
+petsos/
+  app/                 Rotas e telas Expo Router
+  components/          Componentes reutilizáveis por domínio
+  hooks/               Estado, cache e efeitos de tela
+  services/            Cliente HTTP e serviços da API
+  context/             Auth, notificações e estado global
+  styles/              StyleSheets separados por tela/componente
+  constants/           Opções, enums e tokens locais
+  utils/               Helpers compartilhados
+  assets/images/       Backgrounds, ícones e imagens
+  docs/                Dashboard e documentação estática
 ```
 
-> Nenhum arquivo de lógica deve existir aqui — apenas recursos visuais estáticos.
+## Fluxos principais
 
----
+### Autenticação
 
-### `components/`
-Componentes React Native reutilizáveis em várias telas do app. Cada componente deve ser independente e não conter regras de negócio.
+- Login por email/username e senha.
+- Cadastro com validação de username e criação de perfil no backend.
+- Verificação de email via Firebase Auth.
+- Recuperação de senha via email.
+- Lembrar-me salva o último email ou username digitado.
 
-```
-components/
-├── ComplaintCard.tsx        # Card de denúncia exibido na listagem
-├── MapMarker.tsx            # Marcador customizado no mapa
-├── PhotoPicker.tsx          # Seletor de fotos da galeria/câmera
-└── ui/                      # Componentes genéricos de interface
-    ├── Button.tsx
-    ├── Input.tsx
-    └── Modal.tsx
-```
+### Denúncias
 
-> 📌 Componentes específicos de uma única tela devem ficar na própria pasta da tela dentro de `app/`, não aqui.
+- Criação de denúncia com opção anônima.
+- Upload de fotos e preview antes do envio.
+- Localização automática ou seleção manual no mapa.
+- Detalhe público acessível por convidados.
+- Acompanhamento, voluntariado, comentários, respostas e evidências.
 
----
+### Mapa
 
-### `constants/`
-Valores fixos reutilizados em toda a aplicação, evitando strings e números mágicos espalhados pelo código.
+- Marcadores customizados.
+- Popup com ações de ver detalhe e traçar rota.
+- Rota desenhada dentro do mapa do app.
+- Cache de tiles, batch loading e invalidação em tempo real.
+- Debug visual de tiles controlado por variável de ambiente.
 
-```
-constants/
-├── Colors.ts        # Paleta de cores do PetSOS
-├── Layout.ts        # Tamanhos, espaçamentos e breakpoints
-└── Api.ts           # URLs base e endpoints da API do backend
-```
+### Perfil e notificações
 
-**Exemplo:**
-```ts
-// constants/Api.ts
-export const API_URL = process.env.EXPO_PUBLIC_API_URL;
+- Perfil público com resumo e denúncias acompanhadas.
+- Edição de nome, foto, descrição e localização.
+- Autocomplete de cidade/UF consumindo endpoint do backend.
+- Notificações com cache local e contador de não lidas.
 
-export const ENDPOINTS = {
-  complaints: '/api/complaints',
-  users: '/api/users',
-};
-```
+## Otimizações implementadas
 
----
+- Cache local com stale-while-revalidate para perfil, notificações e denúncias.
+- Bootstrap inicial para preencher dados comuns rapidamente.
+- Prefetch e cache de denúncias do mapa por tile.
+- Uso de thumbnails em listas e marcadores.
+- Cache de imagem com `expo-image`.
+- Serviços de API separados por domínio para reduzir duplicação nas telas.
 
-### `hooks/`
-Hooks customizados que encapsulam lógicas reutilizáveis entre componentes e telas.
+## Variáveis de ambiente
 
-```
-hooks/
-├── useComplaints.ts     # Busca, criação e manipulação de denúncias
-├── useLocation.ts       # Captura de geolocalização do dispositivo
-└── usePhotoUpload.ts    # Seleção e envio de fotos
-```
-
-**Exemplo:**
-```ts
-// Uso em qualquer tela
-const { location, requestPermission } = useLocation();
-const { complaints, createComplaint } = useComplaints();
-```
-
-> ✅ Regras de negócio e chamadas à API devem ficar nos hooks, mantendo as telas limpas e focadas apenas na UI.
-
----
-
-### `scripts/`
-Scripts utilitários usados durante o desenvolvimento. Não fazem parte do app em si.
-
-```
-scripts/
-└── reset-project.js    # Limpa o projeto e recria a pasta app/ do zero (gerado pelo Expo)
-```
-
-> ⚠️ Esses scripts são executados via terminal e não são importados pelo app.
-
----
-
-## 🚀 Como rodar localmente
-
-```bash
-# Na raiz do monorepo
-cd frontend
-
-# Instalar dependências
-npm install
-
-# Configurar variáveis de ambiente
-cp .env.example .env
-
-# Rodar o app
-npx expo start
-```
-
-No terminal aparecerão as opções para abrir o app:
-
-- **Expo Go** — escaneie o QR code no celular (mais rápido para testar)
-- **Android Emulator** — requer Android Studio configurado
-- **iOS Simulator** — requer Xcode (apenas macOS)
-
----
-
-## 🔑 Variáveis de Ambiente (`.env.example`)
+Crie um `.env` baseado em `.env.example`.
 
 ```env
-# URL do backend
-EXPO_PUBLIC_API_URL=http://localhost:3000
+EXPO_PUBLIC_API_URL=http://[IP]/api
+EXPO_PUBLIC_UPLOAD_URL=http://[IP]:3030
+
+EXPO_PUBLIC_MAP_TILE_DEBUG=false
+EXPO_PUBLIC_APP_LOGS=false
+
+EXPO_PUBLIC_FIREBASE_API_KEY=
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+EXPO_PUBLIC_FIREBASE_APP_ID=
+EXPO_PUBLIC_FIREBASE_COLLECTION_PREFIX=dev_
 ```
 
-> 📌 No Expo, variáveis de ambiente expostas ao app **precisam** do prefixo `EXPO_PUBLIC_` para serem acessíveis no código.
+Observações:
 
----
+- Variáveis usadas no app Expo precisam do prefixo `EXPO_PUBLIC_`.
+- A chave do OpenRouteService não deve ficar no frontend; as rotas são solicitadas ao backend.
+- `EXPO_PUBLIC_MAP_TILE_DEBUG=true` ativa a camada visual de debug dos tiles.
+- `EXPO_PUBLIC_APP_LOGS=true` ativa logs do app no console do Expo.
 
-## 📦 Dependências principais
+## Como rodar
 
-| Pacote | Uso |
-|---|---|
-| `expo` | Framework base do app |
-| `expo-router` | Navegação file-based |
-| `react-native-maps` | Mapa interativo de denúncias |
-| `expo-location` | Captura de geolocalização |
-| `expo-image-picker` | Seleção de fotos da galeria/câmera |
+```bash
+npm install
+npm start
+```
 
----
+Opções comuns:
 
-## 🗺️ Roadmap por Sprint
+```bash
+npm run ios
+npm run android
+npm run web
+npm run lint
+```
 
-| Sprint | Telas e funcionalidades | Status |
-|---|---|---|
-| Sprint 1 | Formulário de denúncia, upload de fotos, geolocalização, mapa | 🔲 Backlog |
-| Sprint 2 | Filtros no mapa, detalhes da denúncia, colaboração | 🔲 Backlog |
-| Sprint 3 | Histórico de atualizações, status da denúncia | 🔲 Backlog |
-| Sprint 4 | Login, cadastro, logout, recuperação de senha | 🔲 Backlog |
+## Documentação estática
+
+Os arquivos em `docs/` podem ser hospedados como documentação pública:
+
+- `docs/petsos_roadmap_dashboard.html`
+- `docs/petsos_documentacao.html`
+- `docs/petsos_frontend.html`
+- `docs/petsos_backend.html`
+
+Para hospedar no Vercel:
+
+| Configuração | Valor |
+| --- | --- |
+| Framework Preset | `Other` |
+| Root Directory | `docs` |
+| Build Command | vazio |
+| Output Directory | `.` |
+| Install Command | vazio |
+
+O arquivo `docs/index.html` é a entrada do site e redireciona para a documentação geral. O arquivo `docs/vercel.json` adiciona headers básicos de segurança para o deploy estático.
+
+## Validação antes de PR
+
+```bash
+npm run lint
+```
+
+Para fluxos visuais, teste no Expo Go ou simulador, principalmente:
+
+- login/cadastro/recuperação de senha;
+- criação e detalhe de denúncia;
+- mapa, popup de marcador e rota;
+- comentários e reportes;
+- perfil, edição de perfil e notificações.

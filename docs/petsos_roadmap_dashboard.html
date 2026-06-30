@@ -1,0 +1,704 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dashboard Corporativo · Roadmap PetSOS</title>
+<style>
+:root {
+  --nav: #1f2937;
+  --nav-dark: #111827;
+  --bg: #f3f5f8;
+  --card: #ffffff;
+  --ink: #1f2937;
+  --muted: #6b7280;
+  --line: #d6dbe3;
+  --line-dark: #b8c0cc;
+  --blue: #1d4ed8;
+  --green: #15803d;
+  --amber: #b45309;
+  --purple: #6d28d9;
+  --red: #b91c1c;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+a { color: inherit; text-decoration: none; }
+.layout { min-height: 100vh; display: grid; grid-template-columns: 238px 1fr; }
+.sidebar {
+  background: var(--nav);
+  color: #e5e7eb;
+  border-right: 1px solid #0f172a;
+  padding: 20px 16px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+.brand { border-bottom: 1px solid rgba(255,255,255,.12); padding-bottom: 18px; margin-bottom: 18px; }
+.brand strong { display:block; font-size: 1.15rem; letter-spacing: .02em; }
+.brand span { display:block; margin-top: 4px; color:#aeb7c4; font-size:.78rem; }
+.profile { border:1px solid rgba(255,255,255,.12); padding:12px; margin-bottom: 18px; display:grid; grid-template-columns: 38px 1fr; gap:10px; align-items:center; }
+.profile-initial { width:38px; height:38px; display:grid; place-items:center; background:#374151; border:1px solid rgba(255,255,255,.14); font-weight:700; }
+.profile strong { display:block; font-size:.88rem; }
+.profile span { color:#aeb7c4; font-size:.76rem; }
+.nav-title { color:#9ca3af; text-transform:uppercase; letter-spacing:.12em; font-size:.68rem; margin: 20px 8px 8px; }
+.nav a { display:block; padding: 10px 11px; color:#d1d5db; border-left:3px solid transparent; font-size:.9rem; }
+.nav a.active, .nav a:hover { background: var(--nav-dark); color:#fff; border-left-color:#60a5fa; }
+.main { min-width:0; }
+.topbar {
+  height: 58px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 0 26px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.top-left { display:flex; align-items:center; gap:14px; }
+.menu-btn { width:36px; height:34px; border:1px solid var(--line-dark); background:#fff; color:var(--ink); }
+.search input { width:min(420px, 44vw); height:34px; border:1px solid var(--line-dark); padding:0 10px; outline:none; background:#fff; font-size:16px; }
+.search input:focus-visible,
+.filters input:focus-visible,
+.filters select:focus-visible,
+.menu-btn:focus-visible,
+.nav a:focus-visible {
+  outline: 3px solid rgba(96,165,250,.38);
+  outline-offset: 2px;
+}
+.top-meta { color: var(--muted); font-size:.84rem; }
+.content { padding: 24px 26px 34px; }
+.page-header { display:flex; justify-content:space-between; gap:20px; margin-bottom: 20px; align-items:flex-start; }
+.breadcrumb { color:var(--muted); font-size:.82rem; margin-bottom: 8px; }
+h1 { margin:0; font-size:1.72rem; font-weight:700; letter-spacing:-.01em; }
+.subtitle { color:var(--muted); margin:7px 0 0; }
+.base-box { background:#fff; border:1px solid var(--line); padding:12px 14px; min-width:260px; font-size:.86rem; color:var(--muted); }
+.metrics { display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap:16px; margin-bottom:18px; }
+.metric-card { background:#fff; border:1px solid var(--line); padding:18px 18px 16px; border-top:4px solid var(--line-dark); }
+.metric-total { border-top-color: var(--blue); }
+.metric-done { border-top-color: var(--green); }
+.metric-open { border-top-color: var(--amber); }
+.metric-sprints { border-top-color: var(--purple); }
+.metric-card span { display:block; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; font-size:.72rem; }
+.metric-card strong { display:block; font-size:2rem; margin:6px 0 3px; font-weight:700; }
+.metric-card small { color:var(--muted); }
+.panel { background:#fff; border:1px solid var(--line); margin-bottom:18px; }
+.panel-header { padding:14px 16px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; gap:14px; align-items:center; background:#fbfcfe; }
+.panel-header h2 { margin:0; font-size:1rem; font-weight:700; }
+.panel-header span { color:var(--muted); font-size:.82rem; }
+.panel-body { padding:16px; }
+.roadmap-timeline { position:relative; }
+.timeline-scale { display:grid; grid-template-columns: repeat(4, 1fr); border:1px solid var(--line); border-bottom:0; background:#f8fafc; }
+.timeline-scale span { padding:8px 10px; border-right:1px solid var(--line); color:var(--muted); font-size:.78rem; font-weight:700; text-transform:uppercase; }
+.timeline-scale span:last-child { border-right:0; }
+.timeline-grid { display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-left:1px solid var(--line); border-top:1px solid var(--line); }
+.timeline-block { border-right:1px solid var(--line); border-bottom:1px solid var(--line); background:#fff; min-height:232px; display:grid; grid-template-rows:auto 1fr; }
+.timeline-marker { background:#374151; color:#fff; padding:8px 10px; font-weight:700; font-size:.86rem; border-bottom:1px solid var(--line); }
+.timeline-marker.done { background:var(--green); }
+.timeline-marker.backlog { background:var(--purple); }
+.timeline-marker.progress { background:var(--amber); }
+.timeline-content { padding:14px; }
+.timeline-head { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+.timeline-head h3 { margin:0; font-size:1rem; }
+.timeline-theme { margin:10px 0 6px; font-weight:700; line-height:1.35; }
+.timeline-summary { margin:0 0 16px; color:var(--muted); line-height:1.45; font-size:.9rem; }
+.timeline-meta { border-top:1px solid var(--line); padding-top:10px; display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-size:.84rem; }
+.timeline-meta strong { color:var(--ink); }
+.dashboard-grid { display:grid; grid-template-columns: 1.3fr .7fr; gap:18px; margin-bottom:18px; }
+.grid-two { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:18px; margin-bottom:18px; }
+.sprint-list { display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap:16px; margin-bottom:18px; }
+.sprint-card { background:#fff; border:1px solid var(--line); border-top:4px solid #4b5563; padding:16px; }
+.card-kicker { color:var(--muted); font-weight:700; font-size:.8rem; margin-bottom: 10px; }
+.sprint-title-row { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+.sprint-title-row h3 { margin:0; font-size:1rem; }
+.sprint-card p { margin:10px 0 14px; color:var(--muted); line-height:1.4; min-height:40px; }
+.sprint-stat { display:flex; justify-content:space-between; gap:12px; border-top:1px solid var(--line); padding:8px 0; font-size:.84rem; }
+.sprint-stat span { color:var(--muted); }
+.progress-line { height:8px; border:1px solid var(--line-dark); background:#f3f4f6; margin-top:8px; }
+.progress-line i { display:block; height:100%; background:var(--blue); }
+.tag { display:inline-block; padding:4px 8px; border:1px solid currentColor; font-size:.72rem; font-weight:700; line-height:1; background:#fff; white-space:nowrap; }
+.tag.done { color:var(--green); }
+.tag.backlog { color:var(--purple); }
+.tag.progress { color:var(--amber); }
+.chart-svg { width:100%; min-height:220px; }
+.bar-row, .status-row { display:grid; grid-template-columns: 86px 1fr 38px; gap:12px; align-items:center; margin:12px 0; font-size:.88rem; }
+.status-row { grid-template-columns: 92px 1fr 38px; }
+.bar-track { height:11px; border:1px solid var(--line-dark); background:#f9fafb; }
+.bar-track.compact { height:8px; }
+.bar-track i { display:block; height:100%; background:var(--blue); }
+.bar-track i.done { background:var(--green); }
+.bar-track i.backlog { background:var(--purple); }
+.bar-track i.progress { background:var(--amber); }
+.member-row { display:grid; grid-template-columns: 38px 1fr; gap:10px; align-items:center; margin: 12px 0; }
+.member-initial { width:38px; height:34px; border:1px solid var(--line-dark); background:#f3f4f6; display:grid; place-items:center; font-weight:700; font-size:.78rem; color:#374151; }
+.member-head { display:flex; justify-content:space-between; gap:12px; margin-bottom:5px; font-size:.85rem; }
+.member-head span { color:var(--muted); }
+.filters { display:flex; gap:8px; flex-wrap:wrap; }
+.filters input, .filters select { height:34px; border:1px solid var(--line-dark); background:#fff; padding:0 9px; outline:none; font-size:16px; }
+.table-wrap { overflow:auto; }
+table { width:100%; border-collapse:collapse; min-width:880px; }
+th, td { padding:12px 14px; border-bottom:1px solid var(--line); text-align:left; font-size:.88rem; vertical-align:top; }
+th { color:#4b5563; text-transform:uppercase; letter-spacing:.05em; font-size:.72rem; background:#f9fafb; border-bottom:1px solid var(--line-dark); }
+td a { color:var(--blue); font-weight:700; }
+tbody tr:hover td { background:#f8fafc; }
+.note { color:var(--muted); line-height:1.5; margin:0; }
+.footer { color:var(--muted); text-align:center; font-size:.82rem; padding: 6px 0 2px; }
+@media (max-width: 1160px) {
+  .layout { display:block; }
+  .sidebar { position:relative; height:auto; }
+  .nav { display:grid; grid-template-columns: repeat(4, 1fr); gap:4px; }
+  .metrics, .sprint-list, .timeline-grid, .timeline-scale { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dashboard-grid, .grid-two { grid-template-columns:1fr; }
+}
+@media (max-width: 680px) {
+  .content { padding:16px; }
+  .topbar { padding:0 14px; }
+  .top-meta { display:none; }
+  .search input { width:58vw; }
+  .metrics, .sprint-list, .timeline-grid, .timeline-scale, .nav { grid-template-columns:1fr; }
+  .page-header { display:block; }
+  .base-box { margin-top:14px; }
+}
+@media print {
+  .sidebar, .topbar, .filters { display:none; }
+  .layout { display:block; }
+  body { background:#fff; }
+  .content { padding:0; }
+  .panel, .metric-card, .sprint-card { break-inside:avoid; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand"><strong>PetSOS</strong><span>Roadmap Dashboard</span></div>
+    <div class="profile"><div class="profile-initial">D</div><div><strong>DiogoAug16</strong><span>GitHub Projects</span></div></div>
+    <div class="nav-title">Navegação</div>
+    <nav class="nav">
+      <a class="active" href="#overview">Visão geral</a>
+      <a href="#timeline">Timeline</a>
+      <a href="#roadmap">Roadmap detalhado</a>
+      <a href="petsos_documentacao.html">Documentação</a>
+    </nav>
+    <div class="nav-title">Indicadores</div>
+    <nav class="nav">
+      <a href="#roadmap">30 itens concluídos</a><a href="#roadmap">0 itens pendentes</a><a href="petsos_documentacao.html">README técnico</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="top-left">
+        <button class="menu-btn" type="button" aria-label="Abrir navegação">☰</button>
+        <div class="search"><input id="topSearch" type="search" placeholder="Pesquisar item do roadmap" /></div>
+      </div>
+      <div class="top-meta">Arquivo base: petsos - Roadmap(2).tsv</div>
+    </header>
+
+    <section class="content" id="overview">
+      <div class="page-header">
+        <div>
+          <div class="breadcrumb">Home / Projetos / PetSOS / Roadmap</div>
+          <h1>Dashboard Corporativo do Roadmap PetSOS</h1>
+          <p class="subtitle">Visualização objetiva para acompanhamento de sprint, progresso e itens do GitHub Projects.</p>
+        </div>
+        <div class="base-box"><strong>Atualização:</strong> 30/06/2026 07:08<br><strong>Origem:</strong> exportação TSV do GitHub Projects</div>
+      </div>
+
+      <section class="metrics">
+<div class="metric-card metric-total">
+  <span>Total de itens</span>
+  <strong>30</strong>
+  <small>Issues no roadmap</small>
+</div>
+<div class="metric-card metric-done">
+  <span>Concluídos</span>
+  <strong>30</strong>
+  <small>100% de progresso</small>
+</div>
+<div class="metric-card metric-open">
+  <span>Pendentes</span>
+  <strong>0</strong>
+  <small>0 em aberto</small>
+</div>
+<div class="metric-card metric-sprints">
+  <span>Sprints</span>
+  <strong>4</strong>
+  <small>Março a junho de 2026</small>
+</div>
+</section>
+
+      <section class="panel" id="timeline">
+        <div class="panel-header"><h2>Timeline do roadmap</h2><span>Visão macro por sprint e período de entrega</span></div>
+        <div class="panel-body roadmap-timeline">
+          <div class="timeline-scale"><span>Março / Abril</span><span>Abril / Maio</span><span>Maio / Junho</span><span>Junho</span></div>
+          <div class="timeline-grid">
+    <article class="timeline-block">
+      <div class="timeline-marker done">S1</div>
+      <div class="timeline-content">
+        <div class="timeline-head">
+          <h3>Sprint 1</h3>
+          <span class="tag done">Concluída</span>
+        </div>
+        <p class="timeline-theme">Registro e visualização de denúncias</p>
+        <p class="timeline-summary">Base funcional para criação, visualização, filtros, ordenação e gestão inicial de denúncias.</p>
+        <div class="timeline-meta">
+          <span>17/03/2026 — 13/04/2026</span>
+          <strong>11/11 itens</strong>
+        </div>
+        <div class="progress-line"><i style="width:100%"></i></div>
+      </div>
+    </article>
+
+    <article class="timeline-block">
+      <div class="timeline-marker done">S2</div>
+      <div class="timeline-content">
+        <div class="timeline-head">
+          <h3>Sprint 2</h3>
+          <span class="tag done">Concluída</span>
+        </div>
+        <p class="timeline-theme">Colaboração da comunidade e usuários</p>
+        <p class="timeline-summary">Fluxos de login, acompanhamento, comentários, notificações e participação da comunidade.</p>
+        <div class="timeline-meta">
+          <span>14/04/2026 — 13/05/2026</span>
+          <strong>8/8 itens</strong>
+        </div>
+        <div class="progress-line"><i style="width:100%"></i></div>
+      </div>
+    </article>
+
+    <article class="timeline-block">
+      <div class="timeline-marker done">S3</div>
+      <div class="timeline-content">
+        <div class="timeline-head">
+          <h3>Sprint 3</h3>
+          <span class="tag done">Concluída</span>
+        </div>
+        <p class="timeline-theme">Acompanhamento, resolução e validação</p>
+        <p class="timeline-summary">Controle de status, evidências de resolução e validação comunitária das denúncias.</p>
+        <div class="timeline-meta">
+          <span>13/05/2026 — 09/06/2026</span>
+          <strong>7/7 itens</strong>
+        </div>
+        <div class="progress-line"><i style="width:100%"></i></div>
+      </div>
+    </article>
+
+    <article class="timeline-block">
+      <div class="timeline-marker done">S4</div>
+      <div class="timeline-content">
+        <div class="timeline-head">
+          <h3>Sprint 4</h3>
+          <span class="tag done">Concluída</span>
+        </div>
+        <p class="timeline-theme">Gerenciamento, validações e refinamento</p>
+        <p class="timeline-summary">Fechamento do produto com recuperação de senha, perfil, roles e moderação.</p>
+        <div class="timeline-meta">
+          <span>10/06/2026 — 30/06/2026</span>
+          <strong>4/4 itens</strong>
+        </div>
+        <div class="progress-line"><i style="width:100%"></i></div>
+      </div>
+    </article>
+    </div>
+        </div>
+      </section>
+
+      <section class="dashboard-grid" id="charts">
+        <article class="panel">
+          <div class="panel-header"><h2>Atividade por sprint</h2><span>Quantidade de itens planejados</span></div>
+          <div class="panel-body">
+            <svg class="chart-svg" viewBox="0 0 620 220" role="img" aria-label="Gráfico de linha com itens por sprint">
+              <line x1="46" y1="182.0" x2="596" y2="182.0" stroke="#e5e7eb" /><text x="10" y="186.0" fill="#6b7280" font-size="12">0</text><line x1="46" y1="129.3" x2="596" y2="129.3" stroke="#e5e7eb" /><text x="10" y="133.3" fill="#6b7280" font-size="12">4</text><line x1="46" y1="76.7" x2="596" y2="76.7" stroke="#e5e7eb" /><text x="10" y="80.7" fill="#6b7280" font-size="12">8</text><line x1="46" y1="24.0" x2="596" y2="24.0" stroke="#e5e7eb" /><text x="10" y="28.0" fill="#6b7280" font-size="12">12</text>
+              <line x1="46" y1="182" x2="596" y2="182" stroke="#b8c0cc" />
+              <line x1="46" y1="24" x2="46" y2="182" stroke="#b8c0cc" />
+              <polyline points="46.0,37.2 229.3,76.7 412.7,89.8 596.0,129.3" fill="none" stroke="#1d4ed8" stroke-width="3" />
+              <rect x="41.0" y="32.2" width="10" height="10" fill="#1d4ed8" /><text x="46.0" y="25.2" text-anchor="middle" fill="#1f2937" font-size="13" font-weight="700">11</text><rect x="224.3" y="71.7" width="10" height="10" fill="#1d4ed8" /><text x="229.3" y="64.7" text-anchor="middle" fill="#1f2937" font-size="13" font-weight="700">8</text><rect x="407.7" y="84.8" width="10" height="10" fill="#1d4ed8" /><text x="412.7" y="77.8" text-anchor="middle" fill="#1f2937" font-size="13" font-weight="700">7</text><rect x="591.0" y="124.3" width="10" height="10" fill="#1d4ed8" /><text x="596.0" y="117.3" text-anchor="middle" fill="#1f2937" font-size="13" font-weight="700">4</text>
+              <text x="46.0" y="212" text-anchor="middle" fill="#6b7280" font-size="12">S1</text><text x="229.3" y="212" text-anchor="middle" fill="#6b7280" font-size="12">S2</text><text x="412.7" y="212" text-anchor="middle" fill="#6b7280" font-size="12">S3</text><text x="596.0" y="212" text-anchor="middle" fill="#6b7280" font-size="12">S4</text>
+            </svg>
+          </div>
+        </article>
+        <article class="panel">
+          <div class="panel-header"><h2>Status geral</h2><span>Distribuição dos itens</span></div>
+          <div class="panel-body">
+    <div class="status-row">
+      <span class="tag done">Done</span>
+      <div class="bar-track"><i class="done" style="width:100%"></i></div>
+      <strong>30</strong>
+    </div>
+    </div>
+        </article>
+      </section>
+
+      <section class="grid-two">
+        <article class="panel">
+          <div class="panel-header"><h2>Itens por sprint</h2><span>Volume de trabalho planejado</span></div>
+          <div class="panel-body">
+    <div class="bar-row">
+      <span>Sprint 1</span>
+      <div class="bar-track"><i style="width:100%"></i></div>
+      <strong>11</strong>
+    </div>
+
+    <div class="bar-row">
+      <span>Sprint 2</span>
+      <div class="bar-track"><i style="width:73%"></i></div>
+      <strong>8</strong>
+    </div>
+
+    <div class="bar-row">
+      <span>Sprint 3</span>
+      <div class="bar-track"><i style="width:64%"></i></div>
+      <strong>7</strong>
+    </div>
+
+    <div class="bar-row">
+      <span>Sprint 4</span>
+      <div class="bar-track"><i style="width:36%"></i></div>
+      <strong>4</strong>
+    </div>
+    </div>
+        </article>
+        <article class="panel">
+          <div class="panel-header"><h2>Responsáveis</h2><span>Distribuição por atribuição</span></div>
+          <div class="panel-body">
+    <div class="member-row">
+      <span class="member-initial">DI</span>
+      <div class="member-main">
+        <div class="member-head"><strong>DiogoAug16</strong><span>13 itens</span></div>
+        <div class="bar-track compact"><i style="width:100%"></i></div>
+      </div>
+    </div>
+
+    <div class="member-row">
+      <span class="member-initial">LU</span>
+      <div class="member-main">
+        <div class="member-head"><strong>LucasLimaT</strong><span>10 itens</span></div>
+        <div class="bar-track compact"><i style="width:77%"></i></div>
+      </div>
+    </div>
+
+    <div class="member-row">
+      <span class="member-initial">WE</span>
+      <div class="member-main">
+        <div class="member-head"><strong>Wesleyamd</strong><span>10 itens</span></div>
+        <div class="bar-track compact"><i style="width:77%"></i></div>
+      </div>
+    </div>
+
+    <div class="member-row">
+      <span class="member-initial">LA</span>
+      <div class="member-main">
+        <div class="member-head"><strong>libia-alves</strong><span>5 itens</span></div>
+        <div class="bar-track compact"><i style="width:38%"></i></div>
+      </div>
+    </div>
+    </div>
+        </article>
+      </section>
+
+      <section class="panel" id="roadmap">
+        <div class="panel-header">
+          <div><h2>Roadmap detalhado</h2><span>Issues clicáveis do GitHub Projects</span></div>
+          <div class="filters">
+            <input id="tableSearch" type="search" placeholder="Buscar item, issue ou responsável" />
+            <select id="sprintFilter"><option value="">Todas as sprints</option><option value="Sprint 1">Sprint 1</option><option value="Sprint 2">Sprint 2</option><option value="Sprint 3">Sprint 3</option><option value="Sprint 4">Sprint 4</option></select>
+            <select id="statusFilter"><option value="">Todos os status</option><option value="Done">Done</option></select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Issue</th><th>Item</th><th>Sprint</th><th>Responsáveis</th><th>Status</th></tr></thead>
+            <tbody id="roadmapRows">
+    <tr data-sprint="Sprint 1" data-status="Done" data-search="Criar denúncia de maus tratos #46 DiogoAug16, libia-alves, Wesleyamd Done Sprint 1">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/46" target="_blank" rel="noopener noreferrer">#46</a></td>
+      <td><strong>Criar denúncia de maus tratos</strong></td>
+      <td>Sprint 1</td>
+      <td>DiogoAug16, libia-alves, Wesleyamd</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 1" data-status="Done" data-search="Visualizar denúncias no mapa #47 DiogoAug16, libia-alves, Wesleyamd Done Sprint 1">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/47" target="_blank" rel="noopener noreferrer">#47</a></td>
+      <td><strong>Visualizar denúncias no mapa</strong></td>
+      <td>Sprint 1</td>
+      <td>DiogoAug16, libia-alves, Wesleyamd</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 1" data-status="Done" data-search="Anexar fotos da denuncia #56 Wesleyamd Done Sprint 1">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/56" target="_blank" rel="noopener noreferrer">#56</a></td>
+      <td><strong>Anexar fotos da denuncia</strong></td>
+      <td>Sprint 1</td>
+      <td>Wesleyamd</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 1" data-status="Done" data-search="Informar localização da denúncia #57 Wesleyamd Done Sprint 1">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/57" target="_blank" rel="noopener noreferrer">#57</a></td>
+      <td><strong>Informar localização da denúncia</strong></td>
+      <td>Sprint 1</td>
+      <td>Wesleyamd</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 1" data-status="Done" data-search="Editar publicação da denúncia #58 libia-alves, LucasLimaT Done Sprint 1">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/58" target="_blank" rel="noopener noreferrer">#58</a></td>
+      <td><strong>Editar publicação da denúncia</strong></td>
+      <td>Sprint 1</td>
+      <td>libia-alves, LucasLimaT</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 1" data-status="Done" data-search="Excluir publicação da denúncia #59 DiogoAug16, LucasLimaT, Wesleyamd Done Sprint 1">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/59" target="_blank" rel="noopener noreferrer">#59</a></td>
+      <td><strong>Excluir publicação da denúncia</strong></td>
+      <td>Sprint 1</td>
+      <td>DiogoAug16, LucasLimaT, Wesleyamd</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 1" data-status="Done" data-search="Abrir detalhes de uma denúncia #62 LucasLimaT Done Sprint 1">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/62" target="_blank" rel="noopener noreferrer">#62</a></td>
+      <td><strong>Abrir detalhes de uma denúncia</strong></td>
+      <td>Sprint 1</td>
+      <td>LucasLimaT</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 1" data-status="Done" data-search="Filtrar denúncias no mapa #63 DiogoAug16 Done Sprint 1">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/63" target="_blank" rel="noopener noreferrer">#63</a></td>
+      <td><strong>Filtrar denúncias no mapa</strong></td>
+      <td>Sprint 1</td>
+      <td>DiogoAug16</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 1" data-status="Done" data-search="Ordenar lista de denúncias por data #126 DiogoAug16 Done Sprint 1">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/126" target="_blank" rel="noopener noreferrer">#126</a></td>
+      <td><strong>Ordenar lista de denúncias por data</strong></td>
+      <td>Sprint 1</td>
+      <td>DiogoAug16</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 1" data-status="Done" data-search="Listar denúncias em formato de lista #127 DiogoAug16 Done Sprint 1">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/127" target="_blank" rel="noopener noreferrer">#127</a></td>
+      <td><strong>Listar denúncias em formato de lista</strong></td>
+      <td>Sprint 1</td>
+      <td>DiogoAug16</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 1" data-status="Done" data-search="Pesquisar denúncias no mapa #198 DiogoAug16 Done Sprint 1">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/198" target="_blank" rel="noopener noreferrer">#198</a></td>
+      <td><strong>Pesquisar denúncias no mapa</strong></td>
+      <td>Sprint 1</td>
+      <td>DiogoAug16</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 2" data-status="Done" data-search="Assumir uma denúncia para ajudar #48 Wesleyamd Done Sprint 2">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/48" target="_blank" rel="noopener noreferrer">#48</a></td>
+      <td><strong>Assumir uma denúncia para ajudar</strong></td>
+      <td>Sprint 2</td>
+      <td>Wesleyamd</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 2" data-status="Done" data-search="Criar conta no aplicativo #52 DiogoAug16 Done Sprint 2">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/52" target="_blank" rel="noopener noreferrer">#52</a></td>
+      <td><strong>Criar conta no aplicativo</strong></td>
+      <td>Sprint 2</td>
+      <td>DiogoAug16</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 2" data-status="Done" data-search="Visualizar denúncias que estou acompanhando #61 LucasLimaT Done Sprint 2">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/61" target="_blank" rel="noopener noreferrer">#61</a></td>
+      <td><strong>Visualizar denúncias que estou acompanhando</strong></td>
+      <td>Sprint 2</td>
+      <td>LucasLimaT</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 2" data-status="Done" data-search="Visualizar quem assumiu a denúncia #64 LucasLimaT Done Sprint 2">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/64" target="_blank" rel="noopener noreferrer">#64</a></td>
+      <td><strong>Visualizar quem assumiu a denúncia</strong></td>
+      <td>Sprint 2</td>
+      <td>LucasLimaT</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 2" data-status="Done" data-search="Receber notificações de atividade na denúncia #65 Wesleyamd Done Sprint 2">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/65" target="_blank" rel="noopener noreferrer">#65</a></td>
+      <td><strong>Receber notificações de atividade na denúncia</strong></td>
+      <td>Sprint 2</td>
+      <td>Wesleyamd</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 2" data-status="Done" data-search="Fazer logout da conta #73 libia-alves, LucasLimaT Done Sprint 2">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/73" target="_blank" rel="noopener noreferrer">#73</a></td>
+      <td><strong>Fazer logout da conta</strong></td>
+      <td>Sprint 2</td>
+      <td>libia-alves, LucasLimaT</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 2" data-status="Done" data-search="Fazer login no aplicativo #75 DiogoAug16 Done Sprint 2">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/75" target="_blank" rel="noopener noreferrer">#75</a></td>
+      <td><strong>Fazer login no aplicativo</strong></td>
+      <td>Sprint 2</td>
+      <td>DiogoAug16</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 2" data-status="Done" data-search="Comentar numa denuncia #209 LucasLimaT Done Sprint 2">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/209" target="_blank" rel="noopener noreferrer">#209</a></td>
+      <td><strong>Comentar numa denuncia</strong></td>
+      <td>Sprint 2</td>
+      <td>LucasLimaT</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 3" data-status="Done" data-search="Atualizar status da denúncia #49 DiogoAug16 Done Sprint 3">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/49" target="_blank" rel="noopener noreferrer">#49</a></td>
+      <td><strong>Atualizar status da denúncia</strong></td>
+      <td>Sprint 3</td>
+      <td>DiogoAug16</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 3" data-status="Done" data-search="Validar resolução da denúncia #51 LucasLimaT Done Sprint 3">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/51" target="_blank" rel="noopener noreferrer">#51</a></td>
+      <td><strong>Validar resolução da denúncia</strong></td>
+      <td>Sprint 3</td>
+      <td>LucasLimaT</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 3" data-status="Done" data-search="Enviar evidências da resolução #66 DiogoAug16 Done Sprint 3">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/66" target="_blank" rel="noopener noreferrer">#66</a></td>
+      <td><strong>Enviar evidências da resolução</strong></td>
+      <td>Sprint 3</td>
+      <td>DiogoAug16</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 3" data-status="Done" data-search="Solicitar validação da resolução #67 LucasLimaT Done Sprint 3">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/67" target="_blank" rel="noopener noreferrer">#67</a></td>
+      <td><strong>Solicitar validação da resolução</strong></td>
+      <td>Sprint 3</td>
+      <td>LucasLimaT</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 3" data-status="Done" data-search="Visualizar número de validações da denúncia #70 Wesleyamd Done Sprint 3">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/70" target="_blank" rel="noopener noreferrer">#70</a></td>
+      <td><strong>Visualizar número de validações da denúncia</strong></td>
+      <td>Sprint 3</td>
+      <td>Wesleyamd</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 3" data-status="Done" data-search="Confirmar resolução da denúncia (autor) #71 Wesleyamd Done Sprint 3">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/71" target="_blank" rel="noopener noreferrer">#71</a></td>
+      <td><strong>Confirmar resolução da denúncia (autor)</strong></td>
+      <td>Sprint 3</td>
+      <td>Wesleyamd</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 3" data-status="Done" data-search="Confirmar denúncia automaticamente após múltiplas validações #72 libia-alves Done Sprint 3">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/72" target="_blank" rel="noopener noreferrer">#72</a></td>
+      <td><strong>Confirmar denúncia automaticamente após múltiplas validações</strong></td>
+      <td>Sprint 3</td>
+      <td>libia-alves</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 4" data-status="Done" data-search="Recuperar senha #74 DiogoAug16 Done Sprint 4">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/74" target="_blank" rel="noopener noreferrer">#74</a></td>
+      <td><strong>Recuperar senha</strong></td>
+      <td>Sprint 4</td>
+      <td>DiogoAug16</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 4" data-status="Done" data-search="Editar perfil #124 DiogoAug16 Done Sprint 4">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/124" target="_blank" rel="noopener noreferrer">#124</a></td>
+      <td><strong>Editar perfil</strong></td>
+      <td>Sprint 4</td>
+      <td>DiogoAug16</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 4" data-status="Done" data-search="Adicionar roles (admin, ong, anonimo etc ) #285 Wesleyamd Done Sprint 4">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/285" target="_blank" rel="noopener noreferrer">#285</a></td>
+      <td><strong>Adicionar roles (admin, ong, anonimo etc )</strong></td>
+      <td>Sprint 4</td>
+      <td>Wesleyamd</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+
+    <tr data-sprint="Sprint 4" data-status="Done" data-search="Moderação de denuncias #286 LucasLimaT Done Sprint 4">
+      <td><a href="https://github.com/DiogoAug16/petsos/issues/286" target="_blank" rel="noopener noreferrer">#286</a></td>
+      <td><strong>Moderação de denuncias</strong></td>
+      <td>Sprint 4</td>
+      <td>LucasLimaT</td>
+      <td><span class="tag done">Done</span></td>
+    </tr>
+    </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="footer">Dashboard HTML offline e responsivo · Gerado automaticamente a partir do TSV exportado</div>
+    </section>
+  </main>
+</div>
+<script>
+(function () {
+  const rows = Array.from(document.querySelectorAll('#roadmapRows tr'));
+  const tableSearch = document.getElementById('tableSearch');
+  const topSearch = document.getElementById('topSearch');
+  const sprintFilter = document.getElementById('sprintFilter');
+  const statusFilter = document.getElementById('statusFilter');
+
+  function normalize(value) {
+    return (value || '').toString().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+
+  function applyFilters(source) {
+    if (source === topSearch) tableSearch.value = topSearch.value;
+    if (source === tableSearch) topSearch.value = tableSearch.value;
+
+    const q = normalize(tableSearch.value);
+    const sprint = sprintFilter.value;
+    const status = statusFilter.value;
+
+    rows.forEach(row => {
+      const text = normalize(row.dataset.search);
+      const matchText = !q || text.includes(q);
+      const matchSprint = !sprint || row.dataset.sprint === sprint;
+      const matchStatus = !status || row.dataset.status === status;
+      row.style.display = matchText && matchSprint && matchStatus ? '' : 'none';
+    });
+  }
+
+  [tableSearch, topSearch, sprintFilter, statusFilter].forEach(el => {
+    el.addEventListener('input', () => applyFilters(el));
+    el.addEventListener('change', () => applyFilters(el));
+  });
+})();
+</script>
+</body>
+</html>

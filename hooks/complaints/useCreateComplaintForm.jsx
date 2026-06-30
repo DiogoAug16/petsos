@@ -6,9 +6,9 @@ import {
   COMPLAINT_TYPES,
   INITIAL_COMPLAINT_FORM,
 } from '@/constants/complaints/complaints.constants';
-import { useHapticPress } from '@/hooks/ui/useHapticPress';
 import { useRequireVerifiedEmail } from '@/hooks/auth/useRequireVerifiedEmail';
 import { useLocation } from '@/hooks/map/useLocation';
+import { useHapticPress } from '@/hooks/ui/useHapticPress';
 import {
   createComplaint,
   getComplaintById,
@@ -69,6 +69,7 @@ export function useCreateComplaintForm({
           animalOther: '',
           locationMode: normalizedLocation ? 'map' : 'auto',
           photos: loadedPhotos,
+          isAnonymous: Boolean(complaint?.isAnonymous),
         });
 
         if (normalizedLocation) {
@@ -170,6 +171,7 @@ export function useCreateComplaintForm({
         type: form.type,
         animal: form.animal,
         location: resolveLocation(),
+        isAnonymous: Boolean(form.isAnonymous),
       };
       const payload = isEdit
         ? { ...basePayload, photos: form.photos }

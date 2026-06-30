@@ -1,5 +1,5 @@
-import { enqueueComplaintMapTileInvalidation } from '@/utils/map/map-tile-invalidation-store';
 import { apiFetch } from '@/services/api';
+import { enqueueComplaintMapTileInvalidation } from '@/utils/map/map-tile-invalidation-store';
 import { buildImageUploadFile, isLocalMediaUri } from '@/utils/media/image-upload.utils';
 import { writeLocalCache } from '@/utils/shared/local-cache';
 
@@ -49,6 +49,7 @@ export async function createComplaint(data) {
   formData.append("type", data.type);
   formData.append("animal", data.animal);
   formData.append("status", data.status);
+  formData.append("isAnonymous", String(Boolean(data.isAnonymous)));
   formData.append("location", JSON.stringify(data.location));
 
   const convertedPhotos = await Promise.all(
@@ -113,7 +114,8 @@ export async function updateComplaint(id, data) {
           latitude: Number(data.location.latitude),
           longitude: Number(data.location.longitude),
         }
-      : undefined,
+        : undefined,
+      isAnonymous: Boolean(data.isAnonymous),
   };
 
   const localPhotos =
@@ -131,6 +133,7 @@ export async function updateComplaint(id, data) {
   formData.append("description", payload.description);
   formData.append("type", payload.type);
   formData.append("animal", payload.animal);
+  formData.append("isAnonymous", String(Boolean(payload.isAnonymous)));
 
   if (payload.status !== undefined) {
     formData.append("status", payload.status);

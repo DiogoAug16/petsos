@@ -65,3 +65,9 @@ export const reportComment = (complaintId, commentId, reason = null) => {
     body: JSON.stringify({ reason }),
   });
 };
+
+export const deleteComment = (complaintId, commentId) => {
+  return apiFetch(`/complaints/${complaintId}/comments/${commentId}`, {
+    method: 'DELETE',
+  });
+};

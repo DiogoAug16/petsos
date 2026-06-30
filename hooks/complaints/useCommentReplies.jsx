@@ -1,6 +1,7 @@
 import { COMMENTS_PAGE_SIZE } from '@/hooks/complaints/useComplaintComments';
 import {
   createCommentReply,
+  deleteComment,
   getCommentReplies,
   likeComment,
   reportComment,
@@ -48,8 +49,13 @@ const getNextLikeState = (reply) => {
   };
 };
 
-export function useCommentReplies({ complaintId, commentId, onReplyCreated }) {
-  const { isAuthenticated } = useAuth();
+export function useCommentReplies({
+  complaintId,
+  commentId,
+  onReplyCreated,
+  onReplyDeleted,
+}) {
+  const { isAuthenticated, isAdmin } = useAuth();
   const requireAuth = useRequireAuth();
   const requireVerifiedEmail = useRequireVerifiedEmail();
   const [visible, setVisible] = useState(false);
@@ -273,6 +279,39 @@ export function useCommentReplies({ complaintId, commentId, onReplyCreated }) {
     [complaintId, isAuthenticated, requireAuth, requireVerifiedEmail],
   );
 
+  const deleteReply = useCallback(
+    async (reply) => {
+      if (!isAdmin || !complaintId || !reply?.id) return;
+
+      Alert.alert(
+        'Excluir comentário',
+        'Esta resposta será removida da seção de comentários.',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          {
+            text: 'Excluir',
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                await deleteComment(complaintId, reply.id);
+                setReplies((current) =>
+                  current.filter((item) => item.id !== reply.id)
+                );
+                onReplyDeleted?.(commentId, reply);
+              } catch (error) {
+                Alert.alert(
+                  'Não foi possível excluir',
+                  error?.message ?? 'Tente novamente em instantes.',
+                );
+              }
+            },
+          },
+        ],
+      );
+    },
+    [commentId, complaintId, isAdmin, onReplyDeleted],
+  );
+
   return {
     visible,
     replies,
@@ -285,5 +324,6 @@ export function useCommentReplies({ complaintId, commentId, onReplyCreated }) {
     addReply,
     toggleLike,
     reportReply,
+    deleteReply: isAdmin ? deleteReply : null,
   };
 }

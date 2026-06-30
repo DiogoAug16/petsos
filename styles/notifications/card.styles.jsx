@@ -16,9 +16,11 @@ export const styles = StyleSheet.create({
     elevation: 2,
   },
 
-  unreadCard: {
-    backgroundColor: '#FFF9F2',
-    borderColor: '#FFB77A',
+  readCard: {
+    backgroundColor: '#F2F0ED',
+    borderColor: '#E2DDD7',
+    shadowOpacity: 0.015,
+    opacity: 0.78,
   },
 
   iconBox: {
@@ -29,6 +31,10 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+  },
+
+  readIconBox: {
+    backgroundColor: '#E7E2DC',
   },
 
   content: {
@@ -46,6 +52,11 @@ export const styles = StyleSheet.create({
     lineHeight: 20,
     color: '#272A3A',
     fontWeight: '700',
+  },
+
+  readMessage: {
+    color: '#7E7774',
+    fontWeight: '600',
   },
 
   unreadDot: {
@@ -70,6 +81,10 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     color: '#8D7D78',
     fontWeight: '700',
+  },
+
+  readTime: {
+    color: '#AAA29F',
   },
 
   countBadge: {

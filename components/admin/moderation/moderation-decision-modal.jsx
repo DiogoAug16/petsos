@@ -1,10 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import {
   ActivityIndicator,
+  Keyboard,
   Modal,
   Pressable,
   Text,
   TextInput,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 
@@ -24,8 +26,12 @@ export function ModerationDecisionModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.modalBackdrop}>
-        <View style={styles.modalCard}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style={styles.modalBackdrop}>
+          <Pressable
+            style={styles.modalCard}
+            onPress={(event) => event.stopPropagation()}
+          >
           <View style={styles.modalTitleRow}>
             {action ? (
               <Ionicons name={action.icon} size={22} color={action.color} />
@@ -68,8 +74,9 @@ export function ModerationDecisionModal({
               )}
             </Pressable>
           </View>
+          </Pressable>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 }

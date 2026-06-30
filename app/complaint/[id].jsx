@@ -33,7 +33,7 @@ export default function ComplaintDetailScreen() {
   const { id } = useLocalSearchParams();
   const complaintId = Array.isArray(id) ? id[0] : id;
   const router = useRouter();
-  const { user, isAuthenticated, isEmailVerified } = useAuth();
+  const { user, isAuthenticated, isEmailVerified, isAdmin } = useAuth();
   const requireAuth = useRequireAuth();
   const requireVerifiedEmail = useRequireVerifiedEmail();
   const colorScheme = useColorScheme();
@@ -81,7 +81,9 @@ export default function ComplaintDetailScreen() {
     addComment,
     toggleLike,
     reportCommentItem,
+    deleteCommentItem,
     incrementRepliesCount,
+    decrementRepliesCount,
     isBlocked: commentsBlocked,
   } = commentsState;
 
@@ -194,6 +196,7 @@ export default function ComplaintDetailScreen() {
             styles={styles}
             theme={theme}
             isOwner={isOwner}
+            canDelete={isAdmin}
             onBack={() => router.back()}
             onEdit={handleEdit}
             onDelete={handleDelete}
@@ -263,9 +266,11 @@ export default function ComplaintDetailScreen() {
             loadingMore={commentsLoadingMore}
             isBlocked={commentsBlocked}
             loadMore={loadMoreComments}
+            deleteComment={deleteCommentItem}
             reportComment={reportCommentItem}
             toggleLike={toggleLike}
             incrementRepliesCount={incrementRepliesCount}
+            decrementRepliesCount={decrementRepliesCount}
             onReplyPress={handleReplyPress}
             onSectionLayout={handleSectionLayout}
             onComposerAnchorLayout={handleComposerAnchorLayout}

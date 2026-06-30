@@ -12,9 +12,11 @@ export function CommentsSection({
   loadingMore,
   isBlocked,
   loadMore,
+  deleteComment,
   reportComment,
   toggleLike,
   incrementRepliesCount,
+  decrementRepliesCount,
   onReplyPress,
   onSectionLayout,
   onComposerAnchorLayout,
@@ -74,9 +76,11 @@ export function CommentsSection({
                 <CommentItem
                   complaintId={complaintId}
                   comment={comment}
+                  onDelete={deleteComment}
                   onLike={toggleLike}
                   onReport={reportComment}
                   onReplyCreated={incrementRepliesCount}
+                  onReplyDeleted={decrementRepliesCount}
                   onReplyPress={onReplyPress}
                   styles={styles}
                 />

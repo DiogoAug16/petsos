@@ -35,6 +35,7 @@ function formatRelativeTime(createdAt) {
 
 export function NotificationCard({ notification, onPress }) {
   const isUnread = notification.read === false;
+  const isRead = !isUnread;
   const { animatedStyle, onPressIn, onPressOut } = usePressAnimation();
   const { triggerHaptics } = useHaptics();
   const handlePressIn = () => {
@@ -71,21 +72,21 @@ export function NotificationCard({ notification, onPress }) {
       <Animated.View
         style={[
           styles.card,
-          isUnread && styles.unreadCard,
+          isRead && styles.readCard,
           animatedStyle,
         ]}
       >
-        <View style={styles.iconBox}>
+        <View style={[styles.iconBox, isRead && styles.readIconBox]}>
           <Ionicons
             name={getIcon()}
             size={21}
-            color={isUnread ? '#FF8C42' : '#8D7D78'}
+            color={isUnread ? '#FF8C42' : '#AAA29F'}
           />
         </View>
 
         <View style={styles.content}>
           <View style={styles.header}>
-            <Text style={styles.message}>
+            <Text style={[styles.message, isRead && styles.readMessage]}>
               {notification.message}
             </Text>
 
@@ -93,7 +94,7 @@ export function NotificationCard({ notification, onPress }) {
           </View>
 
           <View style={styles.footer}>
-            <Text style={styles.time}>
+            <Text style={[styles.time, isRead && styles.readTime]}>
               {formatRelativeTime(notification.createdAt)}
             </Text>
 

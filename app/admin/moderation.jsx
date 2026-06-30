@@ -7,13 +7,13 @@ import { LoadingState } from '@/components/complaints/states/loading-state';
 import { useAuth } from '@/context/AuthContext';
 import { useAdminModeration } from '@/hooks/admin/useAdminModeration';
 import { adminModerationStyles as styles } from '@/styles/admin/moderation.styles';
-import { getModerationComplaintId } from '@/utils/admin/moderation.utils';
+import { getModerationTargetId } from '@/utils/admin/moderation.utils';
 import { Stack, useRouter } from 'expo-router';
 import { useEffect, useMemo } from 'react';
 import { ActivityIndicator, Alert, FlatList, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const keyExtractor = (item) => String(getModerationComplaintId(item));
+const keyExtractor = (item) => String(getModerationTargetId(item));
 
 export default function AdminModerationScreen() {
   const router = useRouter();

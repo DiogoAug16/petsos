@@ -55,3 +55,13 @@ export const unlikeComment = (complaintId, commentId) => {
     method: 'DELETE',
   });
 };
+
+export const reportComment = (complaintId, commentId, reason = null) => {
+  return apiFetch(`/complaints/${complaintId}/comments/${commentId}/report`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ reason }),
+  });
+};

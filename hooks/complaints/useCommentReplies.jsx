@@ -3,12 +3,16 @@ import {
   createCommentReply,
   getCommentReplies,
   likeComment,
+  reportComment,
   unlikeComment,
 } from '@/services/complaints/comments.service';
+import { COMMENT_REPORT_REASONS } from '@/constants/complaints/report-reasons.constants';
 import { useAuth } from '@/context/AuthContext';
 import { useRequireAuth } from '@/context/AuthPromptContext';
 import { useRequireVerifiedEmail } from '@/hooks/auth/useRequireVerifiedEmail';
+import { openReportReasonAlert } from '@/utils/complaints/report-reason-alert.utils';
 import { useCallback, useState } from 'react';
+import { Alert } from 'react-native';
 
 const DEFAULT_PAGE_INFO = {
   hasMore: false,
@@ -225,6 +229,50 @@ export function useCommentReplies({ complaintId, commentId, onReplyCreated }) {
     [complaintId, isAuthenticated, requireAuth, requireVerifiedEmail, updateReply],
   );
 
+  const reportReply = useCallback(
+    async (reply) => {
+      if (!isAuthenticated) {
+        requireAuth(null, {
+          title: 'Entre para reportar',
+          message: 'Faça login ou crie uma conta para reportar comentários.',
+        });
+        return;
+      }
+
+      if (
+        !requireVerifiedEmail(null, {
+          title: 'Confirme seu email',
+          message: 'Confirme seu email para reportar comentários.',
+        })
+      ) {
+        return;
+      }
+
+      if (!complaintId || !reply?.id) return;
+
+      openReportReasonAlert({
+        title: 'Motivo do reporte',
+        message: 'Escolha por que este comentário deve ser analisado.',
+        reasons: COMMENT_REPORT_REASONS,
+        onSelect: async (reason) => {
+          try {
+            await reportComment(complaintId, reply.id, reason);
+            Alert.alert(
+              'Comentário reportado',
+              'A moderação recebeu sua denúncia.',
+            );
+          } catch (error) {
+            Alert.alert(
+              'Não foi possível reportar',
+              error?.message ?? 'Tente novamente em instantes.',
+            );
+          }
+        },
+      });
+    },
+    [complaintId, isAuthenticated, requireAuth, requireVerifiedEmail],
+  );
+
   return {
     visible,
     replies,
@@ -236,5 +284,6 @@ export function useCommentReplies({ complaintId, commentId, onReplyCreated }) {
     loadMore,
     addReply,
     toggleLike,
+    reportReply,
   };
 }

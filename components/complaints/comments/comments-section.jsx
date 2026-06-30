@@ -12,6 +12,7 @@ export function CommentsSection({
   loadingMore,
   isBlocked,
   loadMore,
+  reportComment,
   toggleLike,
   incrementRepliesCount,
   onReplyPress,
@@ -74,6 +75,7 @@ export function CommentsSection({
                   complaintId={complaintId}
                   comment={comment}
                   onLike={toggleLike}
+                  onReport={reportComment}
                   onReplyCreated={incrementRepliesCount}
                   onReplyPress={onReplyPress}
                   styles={styles}

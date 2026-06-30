@@ -248,6 +248,14 @@ export async function hideComplaintModeration(id, reason) {
   });
 }
 
+export async function reportComplaint(id, reason = null) {
+  return apiFetch(`/complaints/${id}/report`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ reason }),
+  });
+}
+
 export async function getNearbyComplaints(lat, lng, radiusKm = 5) {
   return apiFetch(`/complaints/nearest?lat=${lat}&lng=${lng}&radiusKm=${radiusKm}`, {
     skipAuthRedirect: true,

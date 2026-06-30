@@ -1,11 +1,13 @@
-import { MODERATION_ACTIONS } from '@/constants/admin/moderation.constants';
+import {
+  getModerationActions,
+} from '@/constants/admin/moderation.constants';
 import {
   approveComplaintModeration,
   getPendingModerationComplaints,
   hideComplaintModeration,
   rejectComplaintModeration,
 } from '@/services/complaints/complaints.service';
-import { getModerationComplaintId } from '@/utils/admin/moderation.utils';
+import { getModerationTargetId } from '@/utils/admin/moderation.utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert } from 'react-native';
 
@@ -27,7 +29,7 @@ export function useAdminModeration({ canAccess }) {
   const [submitting, setSubmitting] = useState(false);
 
   const selectedAction = useMemo(
-    () => (decision ? MODERATION_ACTIONS[decision.action] : null),
+    () => (decision ? getModerationActions(decision.item)[decision.action] : null),
     [decision]
   );
 
@@ -81,10 +83,10 @@ export function useAdminModeration({ canAccess }) {
 
   const submitDecision = useCallback(async () => {
     const trimmedReason = reason.trim();
-    const complaintId = getModerationComplaintId(decision?.item);
+    const moderationId = getModerationTargetId(decision?.item);
     const handler = ACTION_HANDLERS[decision?.action];
 
-    if (!complaintId || !handler) return;
+    if (!moderationId || !handler) return;
     if (!trimmedReason) {
       Alert.alert('Motivo obrigatório', 'Informe o motivo da decisão.');
       return;
@@ -92,9 +94,9 @@ export function useAdminModeration({ canAccess }) {
 
     setSubmitting(true);
     try {
-      await handler(complaintId, trimmedReason);
+      await handler(moderationId, trimmedReason);
       setItems((current) =>
-        current.filter((item) => getModerationComplaintId(item) !== complaintId)
+        current.filter((item) => getModerationTargetId(item) !== moderationId)
       );
       closeDecision();
     } catch (err) {

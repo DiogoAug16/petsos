@@ -1,6 +1,6 @@
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 
 import { CommentsSection } from "@/components/complaints/comments/comments-section";
 import { DetailActionDock } from "@/components/complaints/detail/detail-action-dock";
@@ -14,6 +14,7 @@ import { EvidenceValidationSection } from "@/components/complaints/evidence-vali
 import { LoadingState } from "@/components/complaints/states/loading-state";
 import { RequestValidationButton } from "@/components/complaints/request-validation/request-validation-button";
 import { useAuth } from "@/context/AuthContext";
+import { useRequireAuth } from "@/context/AuthPromptContext";
 import { useRequireVerifiedEmail } from "@/hooks/auth/useRequireVerifiedEmail";
 import { useAddress } from "@/hooks/complaints/useAddress";
 import { useColorScheme } from "@/hooks/ui/useColorScheme";
@@ -22,14 +23,18 @@ import { useComplaintConfig } from "@/hooks/complaints/useComplaintConfig";
 import { useComplaintDetailScreenData } from "@/hooks/complaints/useComplaintDetailScreenData";
 import { useComplaintEvidence } from "@/hooks/complaints/useComplaintEvidence";
 import { useComplaintReplyComposer } from "@/hooks/complaints/useComplaintReplyComposer";
+import { COMPLAINT_REPORT_REASONS } from "@/constants/complaints/report-reasons.constants";
 import { complaintsStyles } from "@/styles/complaints";
 import Colors from "@/styles/theme/Colors";
+import { reportComplaint } from "@/services/complaints/complaints.service";
+import { openReportReasonAlert } from "@/utils/complaints/report-reason-alert.utils";
 
 export default function ComplaintDetailScreen() {
   const { id } = useLocalSearchParams();
   const complaintId = Array.isArray(id) ? id[0] : id;
   const router = useRouter();
   const { user, isAuthenticated, isEmailVerified } = useAuth();
+  const requireAuth = useRequireAuth();
   const requireVerifiedEmail = useRequireVerifiedEmail();
   const colorScheme = useColorScheme();
   const styles = complaintsStyles(colorScheme);
@@ -75,6 +80,7 @@ export default function ComplaintDetailScreen() {
     loadMore: loadMoreComments,
     addComment,
     toggleLike,
+    reportCommentItem,
     incrementRepliesCount,
     isBlocked: commentsBlocked,
   } = commentsState;
@@ -96,6 +102,43 @@ export default function ComplaintDetailScreen() {
   const composerSubmitting = composerState.isReplying
     ? composerState.submitting
     : commentSubmitting;
+
+  const handleReportComplaint = () => {
+    if (
+      !requireAuth(null, {
+        title: "Entre para reportar",
+        message: "Faça login ou crie uma conta para reportar denúncias.",
+      })
+    ) {
+      return;
+    }
+
+    if (
+      !requireVerifiedEmail(null, {
+        title: "Confirme seu email",
+        message: "Confirme seu email para reportar denúncias.",
+      })
+    ) {
+      return;
+    }
+
+    openReportReasonAlert({
+      title: "Motivo do reporte",
+      message: "Escolha por que esta denúncia deve ser analisada.",
+      reasons: COMPLAINT_REPORT_REASONS,
+      onSelect: async (reason) => {
+        try {
+          await reportComplaint(complaintId, reason);
+          Alert.alert("Denúncia reportada", "A moderação recebeu seu reporte.");
+        } catch (reportError) {
+          Alert.alert(
+            "Não foi possível reportar",
+            reportError?.message ?? "Tente novamente em instantes.",
+          );
+        }
+      },
+    });
+  };
 
   const renderScreenState = (children) => (
     <>
@@ -154,6 +197,7 @@ export default function ComplaintDetailScreen() {
             onBack={() => router.back()}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onReport={handleReportComplaint}
           />
 
           <DetailActionDock
@@ -219,6 +263,7 @@ export default function ComplaintDetailScreen() {
             loadingMore={commentsLoadingMore}
             isBlocked={commentsBlocked}
             loadMore={loadMoreComments}
+            reportComment={reportCommentItem}
             toggleLike={toggleLike}
             incrementRepliesCount={incrementRepliesCount}
             onReplyPress={handleReplyPress}

@@ -59,7 +59,7 @@ export const detailCommentsStyles = () => {
       flex: 1,
       maxHeight: 92,
       color: text,
-      fontSize: 14,
+      fontSize: 16,
       paddingVertical: 6,
       paddingHorizontal: 4,
     },

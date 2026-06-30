@@ -12,8 +12,11 @@ const UNREAD_CACHE_MAX_AGE_MS = 60 * 60 * 1000;
 
 const UnreadCountContext = createContext({});
 
+const isPendingProfileBootstrap = (error) =>
+  error?.code === 'NOT_FOUND' || error?.status === 404;
+
 export function UnreadCountProvider({ children }) {
-  const { isAuthenticated, isEmailVerified } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
   const intervalRef = useRef(null);
   const unreadCacheKey = auth.currentUser?.uid
@@ -21,7 +24,7 @@ export function UnreadCountProvider({ children }) {
     : null;
 
   const loadUnreadCount = useCallback(async () => {
-    if (!isAuthenticated || !isEmailVerified) return;
+    if (!isAuthenticated) return;
 
     try {
       if (unreadCacheKey) {
@@ -38,7 +41,7 @@ export function UnreadCountProvider({ children }) {
     } catch (error) {
       appLogger.warn('Erro ao buscar contador de notificações', { error });
     }
-  }, [isAuthenticated, isEmailVerified, unreadCacheKey]);
+  }, [isAuthenticated, unreadCacheKey]);
 
   const loadBootstrap = useCallback(async () => {
     if (!isAuthenticated) return;
@@ -70,14 +73,15 @@ export function UnreadCountProvider({ children }) {
         }
       }
     } catch (error) {
+      if (isPendingProfileBootstrap(error)) return;
+
       appLogger.warn('Erro ao carregar bootstrap do app', { error });
     }
   }, [isAuthenticated, unreadCacheKey]);
 
   useEffect(() => {
-    if (!isAuthenticated || !isEmailVerified) {
+    if (!isAuthenticated) {
       setUnreadCount(0);
-      if (isAuthenticated) loadBootstrap();
       return;
     }
 
@@ -96,7 +100,7 @@ export function UnreadCountProvider({ children }) {
       clearInterval(intervalRef.current);
       subscription.remove();
     };
-  }, [isAuthenticated, isEmailVerified, loadBootstrap, loadUnreadCount]);
+  }, [isAuthenticated, loadBootstrap, loadUnreadCount]);
 
   return (
     <UnreadCountContext.Provider value={{ unreadCount, reloadUnreadCount: loadUnreadCount }}>

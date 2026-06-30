@@ -15,7 +15,7 @@ const formatRepliesLabel = (count, visible) => {
 
 const getUsername = (comment) => comment?.username || 'usuario';
 
-function CommentBody({ comment, isReply, onLike, onReply, styles }) {
+function CommentBody({ comment, isReply, onLike, onReply, onReport, styles }) {
   const username = getUsername(comment);
 
   return (
@@ -52,6 +52,16 @@ function CommentBody({ comment, isReply, onLike, onReply, styles }) {
           <Pressable style={styles.commentActionButton} onPress={onReply}>
             <Text style={styles.commentActionText}>Responder</Text>
           </Pressable>
+
+          <Pressable
+            style={styles.commentActionButton}
+            onPress={onReport}
+            accessibilityRole="button"
+            accessibilityLabel="Reportar comentário"
+          >
+            <Ionicons name="flag-outline" size={15} color="#8D7D78" />
+            <Text style={styles.commentActionText}>Reportar</Text>
+          </Pressable>
         </View>
       </View>
     </View>
@@ -62,6 +72,7 @@ export function CommentItem({
   complaintId,
   comment,
   onLike,
+  onReport,
   onReplyCreated,
   onReplyPress,
   styles,
@@ -76,6 +87,7 @@ export function CommentItem({
     loadMore,
     addReply,
     toggleLike,
+    reportReply,
   } = useCommentReplies({
     complaintId,
     commentId: comment.id,
@@ -97,6 +109,7 @@ export function CommentItem({
         comment={comment}
         onLike={() => onLike(comment)}
         onReply={() => startReply(comment)}
+        onReport={() => onReport(comment)}
         styles={styles}
       />
 
@@ -120,6 +133,7 @@ export function CommentItem({
               isReply
               onLike={() => toggleLike(reply)}
               onReply={() => startReply(reply)}
+              onReport={() => reportReply(reply)}
               styles={styles}
             />
           ))}

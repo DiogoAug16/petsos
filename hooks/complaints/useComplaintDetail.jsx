@@ -1,5 +1,10 @@
 import { useFocusEffect } from '@react-navigation/native';
-import { deleteComplaint, getComplaintById } from '@/services/complaints/complaints.service';
+import { useAuth } from '@/context/AuthContext';
+import {
+  deleteComplaint,
+  getAdminComplaintById,
+  getComplaintById,
+} from '@/services/complaints/complaints.service';
 import { useRequireVerifiedEmail } from '@/hooks/auth/useRequireVerifiedEmail';
 import { readLocalCache, writeLocalCache } from '@/utils/shared/local-cache';
 import { useRouter } from 'expo-router';
@@ -11,6 +16,7 @@ const DETAIL_CACHE_MAX_AGE_MS = 6 * 60 * 60 * 1000;
 export function useComplaintDetail(id) {
   const router = useRouter();
   const requireVerifiedEmail = useRequireVerifiedEmail();
+  const { isAdmin } = useAuth();
 
   const [complaint, setComplaint] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,7 +32,7 @@ export function useComplaintDetail(id) {
 
     const controller = new AbortController();
 
-    const cacheKey = `complaint:detail:${id}`;
+    const cacheKey = `complaint:detail:${isAdmin ? 'admin' : 'public'}:${id}`;
 
     setLoading(true);
     readLocalCache(cacheKey, { maxAgeMs: DETAIL_CACHE_MAX_AGE_MS }).then((cached) => {
@@ -38,7 +44,11 @@ export function useComplaintDetail(id) {
 
     setError(null);
 
-    getComplaintById(id, controller.signal)
+    const request = isAdmin
+      ? getAdminComplaintById(id, controller.signal)
+      : getComplaintById(id, controller.signal);
+
+    request
       .then((response) => {
         const data = response?.data || response?.complaint || response;
         setComplaint(data);
@@ -52,7 +62,7 @@ export function useComplaintDetail(id) {
       .finally(() => setLoading(false));
 
     return controller;
-  }, [id]);
+  }, [id, isAdmin]);
 
   useFocusEffect(
     useCallback(() => {

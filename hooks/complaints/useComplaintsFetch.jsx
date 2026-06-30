@@ -1,5 +1,6 @@
 // hooks/useComplaintsFetch.jsx
-import { getComplaints } from '@/services/complaints/complaints.service';
+import { getAdminComplaints, getComplaints } from '@/services/complaints/complaints.service';
+import { filterPubliclyVisibleComplaints } from '@/utils/complaints/visibility.utils';
 import { readLocalCache, writeLocalCache } from '@/utils/shared/local-cache';
 import { useCallback, useState } from 'react';
 
@@ -9,10 +10,9 @@ const DEFAULT_PAGE_INFO = {
   nextCursor: null,
   totalItems: 0,
 };
-const FIRST_PAGE_CACHE_KEY = 'complaints:first-page';
 const FIRST_PAGE_CACHE_MAX_AGE_MS = 6 * 60 * 60 * 1000;
 
-export function useComplaintsFetch() {
+export function useComplaintsFetch({ includeAdminComplaints = false } = {}) {
   const [data, setData] = useState([]);
   const [pageInfo, setPageInfo] = useState(DEFAULT_PAGE_INFO);
   const [loading, setLoading] = useState(true);
@@ -22,15 +22,22 @@ export function useComplaintsFetch() {
 
   const fetchComplaints = useCallback(async (signal, options = {}) => {
     const { silent = false, append = false, cursor } = options;
+    const cacheKey = includeAdminComplaints
+      ? 'complaints:first-page:admin'
+      : 'complaints:first-page:public';
 
     try {
       let cacheApplied = false;
       if (!append && !cursor && !silent) {
-        const cached = await readLocalCache(FIRST_PAGE_CACHE_KEY, {
+        const cached = await readLocalCache(cacheKey, {
           maxAgeMs: FIRST_PAGE_CACHE_MAX_AGE_MS,
         });
         if (cached?.items) {
-          setData(cached.items);
+          setData(
+            includeAdminComplaints
+              ? cached.items
+              : filterPubliclyVisibleComplaints(cached.items)
+          );
           setPageInfo(cached.pageInfo ?? DEFAULT_PAGE_INFO);
           setLoading(false);
           cacheApplied = true;
@@ -43,12 +50,18 @@ export function useComplaintsFetch() {
         setLoading(true);
       }
       setError(null);
-      const result = await getComplaints({ signal, cursor });
+      const result = includeAdminComplaints
+        ? await getAdminComplaints({ signal, cursor })
+        : await getComplaints({ signal, cursor });
+      const items = includeAdminComplaints
+        ? result.items
+        : filterPubliclyVisibleComplaints(result.items);
+      const safeResult = { ...result, items };
 
-      setData((current) => (append ? [...current, ...result.items] : result.items));
+      setData((current) => (append ? [...current, ...items] : items));
       setPageInfo(result.pageInfo);
       if (!append && !cursor) {
-        writeLocalCache(FIRST_PAGE_CACHE_KEY, result);
+        writeLocalCache(cacheKey, safeResult);
       }
     } catch (err) {
       if (err.name === 'AbortError') return;
@@ -60,7 +73,7 @@ export function useComplaintsFetch() {
       setLoadingMore(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [includeAdminComplaints]);
 
   const executeWithAbortController = useCallback(
     async (callback) => {

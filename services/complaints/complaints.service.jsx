@@ -5,15 +5,7 @@ import { writeLocalCache } from '@/utils/shared/local-cache';
 
 const getResponseData = (response) => response?.data ?? response?.complaint ?? response;
 
-export async function getComplaints({ signal, cursor, limit = 50 } = {}) {
-  const params = new URLSearchParams({ limit: String(limit) });
-  if (cursor) params.set('cursor', cursor);
-
-  const result = await apiFetch(`/complaints?${params}`, {
-    signal,
-    skipAuthRedirect: true,
-  });
-
+const normalizePaginatedComplaints = (result, limit) => {
   if (Array.isArray(result)) {
     return {
       items: result,
@@ -37,6 +29,52 @@ export async function getComplaints({ signal, cursor, limit = 50 } = {}) {
       totalItems: items.length,
     },
   };
+};
+
+export async function getComplaints({ signal, cursor, limit = 50 } = {}) {
+  const params = new URLSearchParams({ limit: String(limit) });
+  if (cursor) params.set('cursor', cursor);
+
+  const result = await apiFetch(`/complaints?${params}`, {
+    signal,
+    skipAuthRedirect: true,
+  });
+
+  return normalizePaginatedComplaints(result, limit);
+}
+
+export async function getAdminComplaints({ signal, cursor, limit = 50 } = {}) {
+  const params = new URLSearchParams({ limit: String(limit) });
+  if (cursor) params.set('cursor', cursor);
+
+  const result = await apiFetch(`/complaints/admin?${params}`, { signal });
+  return normalizePaginatedComplaints(result, limit);
+}
+
+export async function getPendingModerationComplaints({
+  signal,
+  cursor,
+  limit = 50,
+} = {}) {
+  const params = new URLSearchParams({ limit: String(limit) });
+  if (cursor) params.set('cursor', cursor);
+
+  const result = await apiFetch(`/complaints/moderation/pending?${params}`, {
+    signal,
+  });
+  return normalizePaginatedComplaints(result, limit);
+}
+
+export async function checkAdminModerationAccess({ signal } = {}) {
+  try {
+    await apiFetch('/complaints/moderation/pending?limit=1', {
+      signal,
+      skipAuthRedirect: true,
+    });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 //Envio do Formulario de criação de denúncia para o backend
@@ -80,6 +118,10 @@ export async function getComplaintById(id, signal) {
   return await apiFetch(`/complaints/${id}`, { signal, skipAuthRedirect: true });
 }
 
+export async function getAdminComplaintById(id, signal) {
+  return await apiFetch(`/complaints/admin/${id}`, { signal });
+}
+
 export async function prefetchComplaintById(id) {
   if (!id) return null;
 
@@ -87,7 +129,7 @@ export async function prefetchComplaintById(id) {
     const response = await getComplaintById(id);
     const complaint = response?.data || response?.complaint || response;
     if (complaint) {
-      writeLocalCache(`complaint:detail:${id}`, complaint);
+      writeLocalCache(`complaint:detail:public:${id}`, complaint);
     }
     return complaint;
   } catch {
@@ -179,6 +221,30 @@ export async function updateComplaintStatus(id, status) {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status }),
+  });
+}
+
+export async function approveComplaintModeration(id, reason) {
+  return apiFetch(`/complaints/${id}/moderation/approve`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ reason }),
+  });
+}
+
+export async function rejectComplaintModeration(id, reason) {
+  return apiFetch(`/complaints/${id}/moderation/reject`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ reason }),
+  });
+}
+
+export async function hideComplaintModeration(id, reason) {
+  return apiFetch(`/complaints/${id}/moderation/hide`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ reason }),
   });
 }
 

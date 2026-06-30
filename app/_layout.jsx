@@ -67,6 +67,7 @@ function RootLayoutNav() {
                 <Stack.Screen name="users/[username]" options={{ headerShown: false }} />
                 <Stack.Screen name="notifications/index" options={{ headerShown: false }} />
                 <Stack.Screen name="profile/edit" options={{ headerShown: false }} />
+                <Stack.Screen name="admin/moderation" options={{ headerShown: false }} />
               </Stack>
             </AuthPromptProvider>
           </UnreadCountProvider>

@@ -179,6 +179,10 @@ export const profileStyles = (colorScheme) => {
       fontSize: 15,
       fontWeight: '900',
     },
+    adminActionButton: {
+      marginTop: 10,
+      backgroundColor: '#272A3A',
+    },
     accountStatusCard: {
       width: '100%',
       marginTop: 14,

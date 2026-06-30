@@ -1,13 +1,18 @@
 import {
   createComplaintComment,
+  deleteComment,
   getComplaintComments,
   likeComment,
+  reportComment,
   unlikeComment,
 } from '@/services/complaints/comments.service';
+import { COMMENT_REPORT_REASONS } from '@/constants/complaints/report-reasons.constants';
 import { useAuth } from '@/context/AuthContext';
 import { useRequireAuth } from '@/context/AuthPromptContext';
 import { useRequireVerifiedEmail } from '@/hooks/auth/useRequireVerifiedEmail';
+import { openReportReasonAlert } from '@/utils/complaints/report-reason-alert.utils';
 import { useCallback, useEffect, useState } from 'react';
+import { Alert } from 'react-native';
 
 export const COMMENTS_PAGE_SIZE = 10;
 
@@ -56,7 +61,7 @@ const getNextLikeState = (comment) => {
 };
 
 export function useComplaintComments(complaintId) {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isAdmin, isLoading: authLoading } = useAuth();
   const requireAuth = useRequireAuth();
   const requireVerifiedEmail = useRequireVerifiedEmail();
   const [comments, setComments] = useState([]);
@@ -196,6 +201,13 @@ export function useComplaintComments(complaintId) {
     }));
   }, [updateComment]);
 
+  const decrementRepliesCount = useCallback((commentId) => {
+    updateComment(commentId, (comment) => ({
+      ...comment,
+      repliesCount: Math.max(Number(comment.repliesCount ?? 0) - 1, 0),
+    }));
+  }, [updateComment]);
+
   const toggleLike = useCallback(
     async (comment) => {
       if (!isAuthenticated) {
@@ -243,6 +255,83 @@ export function useComplaintComments(complaintId) {
     [complaintId, isAuthenticated, requireAuth, requireVerifiedEmail, updateComment],
   );
 
+  const reportCommentItem = useCallback(
+    async (comment) => {
+      if (!isAuthenticated) {
+        requireAuth(null, {
+          title: 'Entre para reportar',
+          message: 'Faça login ou crie uma conta para reportar comentários.',
+        });
+        return;
+      }
+
+      if (
+        !requireVerifiedEmail(null, {
+          title: 'Confirme seu email',
+          message: 'Confirme seu email para reportar comentários.',
+        })
+      ) {
+        return;
+      }
+
+      if (!complaintId || !comment?.id) return;
+
+      openReportReasonAlert({
+        title: 'Motivo do reporte',
+        message: 'Escolha por que este comentário deve ser analisado.',
+        reasons: COMMENT_REPORT_REASONS,
+        onSelect: async (reason) => {
+          try {
+            await reportComment(complaintId, comment.id, reason);
+            Alert.alert(
+              'Comentário reportado',
+              'A moderação recebeu sua denúncia.',
+            );
+          } catch (error) {
+            Alert.alert(
+              'Não foi possível reportar',
+              error?.message ?? 'Tente novamente em instantes.',
+            );
+          }
+        },
+      });
+    },
+    [complaintId, isAuthenticated, requireAuth, requireVerifiedEmail],
+  );
+
+  const deleteCommentItem = useCallback(
+    async (comment) => {
+      if (!isAdmin || !complaintId || !comment?.id) return;
+
+      Alert.alert(
+        'Excluir comentário',
+        'Este comentário será removido da seção de comentários.',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          {
+            text: 'Excluir',
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                await deleteComment(complaintId, comment.id);
+                setComments((current) =>
+                  current.filter((item) => item.id !== comment.id)
+                );
+                setTotalComments((current) => Math.max(current - 1, 0));
+              } catch (error) {
+                Alert.alert(
+                  'Não foi possível excluir',
+                  error?.message ?? 'Tente novamente em instantes.',
+                );
+              }
+            },
+          },
+        ],
+      );
+    },
+    [complaintId, isAdmin],
+  );
+
   useEffect(() => {
     setComments([]);
     setPageInfo(DEFAULT_PAGE_INFO);
@@ -266,6 +355,9 @@ export function useComplaintComments(complaintId) {
     loadMore,
     addComment,
     toggleLike,
+    reportCommentItem,
+    deleteCommentItem: isAdmin ? deleteCommentItem : null,
     incrementRepliesCount,
+    decrementRepliesCount,
   };
 }

@@ -116,7 +116,7 @@ export function PublicProfileScreen({
             </View>
           }
           ListEmptyComponent={
-            <EmptyFollowedList styles={styles} isCurrentUser={false} />
+            <EmptyFollowedList styles={styles} isCurrentUser={isCurrentUser} />
           }
           contentContainerStyle={styles.followedOnlyListContent}
           showsVerticalScrollIndicator={false}

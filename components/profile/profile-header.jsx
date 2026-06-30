@@ -23,6 +23,7 @@ export function ProfileHeader({
 }) {
   const router = useRouter();
   const {
+    isAdmin,
     isEmailVerified,
     logout,
     refreshEmailVerification,
@@ -46,6 +47,10 @@ export function ProfileHeader({
   const handleEdit = () => {
     setMenuVisible(false);
     router.push('/profile/edit');
+  };
+
+  const handleOpenModeration = () => {
+    router.push('/admin/moderation');
   };
 
   const handleBack = () => {
@@ -223,6 +228,18 @@ export function ProfileHeader({
             <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
           </Pressable>
         )}
+
+        {isCurrentUser && isAdmin ? (
+          <Pressable
+            style={[styles.profileActionButton, styles.adminActionButton]}
+            onPress={handleOpenModeration}
+            accessibilityRole="button"
+            accessibilityLabel="Abrir moderação"
+          >
+            <Ionicons name="shield-checkmark-outline" size={18} color="#FFFFFF" />
+            <Text style={styles.profileActionButtonText}>Moderação</Text>
+          </Pressable>
+        ) : null}
       </View>
 
       <Modal

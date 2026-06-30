@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Backend · PetSOS</title>
+<style>
+:root {
+  --nav:#1f2937; --nav-dark:#111827; --bg:#f3f5f8; --ink:#1f2937; --muted:#6b7280;
+  --line:#d6dbe3; --line-dark:#b8c0cc; --blue:#1d4ed8; --green:#15803d; --amber:#b45309; --purple:#6d28d9; --red:#b91c1c;
+}
+* { box-sizing:border-box; }
+body { margin:0; font-family:Arial, Helvetica, sans-serif; background:var(--bg); color:var(--ink); }
+a { color:inherit; text-decoration:none; }
+code { background:#f3f4f6; border:1px solid var(--line); padding:2px 5px; font-size:.84em; }
+.layout { min-height:100vh; display:grid; grid-template-columns:238px 1fr; }
+.sidebar { background:var(--nav); color:#e5e7eb; border-right:1px solid #0f172a; padding:20px 16px; position:sticky; top:0; height:100vh; }
+.brand { border-bottom:1px solid rgba(255,255,255,.12); padding-bottom:18px; margin-bottom:18px; }
+.brand strong { display:block; font-size:1.15rem; letter-spacing:.02em; }
+.brand span { display:block; margin-top:4px; color:#aeb7c4; font-size:.78rem; }
+.nav-title { color:#9ca3af; text-transform:uppercase; letter-spacing:.12em; font-size:.68rem; margin:20px 8px 8px; }
+.nav a { display:block; padding:10px 11px; color:#d1d5db; border-left:3px solid transparent; font-size:.9rem; }
+.nav a.active, .nav a:hover { background:var(--nav-dark); color:#fff; border-left-color:#60a5fa; }
+.nav a:focus-visible { outline:3px solid rgba(96,165,250,.38); outline-offset:2px; }
+.main { min-width:0; }
+.topbar { height:58px; background:#fff; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; padding:0 26px; position:sticky; top:0; z-index:10; }
+.topbar span { color:var(--muted); font-size:.84rem; }
+.content { padding:24px 26px 34px; }
+.breadcrumb { color:var(--muted); font-size:.82rem; margin-bottom:8px; }
+h1 { margin:0; font-size:1.72rem; letter-spacing:-.01em; }
+.subtitle { color:var(--muted); margin:7px 0 20px; line-height:1.5; max-width:880px; }
+.panel { background:#fff; border:1px solid var(--line); margin-bottom:18px; }
+.panel-header { padding:14px 16px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; gap:14px; align-items:center; background:#fbfcfe; }
+.panel-header h2 { margin:0; font-size:1rem; }
+.panel-header span { color:var(--muted); font-size:.82rem; }
+.panel-body { padding:16px; }
+.grid-two { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:16px; }
+.grid-three { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:16px; }
+.card { background:#fff; border:1px solid var(--line); padding:18px; border-top:4px solid var(--line-dark); min-height:100%; }
+.card.blue { border-top-color:var(--blue); } .card.green { border-top-color:var(--green); } .card.amber { border-top-color:var(--amber); } .card.purple { border-top-color:var(--purple); } .card.red { border-top-color:var(--red); }
+.card h3 { margin:0 0 8px; font-size:1rem; }
+.card p, .list { color:var(--muted); line-height:1.5; font-size:.92rem; }
+.card p { margin:0; }
+.list { margin:10px 0 0; padding-left:18px; }
+.list li { margin:6px 0; }
+.stack { display:flex; flex-wrap:wrap; gap:8px; }
+.stack span { background:#f8fafc; border:1px solid var(--line); padding:8px 10px; font-size:.84rem; font-weight:700; }
+pre { margin:0; overflow:auto; background:#1f2937; color:#f9fafb; padding:16px; border:1px solid #111827; line-height:1.5; font-size:.82rem; }
+.footer { color:var(--muted); text-align:center; font-size:.82rem; padding:6px 0 2px; }
+@media (max-width:1160px) { .layout{display:block;} .sidebar{position:relative;height:auto;} .nav{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;} .grid-two,.grid-three{grid-template-columns:1fr;} }
+@media (max-width:680px) { .content{padding:16px;} .topbar{padding:0 14px;} .topbar span{display:none;} .nav{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand"><strong>PetSOS</strong><span>Documentação técnica</span></div>
+    <div class="nav-title">Páginas</div>
+    <nav class="nav">
+      <a href="petsos_roadmap_dashboard.html">Roadmap</a>
+      <a href="petsos_documentacao.html">Visão geral</a>
+      <a href="petsos_frontend.html">Frontend</a>
+      <a class="active" href="petsos_backend.html">Backend</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <header class="topbar"><strong>Backend API</strong><span>Express, Firestore, segurança e observabilidade</span></header>
+    <section class="content">
+      <div class="breadcrumb">Documentação / Backend</div>
+      <h1>Backend PetSOS API</h1>
+      <p class="subtitle">API Node.js com Express 5, Firebase Admin e Firestore. O backend centraliza validação, permissões, uploads, rotas, cache de mapa, notificações, moderação e integrações externas.</p>
+
+      <section class="panel">
+        <div class="panel-header"><h2>Stack</h2><span>Dependências principais</span></div>
+        <div class="panel-body">
+          <div class="stack">
+            <span>Node.js</span><span>Express 5</span><span>Firebase Admin</span><span>Firestore</span><span>Zod</span><span>Multer</span><span>Sharp</span><span>Helmet</span><span>CORS</span><span>Pino</span><span>Pino HTTP</span><span>prom-client</span><span>Swagger UI</span><span>geofire-common</span><span>ws</span><span>Autocannon</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid-three">
+        <article class="card blue">
+          <h3>Domínios</h3>
+          <ul class="list">
+            <li>Usuários, autenticação e perfil.</li>
+            <li>Denúncias, seguidores, voluntários e evidências.</li>
+            <li>Comentários, respostas, notificações e moderação.</li>
+          </ul>
+        </article>
+        <article class="card green">
+          <h3>Mapa</h3>
+          <ul class="list">
+            <li>Geohash para consultas próximas.</li>
+            <li>Tiles indexados e endpoint batch.</li>
+            <li>Realtime de invalidação para atualizar marcadores.</li>
+          </ul>
+        </article>
+        <article class="card amber">
+          <h3>Integrações</h3>
+          <ul class="list">
+            <li>OpenRouteService para rotas por ruas.</li>
+            <li>IBGE para autocomplete de cidade/estado com cache.</li>
+            <li>Uploads locais em <code>/uploads</code> com thumbnails.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header"><h2>Estrutura</h2><span>Pastas principais</span></div>
+        <div class="panel-body">
+<pre><code>petsos-api/
+  src/routes/          Rotas HTTP e middlewares por recurso
+  src/modules/         Services, controllers e repositories por domínio
+  src/schemas/         Schemas Zod de validação
+  src/validators/      Upload, auth e validações de request
+  src/shared/          Erros, helpers e tipos comuns
+  src/config/          Firebase, env e integrações
+  src/logger/          Logger, HTTP logs e métricas
+  scripts/             Backfills e manutenção operacional
+  uploads/             Arquivos locais em produção</code></pre>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header"><h2>Endpoints e fluxos importantes</h2><span>Contratos usados pelo app</span></div>
+        <div class="panel-body">
+          <div class="grid-two">
+            <div class="card blue">
+              <h3>Performance</h3>
+              <ul class="list">
+                <li><code>GET /api/app/bootstrap</code> carrega dados mínimos de inicialização.</li>
+                <li><code>GET /api/users/me/summary</code> agrega perfil, resumo e notificações.</li>
+                <li><code>GET /api/users/:username/profile-summary</code> entrega perfil público agregado.</li>
+                <li><code>POST /api/complaints/map/tiles/batch</code> reduz múltiplos GETs de tiles.</li>
+              </ul>
+            </div>
+            <div class="card green">
+              <h3>Produto</h3>
+              <ul class="list">
+                <li><code>/api/complaints</code> cobre listagem, criação, detalhe, edição e exclusão.</li>
+                <li><code>/api/notifications</code> lista, marca como lida e limpa notificações.</li>
+                <li><code>/api/comments</code> e rotas de denúncia suportam comentários e reportes.</li>
+                <li><code>/api/routes/driving</code> faz proxy seguro para rotas do OpenRouteService.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header"><h2>Segurança</h2><span>Controles implementados</span></div>
+        <div class="panel-body">
+          <div class="grid-three">
+            <article class="card red">
+              <h3>Autorização</h3>
+              <ul class="list">
+                <li>Firebase token validado no backend.</li>
+                <li>Admin como role para moderação e exclusões sensíveis.</li>
+                <li>Backend decide permissões; o frontend apenas reflete estado.</li>
+              </ul>
+            </article>
+            <article class="card amber">
+              <h3>Entrada e abuso</h3>
+              <ul class="list">
+                <li>Payloads validados com Zod.</li>
+                <li>Rate limit para reportes.</li>
+                <li>Email temporário bloqueado e domínio checado via MX.</li>
+              </ul>
+            </article>
+            <article class="card green">
+              <h3>Arquivos e segredos</h3>
+              <ul class="list">
+                <li>Uploads com validação de tipo e tamanho.</li>
+                <li>Thumbnails processadas com Sharp.</li>
+                <li>Chaves externas ficam no backend, não no app.</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header"><h2>Observabilidade e manutenção</h2><span>Diagnóstico operacional</span></div>
+        <div class="panel-body">
+          <div class="grid-two">
+            <div class="card blue">
+              <h3>Logs e métricas</h3>
+              <ul class="list">
+                <li>Pino e Pino HTTP registram requests, erros e eventos de domínio.</li>
+                <li><code>/api/metrics</code> expõe métricas Prometheus com token.</li>
+                <li>Swagger/OpenAPI documenta rotas para inspeção manual.</li>
+              </ul>
+            </div>
+            <div class="card purple">
+              <h3>Scripts</h3>
+              <ul class="list">
+                <li><code>npm run backfill:complaint-geohashes</code> popula geohashes antigos.</li>
+                <li><code>npm run backfill:map-tile-stats</code> recalcula estatísticas dos tiles.</li>
+                <li><code>npm run bench</code> mede rotas críticas com Autocannon.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header"><h2>Comandos</h2><span>Desenvolvimento</span></div>
+        <div class="panel-body">
+          <ul class="list">
+            <li><code>npm install</code> instala dependências.</li>
+            <li><code>npm run dev</code> inicia a API com Nodemon.</li>
+            <li><code>npm start</code> inicia em modo normal.</li>
+            <li><code>npm test</code> executa testes unitários disponíveis.</li>
+            <li><code>npm run lint:check</code> verifica formatação.</li>
+            <li><code>npm run bench</code> executa benchmark controlado.</li>
+          </ul>
+        </div>
+      </section>
+
+      <div class="footer">Documentação estática do PetSOS · Backend</div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

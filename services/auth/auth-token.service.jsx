@@ -9,6 +9,6 @@ export const deleteAuthToken = () =>
   SecureStore.deleteItemAsync(AUTH_TOKEN_KEY);
 
 export const saveFirebaseUserToken = async (user) => {
-  const token = await user.getIdToken();
+  const token = await user.getIdToken(user.emailVerified === true);
   await saveAuthToken(token);
 };

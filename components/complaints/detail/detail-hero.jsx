@@ -13,9 +13,11 @@ export function DetailHero({
   styles,
   theme,
   isOwner,
+  canDelete,
   onBack,
   onEdit,
   onDelete,
+  onReport,
 }) {
   const menuButtonRef = useRef(null);
   const [menuVisible, setMenuVisible] = useState(false);
@@ -25,6 +27,9 @@ export function DetailHero({
   const UPLOAD_URL = useUploadUrl();
   const coverPhotoUri = buildUploadPhotoUri(complaint.photos?.[0], UPLOAD_URL);
   const shouldShowCover = coverPhotoUri && !coverFailed;
+  const canShowDelete = isOwner || canDelete;
+  const canShowReport = Boolean(onReport) && !canShowDelete;
+  const canShowMenu = isOwner || canShowDelete || canShowReport;
 
   useEffect(() => {
     setCoverFailed(false);
@@ -88,7 +93,7 @@ export function DetailHero({
           <Ionicons name="arrow-back" size={20} color={theme.text} />
         </Pressable>
         
-        {isOwner ? (
+        {canShowMenu ? (
           <Pressable
             ref={menuButtonRef}
             collapsable={false}
@@ -117,27 +122,44 @@ export function DetailHero({
           />
 
           <View style={[styles.detailHeroMenu, menuPosition]}>
-            <Pressable
-              style={styles.detailHeroMenuItem}
-              onPress={() => {
-                setMenuVisible(false);
-                onEdit();
-              }}
-            >
-              <Ionicons name="create-outline" size={18} color={theme.text} />
-              <Text style={styles.detailHeroMenuText}>Editar</Text>
-            </Pressable>
+            {isOwner ? (
+              <Pressable
+                style={styles.detailHeroMenuItem}
+                onPress={() => {
+                  setMenuVisible(false);
+                  onEdit();
+                }}
+              >
+                <Ionicons name="create-outline" size={18} color={theme.text} />
+                <Text style={styles.detailHeroMenuText}>Editar</Text>
+              </Pressable>
+            ) : null}
 
-            <Pressable
-              style={styles.detailHeroMenuItem}
-              onPress={() => {
-                setMenuVisible(false);
-                onDelete();
-              }}
-            >
-              <Ionicons name="trash-outline" size={18} color="#E24B4A" />
-              <Text style={styles.detailHeroMenuDangerText}>Excluir</Text>
-            </Pressable>
+            {canShowDelete ? (
+              <Pressable
+                style={styles.detailHeroMenuItem}
+                onPress={() => {
+                  setMenuVisible(false);
+                  onDelete();
+                }}
+              >
+                <Ionicons name="trash-outline" size={18} color="#E24B4A" />
+                <Text style={styles.detailHeroMenuDangerText}>Excluir</Text>
+              </Pressable>
+            ) : null}
+
+            {canShowReport ? (
+              <Pressable
+                style={styles.detailHeroMenuItem}
+                onPress={() => {
+                  setMenuVisible(false);
+                  onReport?.();
+                }}
+              >
+                <Ionicons name="flag-outline" size={18} color="#E24B4A" />
+                <Text style={styles.detailHeroMenuDangerText}>Reportar</Text>
+              </Pressable>
+            ) : null}
           </View>
         </View>
       </Modal>

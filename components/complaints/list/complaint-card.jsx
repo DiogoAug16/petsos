@@ -5,6 +5,7 @@ import { usePressAnimation } from '@/hooks/ui/usePressAnimation';
 import { useUploadUrl } from '@/hooks/shared/useUploadUrl';
 import { useComplaintConfig } from '@/hooks/complaints/useComplaintConfig';
 import { StatusBadge } from '@/components/complaints/list/status-badge';
+import { useAuth } from '@/context/AuthContext';
 import { complaintsStyles } from '@/styles/complaints';
 import { formatDate } from '@/utils/shared/date.utils';
 import { getComplaintCoverPhoto } from '@/utils/media/photo.utils';
@@ -21,6 +22,7 @@ function ComplaintCardComponent({ complaint }) {
   const { address, loadingAddress } = useAddress(complaint.location);
   const router = useRouter();
   const { triggerHaptics } = useHaptics();
+  const { isAdmin } = useAuth();
   const colorScheme = useColorScheme();
   const styles = complaintsStyles(colorScheme);
   const UPLOAD_URL = useUploadUrl();
@@ -48,7 +50,10 @@ function ComplaintCardComponent({ complaint }) {
 
   const handlePress = () => {
     if (!complaintId) return;
-    writeLocalCache(`complaint:detail:${complaintId}`, complaint);
+    writeLocalCache(
+      `complaint:detail:${isAdmin ? 'admin' : 'public'}:${complaintId}`,
+      complaint
+    );
     router.push(`/complaint/${complaintId}`);
   };
 

@@ -2,6 +2,7 @@ import {
   getUserFollowedComplaints,
   getPublicUserProfileSummary,
 } from '@/services/users/users.service';
+import { filterPubliclyVisibleComplaints } from '@/utils/complaints/visibility.utils';
 import { readLocalCache, writeLocalCache } from '@/utils/shared/local-cache';
 import { appLogger } from '@/utils/shared/app-logger';
 import { useCallback, useEffect, useState } from 'react';
@@ -38,7 +39,7 @@ export function usePublicProfile(username, { includeFollowedComplaints = true } 
 
     return {
       profile: summaryResult.profile,
-      followedComplaints: followedResult,
+      followedComplaints: filterPubliclyVisibleComplaints(followedResult),
       followedSummary: normalizeSummary(summaryResult.followedSummary),
     };
   }, [includeFollowedComplaints, username]);

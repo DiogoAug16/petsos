@@ -15,7 +15,15 @@ const formatRepliesLabel = (count, visible) => {
 
 const getUsername = (comment) => comment?.username || 'usuario';
 
-function CommentBody({ comment, isReply, onLike, onReply, styles }) {
+function CommentBody({
+  comment,
+  isReply,
+  onDelete,
+  onLike,
+  onReply,
+  onReport,
+  styles,
+}) {
   const username = getUsername(comment);
 
   return (
@@ -25,7 +33,16 @@ function CommentBody({ comment, isReply, onLike, onReply, styles }) {
       </UserLink>
 
       <View style={styles.commentBody}>
-        <View style={styles.commentBubble}>
+        <Pressable
+          style={styles.commentBubble}
+          onLongPress={onDelete ?? undefined}
+          delayLongPress={360}
+          disabled={!onDelete}
+          accessibilityRole={onDelete ? 'button' : undefined}
+          accessibilityLabel={
+            onDelete ? 'Abrir opções administrativas do comentário' : undefined
+          }
+        >
           <View style={styles.commentHeader}>
             <UserLink username={username}>
               <Text style={styles.commentUsername}>@{username}</Text>
@@ -37,7 +54,7 @@ function CommentBody({ comment, isReply, onLike, onReply, styles }) {
             style={styles.commentText}
             mentionStyle={styles.commentMentionText}
           />
-        </View>
+        </Pressable>
 
         <View style={styles.commentActions}>
           <Pressable style={styles.commentActionButton} onPress={onLike}>
@@ -52,6 +69,16 @@ function CommentBody({ comment, isReply, onLike, onReply, styles }) {
           <Pressable style={styles.commentActionButton} onPress={onReply}>
             <Text style={styles.commentActionText}>Responder</Text>
           </Pressable>
+
+          <Pressable
+            style={styles.commentActionButton}
+            onPress={onReport}
+            accessibilityRole="button"
+            accessibilityLabel="Reportar comentário"
+          >
+            <Ionicons name="flag-outline" size={15} color="#8D7D78" />
+            <Text style={styles.commentActionText}>Reportar</Text>
+          </Pressable>
         </View>
       </View>
     </View>
@@ -62,7 +89,10 @@ export function CommentItem({
   complaintId,
   comment,
   onLike,
+  onDelete,
+  onReport,
   onReplyCreated,
+  onReplyDeleted,
   onReplyPress,
   styles,
 }) {
@@ -76,10 +106,13 @@ export function CommentItem({
     loadMore,
     addReply,
     toggleLike,
+    reportReply,
+    deleteReply,
   } = useCommentReplies({
     complaintId,
     commentId: comment.id,
     onReplyCreated,
+    onReplyDeleted,
   });
 
   const startReply = (target) => {
@@ -95,8 +128,10 @@ export function CommentItem({
     <View style={styles.commentThread}>
       <CommentBody
         comment={comment}
+        onDelete={onDelete ? () => onDelete(comment) : null}
         onLike={() => onLike(comment)}
         onReply={() => startReply(comment)}
+        onReport={() => onReport(comment)}
         styles={styles}
       />
 
@@ -118,8 +153,10 @@ export function CommentItem({
               key={reply.id}
               comment={reply}
               isReply
+              onDelete={deleteReply ? () => deleteReply(reply) : null}
               onLike={() => toggleLike(reply)}
               onReply={() => startReply(reply)}
+              onReport={() => reportReply(reply)}
               styles={styles}
             />
           ))}

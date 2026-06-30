@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Frontend · PetSOS</title>
+<style>
+:root {
+  --nav:#1f2937; --nav-dark:#111827; --bg:#f3f5f8; --ink:#1f2937; --muted:#6b7280;
+  --line:#d6dbe3; --line-dark:#b8c0cc; --blue:#1d4ed8; --green:#15803d; --amber:#b45309; --purple:#6d28d9;
+}
+* { box-sizing:border-box; }
+body { margin:0; font-family:Arial, Helvetica, sans-serif; background:var(--bg); color:var(--ink); }
+a { color:inherit; text-decoration:none; }
+code { background:#f3f4f6; border:1px solid var(--line); padding:2px 5px; font-size:.84em; }
+.layout { min-height:100vh; display:grid; grid-template-columns:238px 1fr; }
+.sidebar { background:var(--nav); color:#e5e7eb; border-right:1px solid #0f172a; padding:20px 16px; position:sticky; top:0; height:100vh; }
+.brand { border-bottom:1px solid rgba(255,255,255,.12); padding-bottom:18px; margin-bottom:18px; }
+.brand strong { display:block; font-size:1.15rem; letter-spacing:.02em; }
+.brand span { display:block; margin-top:4px; color:#aeb7c4; font-size:.78rem; }
+.nav-title { color:#9ca3af; text-transform:uppercase; letter-spacing:.12em; font-size:.68rem; margin:20px 8px 8px; }
+.nav a { display:block; padding:10px 11px; color:#d1d5db; border-left:3px solid transparent; font-size:.9rem; }
+.nav a.active, .nav a:hover { background:var(--nav-dark); color:#fff; border-left-color:#60a5fa; }
+.nav a:focus-visible { outline:3px solid rgba(96,165,250,.38); outline-offset:2px; }
+.main { min-width:0; }
+.topbar { height:58px; background:#fff; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; padding:0 26px; position:sticky; top:0; z-index:10; }
+.topbar span { color:var(--muted); font-size:.84rem; }
+.content { padding:24px 26px 34px; }
+.breadcrumb { color:var(--muted); font-size:.82rem; margin-bottom:8px; }
+h1 { margin:0; font-size:1.72rem; letter-spacing:-.01em; }
+.subtitle { color:var(--muted); margin:7px 0 20px; line-height:1.5; max-width:860px; }
+.panel { background:#fff; border:1px solid var(--line); margin-bottom:18px; }
+.panel-header { padding:14px 16px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; gap:14px; align-items:center; background:#fbfcfe; }
+.panel-header h2 { margin:0; font-size:1rem; }
+.panel-header span { color:var(--muted); font-size:.82rem; }
+.panel-body { padding:16px; }
+.grid-two { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:16px; }
+.grid-three { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:16px; }
+.card { background:#fff; border:1px solid var(--line); padding:18px; border-top:4px solid var(--line-dark); min-height:100%; }
+.card.blue { border-top-color:var(--blue); } .card.green { border-top-color:var(--green); } .card.amber { border-top-color:var(--amber); } .card.purple { border-top-color:var(--purple); }
+.card h3 { margin:0 0 8px; font-size:1rem; }
+.card p, .list { color:var(--muted); line-height:1.5; font-size:.92rem; }
+.card p { margin:0; }
+.list { margin:10px 0 0; padding-left:18px; }
+.list li { margin:6px 0; }
+.stack { display:flex; flex-wrap:wrap; gap:8px; }
+.stack span { background:#f8fafc; border:1px solid var(--line); padding:8px 10px; font-size:.84rem; font-weight:700; }
+pre { margin:0; overflow:auto; background:#1f2937; color:#f9fafb; padding:16px; border:1px solid #111827; line-height:1.5; font-size:.82rem; }
+.footer { color:var(--muted); text-align:center; font-size:.82rem; padding:6px 0 2px; }
+@media (max-width:1160px) { .layout{display:block;} .sidebar{position:relative;height:auto;} .nav{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;} .grid-two,.grid-three{grid-template-columns:1fr;} }
+@media (max-width:680px) { .content{padding:16px;} .topbar{padding:0 14px;} .topbar span{display:none;} .nav{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand"><strong>PetSOS</strong><span>Documentação técnica</span></div>
+    <div class="nav-title">Páginas</div>
+    <nav class="nav">
+      <a href="petsos_roadmap_dashboard.html">Roadmap</a>
+      <a href="petsos_documentacao.html">Visão geral</a>
+      <a class="active" href="petsos_frontend.html">Frontend</a>
+      <a href="petsos_backend.html">Backend</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <header class="topbar"><strong>Frontend mobile</strong><span>Expo, telas, cache e experiência do usuário</span></header>
+    <section class="content">
+      <div class="breadcrumb">Documentação / Frontend</div>
+      <h1>Frontend PetSOS</h1>
+      <p class="subtitle">Aplicativo mobile construído com Expo Router e React Native. A interface prioriza navegação por tabs, mapa como primeira tela útil, ações com feedback tátil, telas públicas para convidados e permissões progressivas para usuários autenticados.</p>
+
+      <section class="panel">
+        <div class="panel-header"><h2>Stack</h2><span>Dependências principais</span></div>
+        <div class="panel-body">
+          <div class="stack">
+            <span>Expo SDK 54</span><span>Expo Router 6</span><span>React 19</span><span>React Native 0.81</span><span>Firebase JS SDK</span><span>react-native-maps</span><span>expo-image</span><span>expo-image-picker</span><span>expo-location</span><span>expo-secure-store</span><span>expo-haptics</span><span>expo-linear-gradient</span><span>Reanimated</span><span>Gesture Handler</span><span>Zod</span><span>zxcvbn</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid-three">
+        <article class="card blue">
+          <h3>Autenticação</h3>
+          <ul class="list">
+            <li>Login, cadastro, recuperação de senha e lembrar último identificador.</li>
+            <li>Envio de verificação de email pelo Firebase Auth.</li>
+            <li>Fluxos de convidado com acesso a denúncias públicas.</li>
+          </ul>
+        </article>
+        <article class="card green">
+          <h3>Mapa</h3>
+          <ul class="list">
+            <li>Marcadores personalizados e popup antes do detalhe.</li>
+            <li>Rotas por ruas desenhadas no mapa do app.</li>
+            <li>Cache de tiles e prefetch de áreas próximas.</li>
+          </ul>
+        </article>
+        <article class="card purple">
+          <h3>Comunidade</h3>
+          <ul class="list">
+            <li>Comentários, respostas e reportes com motivo.</li>
+            <li>Acompanhamento de denúncias e notificações.</li>
+            <li>Voluntariado e evidências para validação.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header"><h2>Estrutura</h2><span>Pastas principais</span></div>
+        <div class="panel-body">
+<pre><code>petsos/
+  app/                 Rotas e telas Expo Router
+  components/          Componentes reutilizáveis por domínio
+  hooks/               Estado, cache e efeitos de tela
+  services/            Cliente HTTP e serviços da API
+  context/             Auth, notificações e estado global
+  styles/              StyleSheets separados por tela/componente
+  constants/           Opções, enums e tokens locais
+  utils/               Helpers compartilhados
+  assets/images/       Backgrounds, ícones e imagens
+  docs/                Dashboard e documentação estática</code></pre>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header"><h2>Otimizações no app</h2><span>Percepção de velocidade</span></div>
+        <div class="panel-body">
+          <div class="grid-two">
+            <div class="card blue">
+              <h3>Cache local</h3>
+              <ul class="list">
+                <li>Perfil do usuário e perfil público com stale-while-revalidate.</li>
+                <li>Contador e lista de notificações cacheados por usuário.</li>
+                <li>Detalhe de denúncia recente reaproveitado ao navegar.</li>
+              </ul>
+            </div>
+            <div class="card green">
+              <h3>Mapa e imagens</h3>
+              <ul class="list">
+                <li>Tiles carregados em batch para reduzir requests individuais.</li>
+                <li>Marcadores renderizados com cache e invalidação realtime.</li>
+                <li><code>expo-image</code> para cache de imagens e thumbnails em listas.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header"><h2>Comandos</h2><span>Desenvolvimento</span></div>
+        <div class="panel-body">
+          <ul class="list">
+            <li><code>npm install</code> instala dependências.</li>
+            <li><code>npm start</code> inicia o Expo.</li>
+            <li><code>npm run ios</code> abre no simulador iOS quando disponível.</li>
+            <li><code>npm run android</code> abre no Android quando disponível.</li>
+            <li><code>npm run lint</code> valida o código com Expo lint.</li>
+          </ul>
+        </div>
+      </section>
+
+      <div class="footer">Documentação estática do PetSOS · Frontend</div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

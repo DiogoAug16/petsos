@@ -1,10 +1,12 @@
 // context/ComplaintsContext.jsx
+import { useAuth } from '@/context/AuthContext';
 import { useComplaintsFetch } from '@/hooks/complaints/useComplaintsFetch';
 import { createContext, useContext, useEffect } from 'react';
 
 const ComplaintsContext = createContext(null);
 
 export function ComplaintsProvider({ children }) {
+  const { isAdmin } = useAuth();
   const {
     data,
     pageInfo,
@@ -17,7 +19,7 @@ export function ComplaintsProvider({ children }) {
     refetchSilent,
     refetch,
     loadMore,
-  } = useComplaintsFetch();
+  } = useComplaintsFetch({ includeAdminComplaints: isAdmin });
 
   useEffect(() => {
     if (typeof AbortController !== 'undefined') {

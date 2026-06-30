@@ -5,27 +5,35 @@ import { router } from 'expo-router';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
+const getAuthHeaders = async (headers, forceRefresh = false) => {
+  const nextHeaders = { ...headers };
+
+  if (!auth.currentUser) return nextHeaders;
+
+  try {
+    const token = await auth.currentUser.getIdToken(forceRefresh);
+    nextHeaders.Authorization = `Bearer ${token}`;
+  } catch {
+    await deleteAuthToken();
+  }
+
+  return nextHeaders;
+};
+
 export async function apiFetch(endpoint, options = {}) {
   if (!API_URL) {
     throw new Error('EXPO_PUBLIC_API_URL não configurada.');
   }
 
   const { skipAuthRedirect = false, ...fetchOptions } = options;
-  const headers = { ...fetchOptions.headers };
+  const requestUrl = `${API_URL}${endpoint}`;
+  const request = async (forceRefresh = false) =>
+    fetch(requestUrl, {
+      ...fetchOptions,
+      headers: await getAuthHeaders(fetchOptions.headers, forceRefresh),
+    });
 
-  if (auth.currentUser) {
-    try {
-      const token = await auth.currentUser.getIdToken();
-      headers['Authorization'] = `Bearer ${token}`;
-    } catch {
-      await deleteAuthToken();
-    }
-  }
-
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...fetchOptions,
-    headers,
-  });
+  let response = await request();
 
   if (response.status === 401) {
     if (skipAuthRedirect) {
@@ -43,6 +51,20 @@ export async function apiFetch(endpoint, options = {}) {
 
   if (!response.ok) {
     const errorBody = await response.json().catch(() => null);
+    const shouldRetryVerifiedEmailToken =
+      response.status === 403 &&
+      errorBody?.errorCode === 'EMAIL_NOT_VERIFIED' &&
+      auth.currentUser?.emailVerified === true;
+
+    if (shouldRetryVerifiedEmailToken) {
+      response = await request(true);
+
+      if (response.ok) {
+        if (response.status === 204) return null;
+        return response.json();
+      }
+    }
+
     const message =
       errorBody?.message || `Erro ${response.status}: ${response.statusText}`;
     const error = new Error(message);

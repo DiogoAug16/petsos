@@ -167,3 +167,12 @@ buck-out/
 #################################################
 *.hprof
 *.js.meta
+
+AGENTS.md
+skills-lock.json
+.agents
+.continue
+.claude
+.interface-design
+assets/images/pets/originals
+petsos-threat-model.md

@@ -3,8 +3,8 @@ import Animated from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { authInputStyles as styles } from '@/styles/auth';
 import PasswordStrengthIndicator from './PasswordStrengthIndicator';
-import { useInputAnimation } from '@/hooks/useInputAnimation';
-import { useShakeAnimation } from '@/hooks/useShakeAnimation';
+import { useInputAnimation } from '@/hooks/ui/useInputAnimation';
+import { useShakeAnimation } from '@/hooks/ui/useShakeAnimation';
 
 export default function AuthInput({
   label,
@@ -53,7 +53,7 @@ export default function AuthInput({
           style={[
             styles.input,
             {
-              backgroundColor: isDark ? '#1A1F2E' : '#F7F9FB',
+              backgroundColor: isDark ? '#FFF6EC' : '#F7F9FB',
               color: colors.text,
             },
             showToggle && styles.passwordInput,

@@ -1,10 +1,8 @@
 import { StyleSheet } from 'react-native';
 
-const ORANGE = '#FF6B35';
+const ORANGE = '#FF9F1C';
 
-export const statesStyles = (colorScheme) => {
-  const isDark = colorScheme === 'dark';
-
+export const statesStyles = () => {
   return StyleSheet.create({
     centered: {
       flex: 1,
@@ -19,11 +17,17 @@ export const statesStyles = (colorScheme) => {
       justifyContent: 'center',
       gap: 12,
       padding: 32,
+      marginHorizontal: 16,
+      marginTop: 24,
+      backgroundColor: '#FFFFFF',
+      borderRadius: 24,
+      borderWidth: 1,
+      borderColor: '#F0D8BF',
     },
 
     loadingText: {
       fontSize: 13,
-      color: '#8A8A8E',
+      color: '#8D7D78',
     },
 
     errorIcon: {
@@ -31,14 +35,14 @@ export const statesStyles = (colorScheme) => {
     },
 
     errorTitle: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: isDark ? '#fff' : '#1C1C1E',
+      fontSize: 18,
+      fontWeight: '800',
+      color: '#272A3A',
     },
 
     errorMessage: {
       fontSize: 13,
-      color: '#8A8A8E',
+      color: '#8D7D78',
       textAlign: 'center',
     },
 
@@ -46,7 +50,10 @@ export const statesStyles = (colorScheme) => {
       paddingHorizontal: 24,
       paddingVertical: 10,
       backgroundColor: ORANGE,
-      borderRadius: 12,
+      borderRadius: 16,
+      minHeight: 44,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
 
     retryButtonText: {
@@ -60,14 +67,14 @@ export const statesStyles = (colorScheme) => {
     },
 
     emptyTitle: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: isDark ? '#fff' : '#1C1C1E',
+      fontSize: 18,
+      fontWeight: '800',
+      color: '#272A3A',
     },
 
     emptySubtitle: {
       fontSize: 13,
-      color: '#8A8A8E',
+      color: '#8D7D78',
       textAlign: 'center',
     },
   });

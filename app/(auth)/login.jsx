@@ -1,14 +1,14 @@
 import { ScrollView, KeyboardAvoidingView, Platform, View } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useColorScheme } from '@/hooks/ui/useColorScheme';
 import Colors from '@/styles/theme/Colors';
-import { useLoginForm } from '@/hooks/useLoginForm';
-import { useEntranceAnimation } from '@/hooks/useEntranceAnimation';
+import { useLoginForm } from '@/hooks/auth/useLoginForm';
+import { useEntranceAnimation } from '@/hooks/ui/useEntranceAnimation';
 import PawBackground from '@/components/auth/PawBackground';
 import AuthHero from '@/components/auth/AuthHero';
 import LoginForm from '@/components/auth/LoginForm';
 import CatAndDogPeeking from '@/components/auth/CatAndDogPeeking';
-import LoginBottomSection from '@/components/auth/LoginBottomSection';
+import LoginSocialPlaceholder from '@/components/auth/LoginSocialPlaceholder';
 import { createLoginStyles } from '@/styles/auth';
 
 export default function LoginScreen() {
@@ -21,15 +21,17 @@ export default function LoginScreen() {
     loginError,
     isSubmitting,
     showPassword,
+    rememberMe,
     updateField,
     handleSubmit,
     isFormValid,
     setShowPassword,
+    setRememberMe,
   } = useLoginForm();
 
   const animatedStyle = useEntranceAnimation();
   const themedStyles = createLoginStyles(colors);
-  const isDark = colors.background !== '#E8F4F8';
+  const isDark = colors.background !== '#FFF6EC';
 
   return (
     <KeyboardAvoidingView
@@ -60,17 +62,19 @@ export default function LoginScreen() {
               loginError={loginError}
               isSubmitting={isSubmitting}
               showPassword={showPassword}
+              rememberMe={rememberMe}
               updateField={updateField}
               handleSubmit={handleSubmit}
               isFormValid={isFormValid}
               setShowPassword={setShowPassword}
+              setRememberMe={setRememberMe}
               colors={colors}
               isDark={isDark}
               styles={themedStyles}
             />
           </View>
 
-          <LoginBottomSection colors={colors} isDark={isDark} />
+          <LoginSocialPlaceholder styles={themedStyles} />
         </ScrollView>
       </Animated.View>
     </KeyboardAvoidingView>

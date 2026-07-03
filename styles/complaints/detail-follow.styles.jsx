@@ -1,21 +1,27 @@
-export const detailFollowStyles = (colorScheme) => {
-  const isDark = colorScheme === 'dark';
-  const card = isDark ? '#242B3D' : '#FFFFFF';
-  const text = isDark ? '#fff' : '#1C1C1E';
-  const muted = '#8A8A8E';
-  const border = isDark ? '#2F3749' : '#F0F0F0';
-  const soft = isDark ? '#2F3749' : '#E8F4F8';
+export const detailFollowStyles = () => {
+  const card = '#FFFFFF';
+  const text = '#272A3A';
+  const muted = '#8D7D78';
+  const border = '#F0D8BF';
+  const soft = '#FFF6EC';
 
   return {
     detailFollowSummary: {
-      marginHorizontal: 14,
-      marginTop: 10,
-      marginBottom: 4,
-      minHeight: 38,
+      minHeight: 58,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
       gap: 12,
+      padding: 12,
+      borderRadius: 22,
+      backgroundColor: '#FFFFFF',
+      borderWidth: 1,
+      borderColor: border,
+      shadowColor: '#7A3F12',
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.08,
+      shadowRadius: 14,
+      elevation: 3,
     },
     followersSummaryButton: {
       minHeight: 36,
@@ -28,21 +34,21 @@ export const detailFollowStyles = (colorScheme) => {
     },
     detailFollowButton: {
       minWidth: 112,
-      minHeight: 36,
+      minHeight: 46,
       paddingHorizontal: 16,
-      borderRadius: 999,
-      backgroundColor: '#fff',
+      borderRadius: 16,
+      backgroundColor: '#FF8C42',
       borderWidth: 1,
-      borderColor: isDark ? '#fff' : '#1C1C1E',
+      borderColor: '#FFFFFF',
       alignItems: 'center',
       justifyContent: 'center',
     },
     detailFollowButtonActive: {
-      backgroundColor: '#000',
+      backgroundColor: '#FF8C42',
       borderWidth: 1.5,
       borderColor: '#fff',
       elevation: 2,
-      shadowColor: '#000',
+      shadowColor: '#7A3F12',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.18,
       shadowRadius: 4,
@@ -51,9 +57,9 @@ export const detailFollowStyles = (colorScheme) => {
       opacity: 0.65,
     },
     detailFollowButtonText: {
-      color: '#000',
+      color: '#FFFFFF',
       fontSize: 13,
-      fontWeight: '800',
+      fontWeight: '900',
     },
     detailFollowButtonActiveText: {
       color: '#fff',
@@ -65,8 +71,8 @@ export const detailFollowStyles = (colorScheme) => {
     },
     unfollowModalCard: {
       backgroundColor: card,
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
       padding: 18,
       paddingBottom: 28,
     },
@@ -89,7 +95,7 @@ export const detailFollowStyles = (colorScheme) => {
     unfollowCancelButton: {
       flex: 1,
       minHeight: 46,
-      borderRadius: 12,
+      borderRadius: 16,
       borderWidth: 0.5,
       borderColor: border,
       alignItems: 'center',
@@ -104,7 +110,7 @@ export const detailFollowStyles = (colorScheme) => {
     unfollowConfirmButton: {
       flex: 1,
       minHeight: 46,
-      borderRadius: 12,
+      borderRadius: 16,
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: '#E24B4A',
@@ -129,8 +135,8 @@ export const detailFollowStyles = (colorScheme) => {
     followersModalCard: {
       maxHeight: '62%',
       backgroundColor: card,
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
       padding: 18,
       paddingBottom: 24,
     },
@@ -152,9 +158,9 @@ export const detailFollowStyles = (colorScheme) => {
       marginTop: 2,
     },
     followersModalCloseButton: {
-      width: 34,
-      height: 34,
-      borderRadius: 17,
+      width: 44,
+      height: 44,
+      borderRadius: 16,
       backgroundColor: soft,
       alignItems: 'center',
       justifyContent: 'center',

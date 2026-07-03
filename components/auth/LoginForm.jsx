@@ -1,11 +1,12 @@
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AuthInput from './AuthInput';
-import { useStaggeredAnimation } from '@/hooks/useStaggeredAnimation';
-import { useButtonPulse } from '@/hooks/useButtonPulse';
+import { useStaggeredAnimation } from '@/hooks/ui/useStaggeredAnimation';
+import { useButtonPulse } from '@/hooks/ui/useButtonPulse';
+import { useHapticPress } from '@/hooks/ui/useHapticPress';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -15,16 +16,16 @@ function LoginForm({
   loginError,
   isSubmitting,
   showPassword,
+  rememberMe,
   updateField,
   handleSubmit,
   isFormValid,
   setShowPassword,
+  setRememberMe,
   colors,
   isDark,
   styles,
 }) {
-  const [rememberMe, setRememberMe] = useState(false);
-
   const titleStyle = useStaggeredAnimation(0);
   const input1Style = useStaggeredAnimation(1);
   const input2Style = useStaggeredAnimation(2);
@@ -32,6 +33,12 @@ function LoginForm({
   const buttonStyle = useStaggeredAnimation(4);
   const linkStyle = useStaggeredAnimation(5);
   const pulseStyle = useButtonPulse(isSubmitting);
+  const handleRememberPress = useHapticPress(() => setRememberMe(!rememberMe));
+  const handleSubmitPress = useHapticPress(handleSubmit, 'normal');
+  const handleRegisterPress = useHapticPress(() => router.replace('/(auth)/register'));
+  const handleForgotPasswordPress = useHapticPress(() =>
+    router.push('/(auth)/forgot-password')
+  );
 
   return (
     <View style={styles.formCard}>
@@ -80,14 +87,17 @@ function LoginForm({
       <Animated.View style={[styles.optionsRow, optionsStyle]}>
         <Pressable
           style={styles.rememberContainer}
-          onPress={() => setRememberMe(!rememberMe)}
+          onPress={handleRememberPress}
+          accessibilityRole="checkbox"
+          accessibilityState={{ checked: rememberMe }}
+          accessibilityLabel="Lembrar email ou username neste aparelho"
         >
           <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
             {rememberMe && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
           </View>
           <Text style={styles.rememberText}>Lembrar-me</Text>
         </Pressable>
-        <Pressable onPress={() => {}}>
+        <Pressable onPress={handleForgotPasswordPress}>
           <Text style={[styles.forgotPassword, { color: colors.primary }]}>
             Esqueci minha senha
           </Text>
@@ -101,7 +111,7 @@ function LoginForm({
             (!isFormValid || isSubmitting) && styles.submitButtonDisabled,
             pulseStyle,
           ]}
-          onPress={handleSubmit}
+          onPress={handleSubmitPress}
           disabled={!isFormValid || isSubmitting}
         >
           <Text style={styles.submitButtonText}>
@@ -115,7 +125,7 @@ function LoginForm({
 
       <Animated.View style={[styles.linkContainer, linkStyle]}>
         <Text style={styles.linkText}>Ainda não tem conta? </Text>
-        <Pressable onPress={() => router.replace('/(auth)/register')}>
+        <Pressable onPress={handleRegisterPress}>
           <Text style={[styles.link, { color: colors.primary }]}>Crie sua conta</Text>
         </Pressable>
       </Animated.View>

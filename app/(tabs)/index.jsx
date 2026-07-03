@@ -1,50 +1,50 @@
 import { BottomCard } from '@/components/bottom-card/bottom-card';
-import { FabButton } from '@/components/floating-buttons/create-complaint-button';
 import { CenterButton } from '@/components/floating-buttons/map-center-button';
-import { AutocompleteSuggestions } from '@/components/map/autocomplete-suggestions';
-import { ComplaintMarkersLayer } from '@/components/map/complaint-markers-layer';
-import { ComplaintsFilter } from '@/components/map/complaints-filter';
-import { HighlightedCircle } from '@/components/map/highlighted-circle';
-import { NoResultsBadge } from '@/components/map/no-results-badge';
+import { AutocompleteSuggestions } from '@/components/map/search/autocomplete-suggestions';
+import { ComplaintsFilter } from '@/components/map/search/complaints-filter';
+import { MapCanvas } from '@/components/map/canvas/map-canvas';
+import { MapComplaintPreview } from '@/components/map/overlays/map-complaint-preview';
+import { NoResultsBadge } from '@/components/map/overlays/no-results-badge';
 import { SearchBar } from '@/components/search-bar/search-bar';
-import { useComplaints } from '@/context/ComplaintsContext';
-import { useBottomCardAnimation } from '@/hooks/useBottomCardAnimation';
-import { useColorScheme } from '@/hooks/useColorScheme.jsx';
-import { useFloatingButtonsAnimation } from '@/hooks/useFloatingButtonsAnimation';
-import { useLocation } from '@/hooks/useLocation.jsx';
-import { useMapHandlers } from '@/hooks/useMapHandlers';
-import { useMapSearchAutocomplete } from '@/hooks/useMapSearchAutocomplete';
-import { useMapTypeFilter } from '@/hooks/useMapTypeFilter';
-import { useNearbyComplaints } from '@/hooks/useNearbyComplaints';
-import { useVisibleMapComplaints } from '@/hooks/useVisibleMapComplaints';
+import { useBottomCardAnimation } from '@/hooks/ui/useBottomCardAnimation';
+import { useColorScheme } from '@/hooks/ui/useColorScheme.jsx';
+import { useFloatingButtonsAnimation } from '@/hooks/ui/useFloatingButtonsAnimation';
+import { useLocation } from '@/hooks/map/useLocation.jsx';
+import { useMapComplaintSelection } from '@/hooks/map/useMapComplaintSelection';
+import { useMapFocusRegion } from '@/hooks/map/useMapFocusRegion';
+import { useMapHandlers } from '@/hooks/map/useMapHandlers';
+import { useMapComplaints } from '@/hooks/map/useMapComplaints';
+import { useMapSearchAutocomplete } from '@/hooks/map/useMapSearchAutocomplete';
+import { useMapTypeFilter } from '@/hooks/map/useMapTypeFilter';
+import { useNearbyComplaints } from '@/hooks/map/useNearbyComplaints';
+import { usePredictiveMapRegion } from '@/hooks/map/usePredictiveMapRegion';
 import { mapScreenStyles } from '@/styles/mapScreen';
-import { useFocusEffect } from '@react-navigation/native';
-import { useRouter } from 'expo-router';
-import { useCallback, useRef, useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRef, useState } from 'react';
 import { Animated, View } from 'react-native';
-import MapView from 'react-native-maps';
 
 export default function MapScreen() {
   const router = useRouter();
+  const { focusLat, focusLng } = useLocalSearchParams();
   const { location } = useLocation();
   const colorScheme = useColorScheme();
   const mapRef = useRef(null);
-  const [region, setRegion] = useState(null);
-  const { data: allComplaints = [], refetchSilent } = useComplaints();
+  const [mapReady, setMapReady] = useState(false);
+  const { visibleRegion, prefetchRegion, movement, updateRegion } =
+    usePredictiveMapRegion();
 
-  const { translateY: buttonsTranslateY, animateTo } =
-    useFloatingButtonsAnimation();
+  const { translateY: buttonsTranslateY, animateTo } = useFloatingButtonsAnimation();
 
   const animation = useBottomCardAnimation(160, animateTo);
 
   const { nearbyComplaints, refetchNearby } = useNearbyComplaints(location, 5);
-
-  useFocusEffect(
-    useCallback(() => {
-      refetchNearby();
-      refetchSilent();
-    }, [refetchNearby, refetchSilent])
-  );
+  const { focusCoordinate } = useMapFocusRegion({
+    focusLat,
+    focusLng,
+    mapReady,
+    mapRef,
+    onFocus: refetchNearby,
+  });
 
   const styles = mapScreenStyles(colorScheme);
 
@@ -52,10 +52,26 @@ export default function MapScreen() {
     mapRef.current?.animateToRegion(location, 500);
   };
 
-  const { shouldShowComplaintMarkers, validComplaints } = useVisibleMapComplaints(
-    allComplaints,
-    region
-  );
+  const {
+    isPreviewVisible,
+    routeComplaintId,
+    routeCoordinates,
+    routeRenderKey,
+    routeLoadingComplaintId,
+    selectedComplaint,
+    selectedCoordinate,
+    clearSelectedComplaint,
+    openSelectedComplaintDetails,
+    selectMapComplaint,
+    showSelectedRoute,
+  } = useMapComplaintSelection({ location, mapRef, router });
+
+  const { complaints: mapComplaints, shouldShowComplaintMarkers } = useMapComplaints({
+    visibleRegion: visibleRegion ?? location,
+    prefetchRegion: prefetchRegion ?? location,
+    movement,
+    enabled: Boolean(mapReady && location),
+  });
 
   const {
     selectedType,
@@ -68,7 +84,7 @@ export default function MapScreen() {
     clearTypeFilter,
     toggleFilter,
     closeFilter,
-  } = useMapTypeFilter(validComplaints);
+  } = useMapTypeFilter(mapComplaints);
 
   const {
     searchText,
@@ -81,9 +97,7 @@ export default function MapScreen() {
   } = useMapSearchAutocomplete(filteredComplaints);
 
   const nearestComplaint =
-    nearbyComplaints && nearbyComplaints.length > 0
-      ? nearbyComplaints[0]
-      : null;
+    nearbyComplaints && nearbyComplaints.length > 0 ? nearbyComplaints[0] : null;
 
   const {
     handleComplaintMarkerPress,
@@ -92,9 +106,9 @@ export default function MapScreen() {
     handleApplyFilter,
     handleClearFilter,
   } = useMapHandlers({
-    router,
     hideSuggestions,
     closeFilter,
+    selectComplaint: selectMapComplaint,
     toggleFilter,
     applyTypeFilter,
     clearTypeFilter,
@@ -104,24 +118,28 @@ export default function MapScreen() {
 
   return (
     <View style={styles.container}>
-      <MapView
-        ref={mapRef}
-        style={styles.map}
-        initialRegion={location}
-        showsUserLocation
-        showsMyLocationButton={false}
-        onRegionChangeComplete={setRegion}
-        onPress={handleMapPress}
-      >
-        <HighlightedCircle coordinate={highlightedCoordinate} />
-
-        <ComplaintMarkersLayer
-          key={appliedType ?? 'all'}
-          complaints={filteredComplaints}
-          shouldRender={shouldShowComplaintMarkers}
-          onMarkerPress={handleComplaintMarkerPress}
-        />
-      </MapView>
+      <MapCanvas
+        filteredComplaints={filteredComplaints}
+        focusCoordinate={focusCoordinate}
+        highlightedCoordinate={highlightedCoordinate}
+        location={location}
+        mapRef={mapRef}
+        movement={movement}
+        onMapPress={handleMapPress}
+        onMarkerPress={handleComplaintMarkerPress}
+        onReady={() => {
+          setMapReady(true);
+          updateRegion(location, { immediate: true });
+        }}
+        prefetchRegion={prefetchRegion}
+        routeCoordinates={routeCoordinates}
+        routeRenderKey={routeRenderKey}
+        selectedCoordinate={selectedCoordinate}
+        shouldShowComplaintMarkers={mapReady && shouldShowComplaintMarkers}
+        styles={styles}
+        updateRegion={updateRegion}
+        visibleRegion={visibleRegion}
+      />
 
       <SearchBar
         style={styles}
@@ -142,7 +160,10 @@ export default function MapScreen() {
       />
 
       {Boolean(appliedType) && hasNoFilteredResults && !isFilterOpen && (
-        <NoResultsBadge styles={styles} message="Nenhuma denúncia encontrada para o tipo selecionado." />
+        <NoResultsBadge
+          styles={styles}
+          message="Nenhuma denúncia encontrada para o tipo selecionado."
+        />
       )}
 
       {shouldRenderSuggestions && !isFilterOpen && (
@@ -154,19 +175,29 @@ export default function MapScreen() {
         />
       )}
 
+      {selectedComplaint && isPreviewVisible && !isFilterOpen && (
+        <MapComplaintPreview
+          complaint={selectedComplaint}
+          styles={styles}
+          onClose={clearSelectedComplaint}
+          onDetails={openSelectedComplaintDetails}
+          onRoute={showSelectedRoute}
+          routeActive={
+            routeCoordinates.length > 1 &&
+            routeComplaintId === (selectedComplaint.id ?? selectedComplaint._id)
+          }
+          routeLoading={
+            routeLoadingComplaintId ===
+            (selectedComplaint.id ?? selectedComplaint._id)
+          }
+        />
+      )}
+
       <Animated.View style={{ transform: [{ translateY: buttonsTranslateY }] }}>
         <CenterButton style={styles.centerBtn} onPress={centerOnUser} />
-
-        <FabButton
-          style={styles.fab}
-        />
       </Animated.View>
 
-      <BottomCard
-        style={styles}
-        complaint={nearestComplaint}
-        animation={animation}
-      />
+      <BottomCard style={styles} complaint={nearestComplaint} animation={animation} />
     </View>
   );
 }

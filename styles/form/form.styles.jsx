@@ -1,15 +1,15 @@
 import { StyleSheet } from 'react-native';
 
 export const FORM_COLORS = {
-  background: '#E8F4F8',
+  background: '#FFF6EC',
   card: '#FFFFFF',
-  border: '#F0F0F0',
-  text: '#1C1C1E',
-  muted: '#8A8A8E',
+  border: '#F0D8BF',
+  text: '#272A3A',
+  muted: '#8D7D78',
   placeholder: '#A8C4CE',
   danger: '#E63946',
   green: '#1A936F',
-  orange: '#FF6B35',
+  orange: '#FF9F1C',
 };
 
 export const formStyles = StyleSheet.create({

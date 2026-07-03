@@ -7,23 +7,29 @@ const DEFAULT_PROMPT = {
   title: 'Entre para continuar',
   message:
     'Crie uma conta ou faça login para participar das denúncias, comentar e acompanhar atualizações.',
+  primaryLabel: 'Criar conta',
+  secondaryLabel: 'Entrar',
+  onPrimaryPress: null,
+  onSecondaryPress: null,
 };
 
 const AuthPromptContext = createContext(null);
 
 export function AuthPromptProvider({ children }) {
   const router = useRouter();
-  const [prompt, setPrompt] = useState(null);
+  const [prompt, setPrompt] = useState(DEFAULT_PROMPT);
+  const [promptVisible, setPromptVisible] = useState(false);
 
   const openAuthPrompt = useCallback((options = {}) => {
     setPrompt({
       ...DEFAULT_PROMPT,
       ...options,
     });
+    setPromptVisible(true);
   }, []);
 
   const closeAuthPrompt = useCallback(() => {
-    setPrompt(null);
+    setPromptVisible(false);
   }, []);
 
   const goToLogin = useCallback(() => {
@@ -35,6 +41,24 @@ export function AuthPromptProvider({ children }) {
     closeAuthPrompt();
     router.push('/(auth)/register');
   }, [closeAuthPrompt, router]);
+
+  const handlePrimaryPress = useCallback(() => {
+    if (prompt.onPrimaryPress) {
+      prompt.onPrimaryPress();
+      return;
+    }
+
+    goToRegister();
+  }, [goToRegister, prompt]);
+
+  const handleSecondaryPress = useCallback(() => {
+    if (prompt.onSecondaryPress) {
+      prompt.onSecondaryPress();
+      return;
+    }
+
+    goToLogin();
+  }, [goToLogin, prompt]);
 
   const value = useMemo(
     () => ({
@@ -48,12 +72,14 @@ export function AuthPromptProvider({ children }) {
     <AuthPromptContext.Provider value={value}>
       {children}
       <AuthPromptBottomSheet
-        visible={Boolean(prompt)}
-        title={prompt?.title ?? DEFAULT_PROMPT.title}
-        message={prompt?.message ?? DEFAULT_PROMPT.message}
+        visible={promptVisible}
+        title={prompt.title}
+        message={prompt.message}
+        primaryLabel={prompt.primaryLabel}
+        secondaryLabel={prompt.secondaryLabel}
         onClose={closeAuthPrompt}
-        onLogin={goToLogin}
-        onRegister={goToRegister}
+        onPrimaryPress={handlePrimaryPress}
+        onSecondaryPress={handleSecondaryPress}
       />
     </AuthPromptContext.Provider>
   );

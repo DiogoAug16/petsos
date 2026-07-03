@@ -1,47 +1,44 @@
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useRef, useState } from "react";
-import { Animated, KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { useState } from "react";
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 
-import { CommentComposer } from "@/components/complaints/comment-composer";
-import { CommentsSection } from "@/components/complaints/comments-section";
-import { DetailFollowSummary } from "@/components/complaints/detail-follow-summary";
-import { DetailHero } from "@/components/complaints/detail-hero";
-import { DetailInfoBar } from "@/components/complaints/detail-info-bar";
-import { DetailMainCard } from "@/components/complaints/detail-main-card";
-import { DetailMapCard } from "@/components/complaints/detail-map-card";
-import { DetailMapModal } from "@/components/complaints/detail-map-modal";
-import { DetailPhotosCard } from "@/components/complaints/detail-photos-card";
-import { ErrorState } from "@/components/complaints/error-state";
-import { EvidenceSection } from "@/components/complaints/evidence-section";
-import { EvidenceSubmitModal } from "@/components/complaints/evidence-submit-modal";
-import { EvidenceValidationSection } from "@/components/complaints/evidence-validation-section";
-import { FollowConfirmModal } from "@/components/complaints/follow-confirm-modal";
-import { LoadingState } from "@/components/complaints/loading-state";
-import { UnfollowConfirmModal } from "@/components/complaints/unfollow-confirm-modal";
-import { UnvolunteerConfirmModal } from "@/components/complaints/unvolunteer-confirm-modal";
-import { VolunteerButton } from "@/components/complaints/volunteer-button";
-import { VolunteerConfirmModal } from "@/components/complaints/volunteer-confirm-modal";
-import { RequestValidationButton } from "@/components/complaints/request-validation-button";
+import { CommentsSection } from "@/components/complaints/comments/comments-section";
+import { DetailActionDock } from "@/components/complaints/detail/detail-action-dock";
+import { DetailCommentComposerBar } from "@/components/complaints/detail/detail-comment-composer-bar";
+import { DetailConfirmationModals } from "@/components/complaints/detail/detail-confirmation-modals";
+import { DetailContentSection } from "@/components/complaints/detail/detail-content-section";
+import { DetailHero } from "@/components/complaints/detail/detail-hero";
+import { DetailLeadSection } from "@/components/complaints/detail/detail-lead-section";
+import { ErrorState } from "@/components/complaints/states/error-state";
+import { EvidenceValidationSection } from "@/components/complaints/evidence-validation/evidence-validation-section";
+import { LoadingState } from "@/components/complaints/states/loading-state";
+import { RequestValidationButton } from "@/components/complaints/request-validation/request-validation-button";
 import { useAuth } from "@/context/AuthContext";
-import { useAddress } from "@/hooks/useAddress";
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { useCommentComposerVisibility } from "@/hooks/useCommentComposerVisibility";
-import { useComplaintConfig } from "@/hooks/useComplaintConfig";
-import { useComplaintDetailScreenData } from "@/hooks/useComplaintDetailScreenData";
-import { useComplaintEvidence } from "@/hooks/useComplaintEvidence";
-import { useComplaintReplyComposer } from "@/hooks/useComplaintReplyComposer";
+import { useRequireAuth } from "@/context/AuthPromptContext";
+import { useRequireVerifiedEmail } from "@/hooks/auth/useRequireVerifiedEmail";
+import { useAddress } from "@/hooks/complaints/useAddress";
+import { useColorScheme } from "@/hooks/ui/useColorScheme";
+import { useCommentComposerVisibility } from "@/hooks/complaints/useCommentComposerVisibility";
+import { useComplaintConfig } from "@/hooks/complaints/useComplaintConfig";
+import { useComplaintDetailScreenData } from "@/hooks/complaints/useComplaintDetailScreenData";
+import { useComplaintEvidence } from "@/hooks/complaints/useComplaintEvidence";
+import { useComplaintReplyComposer } from "@/hooks/complaints/useComplaintReplyComposer";
+import { COMPLAINT_REPORT_REASONS } from "@/constants/complaints/report-reasons.constants";
 import { complaintsStyles } from "@/styles/complaints";
 import Colors from "@/styles/theme/Colors";
+import { reportComplaint } from "@/services/complaints/complaints.service";
+import { openReportReasonAlert } from "@/utils/complaints/report-reason-alert.utils";
 
 export default function ComplaintDetailScreen() {
   const { id } = useLocalSearchParams();
   const complaintId = Array.isArray(id) ? id[0] : id;
   const router = useRouter();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isEmailVerified, isAdmin } = useAuth();
+  const requireAuth = useRequireAuth();
+  const requireVerifiedEmail = useRequireVerifiedEmail();
   const colorScheme = useColorScheme();
   const styles = complaintsStyles(colorScheme);
   const theme = Colors[colorScheme ?? "light"];
-  const mapRef = useRef();
   const {
     isVisible: isCommentComposerVisible,
     animatedStyle: commentComposerAnimatedStyle,
@@ -67,40 +64,11 @@ export default function ComplaintDetailScreen() {
     complaint,
     loading,
     error,
-    showMapModal,
     fetchComplaintDetails,
     handleEdit,
     handleOpenMap,
     handleDelete,
-    handleCloseMapModal,
   } = detail;
-
-  const {
-    isFollowing,
-    followers,
-    totalFollowers,
-    loading: followersLoading,
-    actionLoading: followLoading,
-    followModalVisible,
-    unfollowModalVisible,
-    toggleFollow,
-    closeFollowModal,
-    confirmFollow,
-    closeUnfollowModal,
-    confirmUnfollow,
-  } = followersState;
-
-  const {
-    isVolunteer,
-    actionLoading: volunteerLoading,
-    volunteerModalVisible,
-    unvolunteerModalVisible,
-    toggleVolunteer,
-    closeVolunteerModal,
-    confirmVolunteer,
-    closeUnvolunteerModal,
-    confirmUnvolunteer,
-  } = volunteersState;
 
   const {
     comments,
@@ -112,7 +80,10 @@ export default function ComplaintDetailScreen() {
     loadMore: loadMoreComments,
     addComment,
     toggleLike,
+    reportCommentItem,
+    deleteCommentItem,
     incrementRepliesCount,
+    decrementRepliesCount,
     isBlocked: commentsBlocked,
   } = commentsState;
 
@@ -125,6 +96,7 @@ export default function ComplaintDetailScreen() {
   const { address } = useAddress(complaint?.location);
   const { status, type, emoji } = useComplaintConfig(complaint);
   const isOwner = Boolean(user?.uid && user.uid === complaint?.createdById);
+  const canParticipate = isAuthenticated && isEmailVerified;
 
   const { composerState, handleReplyPress, handleComposerSubmit } =
     useComplaintReplyComposer({ addComment, handleInputFocus });
@@ -132,6 +104,43 @@ export default function ComplaintDetailScreen() {
   const composerSubmitting = composerState.isReplying
     ? composerState.submitting
     : commentSubmitting;
+
+  const handleReportComplaint = () => {
+    if (
+      !requireAuth(null, {
+        title: "Entre para reportar",
+        message: "Faça login ou crie uma conta para reportar denúncias.",
+      })
+    ) {
+      return;
+    }
+
+    if (
+      !requireVerifiedEmail(null, {
+        title: "Confirme seu email",
+        message: "Confirme seu email para reportar denúncias.",
+      })
+    ) {
+      return;
+    }
+
+    openReportReasonAlert({
+      title: "Motivo do reporte",
+      message: "Escolha por que esta denúncia deve ser analisada.",
+      reasons: COMPLAINT_REPORT_REASONS,
+      onSelect: async (reason) => {
+        try {
+          await reportComplaint(complaintId, reason);
+          Alert.alert("Denúncia reportada", "A moderação recebeu seu reporte.");
+        } catch (reportError) {
+          Alert.alert(
+            "Não foi possível reportar",
+            reportError?.message ?? "Tente novamente em instantes.",
+          );
+        }
+      },
+    });
+  };
 
   const renderScreenState = (children) => (
     <>
@@ -170,9 +179,12 @@ export default function ComplaintDetailScreen() {
         <ScrollView
           style={styles.detailScroll}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingBottom: composerVisible && isAuthenticated ? 104 : 18,
-          }}
+          contentContainerStyle={[
+            styles.detailScrollContent,
+            composerVisible &&
+              canParticipate &&
+              styles.detailScrollContentWithComposer,
+          ]}
           onLayout={handleViewportLayout}
           onScroll={handleScroll}
           scrollEventThrottle={16}
@@ -184,69 +196,49 @@ export default function ComplaintDetailScreen() {
             styles={styles}
             theme={theme}
             isOwner={isOwner}
+            canDelete={isAdmin}
             onBack={() => router.back()}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onReport={handleReportComplaint}
           />
 
-          {!isOwner && (
-            <DetailFollowSummary
-              followers={followers}
-              totalFollowers={totalFollowers}
-              followersLoading={followersLoading}
-              followLoading={followLoading}
-              isFollowing={isFollowing}
-              isOwner={isOwner}
-              onToggleFollow={toggleFollow}
-              styles={styles}
-            />
-          )}
-
-          <DetailInfoBar
+          <DetailActionDock
             complaint={complaint}
+            followersState={followersState}
+            isOwner={isOwner}
+            volunteersState={volunteersState}
+            onSubmitEvidence={() => {
+              requireVerifiedEmail(() => setEvidenceModalVisible(true), {
+                title: "Confirme seu email",
+                message: "Confirme seu email para enviar evidências.",
+              });
+            }}
+            styles={styles}
+          />
+
+          <DetailLeadSection
+            address={address}
+            complaint={complaint}
+            followersState={followersState}
+            isOwner={isOwner}
             status={status}
             type={type}
             emoji={emoji}
             styles={styles}
-            colorScheme={colorScheme}
           />
 
-          <VolunteerButton
+          <DetailContentSection
+            address={address}
             complaint={complaint}
-            isOwner={isOwner}
-            isVolunteer={isVolunteer}
-            volunteerLoading={volunteerLoading}
-            onToggleVolunteer={toggleVolunteer}
-            onSubmitEvidence={() => setEvidenceModalVisible(true)}
+            evidences={evidences}
+            onOpenMap={handleOpenMap}
             styles={styles}
           />
 
-          <View style={styles.detailContent}>
-            <DetailMainCard
-              complaint={complaint}
-              address={address}
-              followers={followers}
-              totalFollowers={totalFollowers}
-              followersLoading={followersLoading}
-              showFollowers={isOwner}
-              styles={styles}
-            />
-
-            <DetailPhotosCard photos={complaint.photos} styles={styles} />
-
-            <DetailMapCard
-              location={complaint.location}
-              address={address}
-              onOpenMap={() => handleOpenMap(mapRef)}
-              styles={styles}
-            />
-
-            <EvidenceSection evidences={evidences} styles={styles} />
-          </View>
-
           <RequestValidationButton
             complaint={complaint}
-            isVolunteer={isVolunteer}
+            isVolunteer={canParticipate && volunteersState.isVolunteer}
             evidences={evidences}
             onRequested={() => {
               fetchComplaintDetails();
@@ -256,8 +248,8 @@ export default function ComplaintDetailScreen() {
           <EvidenceValidationSection
             complaint={complaint}
             isOwner={isOwner}
-            isVolunteer={isVolunteer}
-            isFollowing={isFollowing}
+            isVolunteer={canParticipate && volunteersState.isVolunteer}
+            isFollowing={canParticipate && followersState.isFollowing}
             evidences={evidences}
             onStatusChanged={() => {
               fetchComplaintDetails();
@@ -274,8 +266,11 @@ export default function ComplaintDetailScreen() {
             loadingMore={commentsLoadingMore}
             isBlocked={commentsBlocked}
             loadMore={loadMoreComments}
+            deleteComment={deleteCommentItem}
+            reportComment={reportCommentItem}
             toggleLike={toggleLike}
             incrementRepliesCount={incrementRepliesCount}
+            decrementRepliesCount={decrementRepliesCount}
             onReplyPress={handleReplyPress}
             onSectionLayout={handleSectionLayout}
             onComposerAnchorLayout={handleComposerAnchorLayout}
@@ -283,86 +278,42 @@ export default function ComplaintDetailScreen() {
           />
         </ScrollView>
 
-        {isAuthenticated && (
-          <Animated.View
-            pointerEvents={composerVisible ? "auto" : "none"}
-            style={[styles.detailCommentInputBar, commentComposerAnimatedStyle]}
-          >
-            <CommentComposer
-              key={composerState.key}
-              placeholder={composerState.placeholder}
-              submitting={composerSubmitting}
-              initialText={composerState.initialText}
-              autoFocus={composerState.isReplying}
-              onSubmit={async (text) => {
-                const result = await handleComposerSubmit(text);
-                if (result) {
-                  fetchComplaintDetails();
-                  refreshEvidence();
-                }
-                return result;
-              }}
-              onFocus={handleInputFocus}
-              onBlur={() => {
-                if (!composerState.isReplying) {
-                  handleInputBlur();
-                }
-              }}
-              styles={styles}
-            />
-          </Animated.View>
+        {canParticipate && (
+          <DetailCommentComposerBar
+            animatedStyle={commentComposerAnimatedStyle}
+            composerState={composerState}
+            composerSubmitting={composerSubmitting}
+            composerVisible={composerVisible}
+            onSubmit={async (text) => {
+              const result = await handleComposerSubmit(text);
+              if (result) {
+                fetchComplaintDetails();
+                refreshEvidence();
+              }
+              return result;
+            }}
+            onFocus={handleInputFocus}
+            onBlur={() => {
+              if (!composerState.isReplying) {
+                handleInputBlur();
+              }
+            }}
+            styles={styles}
+          />
         )}
       </KeyboardAvoidingView>
 
-      <FollowConfirmModal
-        visible={followModalVisible}
-        loading={followLoading}
-        onCancel={closeFollowModal}
-        onConfirm={confirmFollow}
-        styles={styles}
-      />
-
-      <UnfollowConfirmModal
-        visible={unfollowModalVisible}
-        loading={followLoading}
-        onCancel={closeUnfollowModal}
-        onConfirm={confirmUnfollow}
-        styles={styles}
-      />
-
-      <VolunteerConfirmModal
-        visible={volunteerModalVisible}
-        loading={volunteerLoading}
-        onCancel={closeVolunteerModal}
-        onConfirm={confirmVolunteer}
-        styles={styles}
-      />
-
-      <UnvolunteerConfirmModal
-        visible={unvolunteerModalVisible}
-        loading={volunteerLoading}
-        onCancel={closeUnvolunteerModal}
-        onConfirm={confirmUnvolunteer}
-        styles={styles}
-      />
-
-      <DetailMapModal
-        visible={showMapModal}
-        location={complaint.location}
-        mapRef={mapRef}
-        onClose={handleCloseMapModal}
-        styles={styles}
-        theme={theme}
-      />
-
-      <EvidenceSubmitModal
-        visible={evidenceModalVisible}
+      <DetailConfirmationModals
         complaintId={complaintId}
-        onClose={() => setEvidenceModalVisible(false)}
-        onSubmitted={() => {
+        evidenceModalVisible={evidenceModalVisible}
+        followersState={followersState}
+        onCloseEvidence={() => setEvidenceModalVisible(false)}
+        onEvidenceSubmitted={() => {
           fetchComplaintDetails();
           refreshEvidence();
         }}
+        styles={styles}
+        volunteersState={volunteersState}
       />
     </View>
   );

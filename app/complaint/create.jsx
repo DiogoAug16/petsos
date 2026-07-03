@@ -1,353 +1,102 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import {
-  Alert,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Alert, Pressable, Text, View } from 'react-native';
 
-import ComplaintBasicInfo from '../../components/complaints/ComplaintBasicInfo';
-import ComplaintLocation from '../../components/complaints/ComplaintLocation';
-import ComplaintTypeAnimal from '../../components/complaints/ComplaintTypeAnimal';
-import PhotoSection from '../../components/complaints/PhotoSection';
-
+import { CreateAuthRequired } from '@/components/complaints/create/create-auth-required';
+import { CreateComplaintFooter } from '@/components/complaints/create/create-complaint-footer';
+import { CreateComplaintForm } from '@/components/complaints/create/create-complaint-form';
 import { useAuth } from '@/context/AuthContext';
 import { useAuthPrompt } from '@/context/AuthPromptContext';
-import { useLocation } from '../../hooks/useLocation';
-import { createComplaint, getComplaintById, updateComplaint } from '../../services/complaints.service';
-import { ANIMAL_TYPES, COMPLAINT_TYPES } from '../../constants/complaints.constants';
-import { validateComplaintForm } from '../../utils/complaintForm';
-
-const COLORS = {
-  background: '#E8F4F8',
-  border: '#F0F0F0',
-  orange: '#FF6B35',
-};
-
-// Estado inicial do formulário
-const INITIAL_FORM = {
-  title: '',
-  description: '',
-  type: '',
-  animal: '',
-  animalOther: '',
-  locationMode: 'auto',
-  photos: [],
-};
-
-const normalizeText = (value) =>
-  String(value ?? '')
-    .trim()
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-
-const normalizeComplaintResponse = (response) =>
-  response?.data || response?.complaint || response;
-
-const normalizeLocation = (location) => {
-  const latitude = Number(location?.latitude);
-  const longitude = Number(location?.longitude);
-
-  if (Number.isNaN(latitude) || Number.isNaN(longitude)) {
-    return null;
-  }
-
-  return { latitude, longitude };
-};
-
-const normalizeComplaintType = (value) => {
-  const normalized = normalizeText(value);
-  if (!normalized) return '';
-
-  const directMatch = COMPLAINT_TYPES.find(
-    (item) =>
-      normalizeText(item.value) === normalized ||
-      normalizeText(item.label) === normalized
-  );
-
-  if (directMatch) return directMatch.value;
-
-  if (normalized.includes('maus')) return 'maus-tratos fisicos';
-  if (normalized.includes('neglig')) return 'negligencia';
-  if (normalized.includes('aband')) return 'abandono';
-  if (normalized.includes('perd')) return 'perdido';
-  if (normalized.includes('outro')) return 'outro';
-
-  return '';
-};
-
-const normalizeAnimalType = (value) => {
-  const normalized = normalizeText(value);
-  if (!normalized) return '';
-
-  const directMatch = ANIMAL_TYPES.find(
-    (item) =>
-      normalizeText(item.value) === normalized ||
-      normalizeText(item.label) === normalized
-  );
-
-  if (directMatch) return directMatch.value;
-
-  if (normalized.includes('cach') || normalized.includes('cao')) return 'cachorro';
-  if (normalized.includes('gat')) return 'gato';
-  if (normalized.includes('pass')) return 'passaro';
-  if (normalized.includes('outro')) return 'outro';
-
-  return '';
-};
+import { useCreateComplaintForm } from '@/hooks/complaints/useCreateComplaintForm';
+import {
+  createComplaintColors,
+  createComplaintStyles as styles,
+} from '@/styles/complaints/create.styles';
 
 export default function CreateComplaintScreen() {
   const router = useRouter();
   const { edit, id } = useLocalSearchParams();
   const complaintId = Array.isArray(id) ? id[0] : id;
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const {
+    isAuthenticated,
+    isEmailVerified,
+    isLoading: authLoading,
+    refreshEmailVerification,
+    resendVerificationEmail,
+  } = useAuth();
   const { openAuthPrompt } = useAuthPrompt();
-
-  // Hook que captura localização automática
-  const { location } = useLocation();
-
-  const [form, setForm] = useState(INITIAL_FORM);
-
-  // Localização escolhida manualmente no mapa
-  const [manualLocation, setManualLocation] = useState(null);
-
-  // Controle de loading no envio
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Controle de loading no carregamento para edição
-  const [isLoadingEdit, setIsLoadingEdit] = useState(false);
-
   const isEdit = edit === 'true' && complaintId;
-
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      openAuthPrompt({
-        title: 'Entre para criar uma denúncia',
-        message:
-          'Faça login ou crie uma conta para registrar uma denúncia.',
-      });
-    }
-  }, [authLoading, isAuthenticated, openAuthPrompt]);
-
-  // Carrega dados para edição
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    if (isEdit) {
-      const loadComplaint = async () => {
-        try {
-          setIsLoadingEdit(true);
-          const response = await getComplaintById(complaintId);
-          const complaint = normalizeComplaintResponse(response);
-          const normalizedLocation = normalizeLocation(complaint?.location);
-
-          const loadedPhotos = Array.isArray(complaint?.photos)
-            ? complaint.photos.filter(Boolean)
-            : [];
-
-          setForm({
-            title: complaint?.title || '',
-            description: complaint?.description || '',
-            type: normalizeComplaintType(complaint?.type),
-            animal: normalizeAnimalType(complaint?.animal),
-            animalOther: '',
-            locationMode: normalizedLocation ? 'map' : 'auto',
-            photos: loadedPhotos,
-          });
-          if (normalizedLocation) {
-            setManualLocation(normalizedLocation);
-          }
-        } catch {
-          Alert.alert('Erro', 'Não foi possível carregar os dados da denúncia.');
-          router.back();
-        } finally {
-          setIsLoadingEdit(false);
-        }
-      };
-      loadComplaint();
-    }
-  }, [complaintId, isAuthenticated, isEdit, router]);
-
-  // Atualiza qualquer campo do formulário
-  const updateField = (field, value) => {
-    setForm((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  // Reseta o formulário após envio
-  const resetForm = () => {
-    setForm(INITIAL_FORM);
-    setManualLocation(null);
-  };
-
-  // Quando entra no modo "map", define localização inicial no marcador
-  useEffect(() => {
-    if (form.locationMode === 'map' && location && !manualLocation) {
-      setManualLocation(location);
-    }
-  }, [form.locationMode, location, manualLocation]);
-
-  // Decide qual localização será enviada
-  const resolveLocation = () => {
-    if (form.locationMode === 'auto') {
-      return location || null;
-    }
-
-    if (form.locationMode === 'map') {
-      return manualLocation || null;
-    }
-
-    return null;
-  };
-
-  const handleGoBack = () => {
-    if (typeof router.canGoBack === 'function' && router.canGoBack()) {
-      router.back();
-      return;
-    }
-
-    router.replace('/');
-  };
-
-  // Função principal de envio da denúncia
-  const handleSubmit = async () => {
-    if (!isAuthenticated) {
-      openAuthPrompt({
-        title: 'Entre para criar uma denúncia',
-        message:
-          'Faça login ou crie uma conta para registrar uma denúncia.',
-      });
-      return;
-    }
-
-    // Validação do formulário
-    const validationError = validateComplaintForm(form);
-
-    if (validationError) {
-      Alert.alert('Validação', validationError);
-      return;
-    }
-
-    // Garante que localização automática foi obtida
-    if (form.locationMode === 'auto' && !location) {
-      Alert.alert(
-        'Localização',
-        'Não foi possível obter a localização atual.'
-      );
-      return;
-    }
-
-    // Garante que usuário escolheu ponto no mapa
-    if (form.locationMode === 'map' && !manualLocation) {
-      Alert.alert('Mapa', 'Selecione um ponto no mapa.');
-      return;
-    }
-
-    if (isSubmitting) return;
-
-    try {
-      setIsSubmitting(true);
-
-      // Monta payload final para API
-      const basePayload = {
-        title: form.title.trim(),
-        description: form.description.trim(),
-        type: form.type,
-        animal: form.animal,
-        location: resolveLocation(),
-      };
-
-      const payload = isEdit
-        ? {
-            ...basePayload,
-            photos: form.photos,
-          }
-        : {
-            ...basePayload,
-            status: 'aberto',
-            photos: form.photos,
-          };
-
-      if (isEdit) {
-        const result = await updateComplaint(complaintId, payload);
-
-        if (result) {
-          Alert.alert('Sucesso', 'Denúncia atualizada com sucesso!', [
-            {
-              text: 'OK',
-              onPress: () => router.back(),
-            },
-          ]);
-        } else {
-          Alert.alert('Erro', 'O servidor não confirmou a alteração.');
-        }
-      } else {
-        await createComplaint(payload);
-        // Feedback + navegação
-        Alert.alert('Sucesso', 'Denúncia criada com sucesso!', [
-          {
-            text: 'OK',
-            onPress: () => {
-              resetForm();
-              router.back();
-            },
-          },
-        ]);
-      }
-    } catch {
-      Alert.alert('Erro', 'Não foi possível salvar a denúncia.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const {
+    form,
+    location,
+    manualLocation,
+    isSubmitting,
+    isLoadingEdit,
+    handleAuthRequiredPress,
+    handleGoBack,
+    handleSubmit,
+    setManualLocation,
+    updateField,
+  } = useCreateComplaintForm({
+    complaintId,
+    isAuthenticated,
+    isEdit,
+    authLoading,
+    openAuthPrompt,
+    router,
+  });
 
   if (authLoading) {
-    return (
-      <>
-        <Stack.Screen options={{ headerShown: false }} />
-        <View style={styles.authRequiredScreen}>
-          <Text style={styles.authRequiredText}>Carregando...</Text>
-        </View>
-      </>
-    );
+    return <CreateAuthRequired loading styles={styles} />;
   }
 
   if (!isAuthenticated) {
     return (
-      <>
-        <Stack.Screen options={{ headerShown: false }} />
-        <View style={styles.authRequiredScreen}>
-          <Text style={styles.authRequiredTitle}>Criar denúncia</Text>
-          <Text style={styles.authRequiredText}>
-            Entre ou crie sua conta para registrar uma denúncia.
-          </Text>
-          <Pressable
-            style={styles.authRequiredButton}
-            onPress={() =>
-              openAuthPrompt({
-                title: 'Entre para criar uma denúncia',
-                message:
-                  'Faça login ou crie uma conta para registrar uma denúncia.',
-              })
+      <CreateAuthRequired
+        onPress={handleAuthRequiredPress}
+        styles={styles}
+      />
+    );
+  }
+
+  if (!isEmailVerified) {
+    return (
+      <CreateAuthRequired
+        title="Confirme seu email"
+        message="Confirme seu email para criar denúncias e participar das ações da comunidade."
+        buttonText="Reenviar email"
+        secondaryButtonText="Já confirmei"
+        onPress={async () => {
+          try {
+            await resendVerificationEmail();
+            Alert.alert(
+              'Email enviado',
+              'Enviamos um novo link de confirmação para o seu email.',
+            );
+          } catch {
+            Alert.alert('Erro', 'Não foi possível reenviar o email agora.');
+          }
+        }}
+        onSecondaryPress={async () => {
+          try {
+            const verified = await refreshEmailVerification();
+            if (!verified) {
+              Alert.alert(
+                'Ainda não confirmado',
+                'Abra o link enviado para seu email e tente novamente.',
+              );
             }
-          >
-            <Text style={styles.authRequiredButtonText}>Entrar ou criar conta</Text>
-          </Pressable>
-        </View>
-      </>
+          } catch {
+            Alert.alert('Erro', 'Não foi possível verificar seu email agora.');
+          }
+        }}
+        styles={styles}
+      />
     );
   }
 
   return (
     <>
-      {/* Configuração do header */}
       <Stack.Screen
         options={{
           title: isEdit ? 'Editar Denúncia' : 'Nova Denúncia',
@@ -358,7 +107,11 @@ export default function CreateComplaintScreen() {
               hitSlop={12}
               style={styles.headerBackContainer}
             >
-              <Ionicons name="chevron-back" size={20} color={COLORS.orange} />
+              <Ionicons
+                name="chevron-back"
+                size={20}
+                color={createComplaintColors.orange}
+              />
               <Text style={styles.headerButton}>Voltar</Text>
             </Pressable>
           ),
@@ -371,169 +124,24 @@ export default function CreateComplaintScreen() {
             <Text>Carregando dados...</Text>
           </View>
         ) : (
-          <ScrollView
-            style={styles.container}
-            contentContainerStyle={styles.content}
-            showsVerticalScrollIndicator={false}
-          >
-            {/* Dados básicos */}
-            <ComplaintBasicInfo
-              title={form.title}
-              description={form.description}
-              onChangeTitle={(value) => updateField('title', value)}
-              onChangeDescription={(value) =>
-                updateField('description', value)
-              }
-            />
-
-            {/* Tipo e animal */}
-            <ComplaintTypeAnimal
-              type={form.type}
-              animal={form.animal}
-              animalOther={form.animalOther}
-              onChangeType={(value) => updateField('type', value)}
-              onChangeAnimal={(value) => updateField('animal', value)}
-              onChangeAnimalOther={(value) =>
-                updateField('animalOther', value)
-              }
-            />
-
-            {/* Localização */}
-            <ComplaintLocation
-              locationMode={form.locationMode}
-              location={location}
-              manualLocation={manualLocation}
-              onChangeLocationMode={(value) =>
-                updateField('locationMode', value)
-              }
-              onChangeManualLocation={setManualLocation}
-            />
-
-            {/* Fotos */}
-            <PhotoSection
-              photos={form.photos}
-              setPhotos={(value) => {
-                if (typeof value === 'function') {
-                  updateField('photos', value(form.photos));
-                  return;
-                }
-
-                updateField('photos', value);
-              }}
-              maxPhotos={5}
-            />
-          </ScrollView>
+          <CreateComplaintForm
+            form={form}
+            location={location}
+            manualLocation={manualLocation}
+            onChangeManualLocation={setManualLocation}
+            onUpdateField={updateField}
+            styles={styles}
+          />
         )}
 
-        {/* Botão fixo inferior */}
-        <View style={styles.footer}>
-          <Pressable
-            style={[
-              styles.submitButton,
-              isSubmitting && styles.submitButtonDisabled,
-            ]}
-            onPress={handleSubmit}
-            disabled={isSubmitting || isLoadingEdit}
-          >
-            <Text style={styles.submitButtonText}>
-              {isSubmitting ? 'Salvando...' : isEdit ? 'Salvar' : 'Publicar'}
-            </Text>
-          </Pressable>
-        </View>
+        <CreateComplaintFooter
+          isEdit={isEdit}
+          isLoadingEdit={isLoadingEdit}
+          isSubmitting={isSubmitting}
+          onSubmit={handleSubmit}
+          styles={styles}
+        />
       </View>
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  content: {
-    padding: 16,
-    paddingBottom: 120,
-    gap: 14,
-  },
-  headerButton: {
-    color: COLORS.orange,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  headerBackContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 4,
-    paddingRight: 8,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  footer: {
-    position: 'absolute',
-    left: -25,
-    right: -25,
-    bottom: 0,
-    padding: 35,
-    backgroundColor: COLORS.background,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-    overflow: 'hidden', //  ESSENCIAL
-  },
-  submitButton: {
-    backgroundColor: COLORS.orange,
-    borderRadius: 16,
-    paddingVertical: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-     marginTop: -25, // sobe o botão
-    width: '100%', //  garante alinhamento correto
-  },
-  submitButtonDisabled: {
-    opacity: 0.7,
-  },
-  submitButtonText: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '700',
-  },
-  authRequiredScreen: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  authRequiredTitle: {
-    color: '#1C1C1E',
-    fontSize: 24,
-    fontWeight: '900',
-  },
-  authRequiredText: {
-    color: '#8A8A8E',
-    fontSize: 15,
-    lineHeight: 21,
-    textAlign: 'center',
-    marginTop: 8,
-    marginBottom: 18,
-  },
-  authRequiredButton: {
-    minHeight: 46,
-    paddingHorizontal: 18,
-    borderRadius: 999,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.orange,
-  },
-  authRequiredButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '900',
-  },
-});

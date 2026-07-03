@@ -1,15 +1,18 @@
 import { useFocusEffect } from '@react-navigation/native';
+import { Image } from 'expo-image';
 import { useCallback } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import { ErrorState } from '@/components/complaints/error-state';
-import { LoadingState } from '@/components/complaints/loading-state';
+import { ErrorState } from '@/components/complaints/states/error-state';
+import { LoadingState } from '@/components/complaints/states/loading-state';
 import { PublicProfileScreen } from '@/components/profile/public-profile-screen';
 import { useAuth } from '@/context/AuthContext';
 import { useAuthPrompt } from '@/context/AuthPromptContext';
-import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { profileStyles } from '@/styles/profile.styles';
+import { useCurrentUserProfile } from '@/hooks/profile/useCurrentUserProfile';
+import { useColorScheme } from '@/hooks/ui/useColorScheme';
+import { profileStyles } from '@/styles/profile/profile.styles';
+
+const PROFILE_BACKGROUND = require('@/assets/images/pets/perfil_bg.webp');
 
 function GuestProfileScreen() {
   const colorScheme = useColorScheme();
@@ -20,7 +23,7 @@ function GuestProfileScreen() {
     openAuthPrompt({
       title: 'Entre para ver seu perfil',
       message:
-        'Seu perfil reune as denúncias que você acompanha e suas informções públicas.',
+        'Seu perfil reúne as denúncias que você acompanha e suas informações públicas.',
     });
   }, [openAuthPrompt]);
 
@@ -32,13 +35,22 @@ function GuestProfileScreen() {
 
   return (
     <View style={styles.authRequiredScreen}>
-      <Text style={styles.authRequiredTitle}>Perfil</Text>
-      <Text style={styles.authRequiredText}>
-        Entre ou crie sua conta para acessar seu perfil.
-      </Text>
-      <Pressable style={styles.authRequiredButton} onPress={openPrompt}>
-        <Text style={styles.authRequiredButtonText}>Entrar ou criar conta</Text>
-      </Pressable>
+      <Image
+        source={PROFILE_BACKGROUND}
+        style={styles.backgroundImage}
+        contentFit="cover"
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+      />
+      <View style={styles.authRequiredCard}>
+        <Text style={styles.authRequiredTitle}>Perfil</Text>
+        <Text style={styles.authRequiredText}>
+          Entre ou crie sua conta para acessar seu perfil.
+        </Text>
+        <Pressable style={styles.authRequiredButton} onPress={openPrompt}>
+          <Text style={styles.authRequiredButtonText}>Entrar ou criar conta</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }

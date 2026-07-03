@@ -1,4 +1,4 @@
-import { useUnreadCount } from '@/hooks/useUnreadCount';
+import { useUnreadCount } from '@/hooks/notifications/useUnreadCount';
 import { styles } from '@/styles/notifications/bell.styles';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -11,7 +11,7 @@ export function NotificationBell() {
   return (
     <Pressable
       style={styles.container}
-      onPress={() => router.push('/notifications')}
+      onPress={() => router.push('/(tabs)/notifications-tab')}
     >
       <Ionicons name="notifications-outline" size={24} color="#FFFFFF" />
 

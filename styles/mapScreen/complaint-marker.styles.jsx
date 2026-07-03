@@ -1,37 +1,81 @@
 import { StyleSheet } from 'react-native';
 
 export const complaintMarkerStyles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
+  markerShell: {
+    width: 54,
+    height: 62,
     alignItems: 'center',
-    backgroundColor: 'white',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 15,
+    justifyContent: 'flex-start',
+  },
+
+  halo: {
+    position: 'absolute',
+    top: 5,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    opacity: 0.42,
+  },
+
+  pin: {
+    width: 44,
+    height: 44,
+    borderRadius: 18,
     borderWidth: 2,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
     position: 'relative',
   },
-  label: {
-    fontSize: 12,
-    fontWeight: '700',
-    marginLeft: 5,
-    color: '#333',
+
+  face: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  arrow: {
+
+  markerEmoji: {
+    fontSize: 18,
+    lineHeight: 22,
+  },
+
+  cheeks: {
     position: 'absolute',
-    bottom: -8,
-    left: '50%',
-    marginLeft: -6,
-    width: 0,
-    height: 0,
-    borderLeftWidth: 6,
-    borderRightWidth: 6,
-    borderTopWidth: 8,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
+    left: 10,
+    right: 10,
+    bottom: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+
+  cheek: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#FFB7C5',
+    opacity: 0.82,
+  },
+
+  statusDot: {
+    position: 'absolute',
+    top: -3,
+    right: -3,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+
+  pointer: {
+    width: 14,
+    height: 14,
+    marginTop: -6,
+    borderRightWidth: 2,
+    borderBottomWidth: 2,
+    borderBottomRightRadius: 4,
+    transform: [{ rotate: '45deg' }],
   },
 });

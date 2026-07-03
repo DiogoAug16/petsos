@@ -1,12 +1,12 @@
 import { StyleSheet } from 'react-native';
 
 export const createLoginStyles = (colors) => {
-  const isDark = colors.background !== '#E8F4F8';
+  const isDark = colors.background !== '#FFF6EC';
 
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: isDark ? '#1A1F2E' : '#E8F4F8',
+      backgroundColor: isDark ? '#FFF6EC' : '#FFF6EC',
     },
     scrollContent: {
       flexGrow: 1,
@@ -47,7 +47,7 @@ export const createLoginStyles = (colors) => {
       lineHeight: 20,
     },
     formCard: {
-      backgroundColor: isDark ? '#242B3D' : '#FFFFFF',
+      backgroundColor: isDark ? '#FFFCF7' : '#FFFFFF',
       borderRadius: 20,
       padding: 24,
       gap: 16,
@@ -57,7 +57,7 @@ export const createLoginStyles = (colors) => {
       shadowRadius: 12,
       elevation: 6,
       borderWidth: 1,
-      borderColor: isDark ? '#2F3749' : '#F0F0F0',
+      borderColor: isDark ? '#F0D8BF' : '#F0D8BF',
       overflow: 'visible',
     },
     titleContainer: {
@@ -114,6 +114,8 @@ export const createLoginStyles = (colors) => {
       paddingVertical: 16,
       alignItems: 'center',
       justifyContent: 'center',
+      flexDirection: 'row',
+      gap: 8,
       marginTop: 8,
       shadowColor: colors.primary,
       shadowOffset: { width: 0, height: 8 },
@@ -132,6 +134,13 @@ export const createLoginStyles = (colors) => {
       textAlign: 'center',
       marginTop: 12,
     },
+    successText: {
+      color: '#1A936F',
+      fontSize: 13,
+      fontWeight: '700',
+      textAlign: 'center',
+      lineHeight: 19,
+    },
     submitButtonText: {
       color: '#FFFFFF',
       fontSize: 16,
@@ -146,7 +155,7 @@ export const createLoginStyles = (colors) => {
     dividerLine: {
       flex: 1,
       height: 1,
-      backgroundColor: isDark ? '#2F3749' : '#E0E0E0',
+      backgroundColor: isDark ? '#F0D8BF' : '#E0E0E0',
     },
     dividerText: {
       fontSize: 14,
@@ -163,11 +172,11 @@ export const createLoginStyles = (colors) => {
       alignItems: 'center',
       justifyContent: 'center',
       gap: 8,
-      backgroundColor: isDark ? '#1A1F2E' : '#2C3E50',
+      backgroundColor: isDark ? '#FFF6EC' : '#2B2D42',
       borderRadius: 12,
       paddingVertical: 14,
       borderWidth: 1,
-      borderColor: isDark ? '#2F3749' : '#34495E',
+      borderColor: isDark ? '#F0D8BF' : '#3A3850',
     },
     socialButtonText: {
       color: '#FFFFFF',
@@ -187,6 +196,61 @@ export const createLoginStyles = (colors) => {
     link: {
       fontSize: 14,
       fontWeight: '700',
+    },
+    socialSlot: {
+      marginTop: 22,
+      marginBottom: 20,
+      gap: 14,
+    },
+    socialDivider: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      paddingHorizontal: 10,
+    },
+    socialDividerLine: {
+      flex: 1,
+      height: 1,
+      backgroundColor: '#F0D8BF',
+    },
+    socialDividerText: {
+      color: colors.tabIconDefault,
+      fontSize: 13,
+      fontWeight: '700',
+    },
+    socialSoonCard: {
+      minHeight: 64,
+      borderRadius: 20,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      backgroundColor: '#FFFFFF',
+      borderWidth: 1,
+      borderColor: '#F0D8BF',
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    socialSoonIcon: {
+      width: 40,
+      height: 40,
+      borderRadius: 14,
+      backgroundColor: '#FFF6EC',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    socialSoonCopy: {
+      flex: 1,
+    },
+    socialSoonTitle: {
+      color: colors.text,
+      fontSize: 14,
+      fontWeight: '800',
+    },
+    socialSoonText: {
+      marginTop: 2,
+      color: colors.tabIconDefault,
+      fontSize: 12,
+      fontWeight: '600',
     },
   });
 };

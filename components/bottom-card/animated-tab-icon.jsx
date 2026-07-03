@@ -23,12 +23,37 @@ export function AnimatedTabIcon({ name, nameActive, color, focused }) {
   }, [focused, opacity, scale]);
 
   return (
-    <Animated.View style={{ transform: [{ scale }] }}>
-      <Animated.View style={{ position: 'absolute', opacity }}>
-        <Ionicons name={nameActive} size={28} color={color} />
+    <Animated.View
+      style={{
+        width: 40,
+        height: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+        transform: [{ scale }],
+      }}
+    >
+      <Animated.View
+        style={{
+          position: 'absolute',
+          width: 40,
+          height: 40,
+          alignItems: 'center',
+          justifyContent: 'center',
+          opacity,
+        }}
+      >
+        <Ionicons name={nameActive} size={32} color={color} />
       </Animated.View>
-      <Animated.View style={{ opacity: Animated.subtract(1, opacity) }}>
-        <Ionicons name={name} size={28} color={color} />
+      <Animated.View
+        style={{
+          width: 40,
+          height: 40,
+          alignItems: 'center',
+          justifyContent: 'center',
+          opacity: Animated.subtract(1, opacity),
+        }}
+      >
+        <Ionicons name={name} size={32} color={color} />
       </Animated.View>
     </Animated.View>
   );

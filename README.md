@@ -76,7 +76,7 @@ petsos/
 
 - Perfil público com resumo e denúncias acompanhadas.
 - Edição de nome, foto, descrição e localização.
-- Autocomplete de cidade/UF consumindo endpoint do backend.
+- Autocomplete de cidade/UF no perfil.
 - Notificações com cache local e contador de não lidas.
 
 ## Otimizações implementadas

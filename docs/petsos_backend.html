@@ -101,10 +101,38 @@ pre { margin:0; overflow:auto; background:#1f2937; color:#f9fafb; padding:16px; 
           <h3>Integrações</h3>
           <ul class="list">
             <li>OpenRouteService para rotas por ruas.</li>
-            <li>IBGE para autocomplete de cidade/estado com cache.</li>
+            <li>Contrato <code>/locations/cities</code> consumido pelo app para sugestões de cidade/UF.</li>
             <li>Uploads locais em <code>/uploads</code> com thumbnails.</li>
           </ul>
         </article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header"><h2>Recorte do GitHub Projects</h2><span>78 itens marcados como Backend</span></div>
+        <div class="panel-body">
+          <div class="grid-three">
+            <article class="card red">
+              <h3>Moderação</h3>
+              <ul class="list">
+                <li>Campos de moderação na denúncia.</li>
+                <li>Endpoints para aprovar, rejeitar, ocultar e listar pendências.</li>
+                <li>Registro de ações administrativas para rastreabilidade.</li>
+              </ul>
+            </article>
+            <article class="card green">
+              <h3>Validação</h3>
+              <ul class="list">
+                <li>Repositório de validações por denúncia.</li>
+                <li><code>POST /api/complaints/:id/validations</code> com regra de proximidade de 5km.</li>
+                <li>Solicitação de validação com notificação para seguidores e usuários próximos.</li>
+              </ul>
+            </article>
+            <article class="card blue">
+              <h3>Entrega</h3>
+              <p>Os itens recentes de API no Project estão em <code>Done</code>, com releases v1.2.0 e v1.3.0 vinculadas às sprints 3 e 4.</p>
+            </article>
+          </div>
+        </div>
       </section>
 
       <section class="panel">
